@@ -28,6 +28,8 @@
 	<body>
 		<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">Importer</button>
 		<a href="{{path('export')}}" class="btn btn btn-primary">Exporter</a>
+		<a href="{{path('home')}}">home</a>
+		<a href="{{path('settings')}}">Parametres</a>
 		{% block body %}{% endblock %}
 
 		<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

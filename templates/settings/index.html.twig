@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello SettingsController!{% endblock %}
+
+{% block body %}
+<div class="container d-flex">
+
+    <div><button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createCategorie">Creer</button>
+    <table class="table table-striped">
+        <thead>
+            <th>Libelle</th>
+            <th></th>
+        </thead>
+        <tbody>
+            {% for item in categories %}
+                <tr>
+                    <td>{{item}}</td>
+                    <td>
+                        <a href="{{path('delete',{option: 'categorie' , id: item.id})}}" class="btn btn-danger">Supprimer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table></div> 
+    <div><button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createFilter">Creer</button>
+    <a href="{{path('sync')}}" class="btn btn-info">Synchroniser</a>
+    <table class="table table-striped">
+        <thead>
+            <th>Libelle</th>
+            <th>tags</th>
+        </thead>
+        <tbody>
+            {% for item in categories %}
+                {% if item.hasKeywords() %}
+                <tr>
+                    <td>{{item}}</td>
+                    <td>
+                        {% for tags in item.filters %}
+                            <div>{{tags.keyword}}
+                                <a href="{{path('delete',{option: 'filter' , id: tags.id})}}" class="btn btn-danger">Supprimer</a>
+                            </div>
+                        {% endfor %}
+                    
+                    </td>
+                  
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table></div>
+    </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="createCategorie" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Créer une catégorie</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      {{form_start(createCategorie)}}
+      <div class="modal-body">
+        {{form_widget(createCategorie)}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success">Créer</button>
+      </div>
+      {{form_end(createCategorie)}}
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="createFilter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Créer un Filtre</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      {{form_start(createFilter)}}
+      <div class="modal-body">
+        {{form_widget(createFilter)}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success">Créer</button>
+      </div>
+      {{form_end(createFilter)}}
+    </div>
+  </div>
+</div>
+{% endblock %}

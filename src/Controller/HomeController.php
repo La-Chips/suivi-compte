@@ -8,6 +8,7 @@ use DOMDocument;
 use App\Entity\Ligne;
 use App\Entity\Etapes;
 use App\Entity\Statut;
+use App\Entity\Categorie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,8 +21,11 @@ class HomeController extends AbstractController
     {
 
         $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findAll();
+        $to_filter = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['categorie' => null]);
         $du = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['statut' => 1]);
         $to_pay = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['statut' => 2]);
+        $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
+
 
         $du_total =
             $this->getDoctrine()->getRepository(Ligne::class)->sumDu()[0]['total'];
@@ -30,6 +34,8 @@ class HomeController extends AbstractController
 
 
         return $this->render('home/index.html.twig', [
+            'categories'=>$categories,
+            'to_filter' => $to_filter,
             'lignes' => $lignes,
             'to_pay' => $to_pay,
             'du' => $du,
@@ -73,6 +79,23 @@ class HomeController extends AbstractController
 
         return $this->redirectToRoute('home');
     }
+
+    #[Route('/categoriser', name: 'categoriser')]
+    public function categoriser(Request $request)
+    {
+        foreach ($request->request as $key => $value) {
+            $ligne = explode('_',$key)[1];
+            $ligne = $this->getDoctrine()->getRepository(Ligne::class)->find($ligne);
+            $categorie = $this->getDoctrine()->getRepository(Categorie::class)->find($value);
+
+            $ligne->setCategorie($categorie);
+            $this->getDoctrine()->getManager()->flush();
+
+        }
+        return $this->redirectToRoute('home');
+    }
+
+
     #[Route('/export', name: 'export')]
     public function export(Request $request): Response
     {
@@ -122,8 +145,10 @@ class HomeController extends AbstractController
                                 $ligne->setDate($date);
                             } elseif (str_contains($class, 'Operation-value-')) {
                                 $montant = substr($value, 0, -8);
+                                
                                 $montant = str_replace(' ', '', $montant);
-                                $ligne->setMontant(floatval($montant));
+                                $montant = str_replace(',', '.', $montant);
+                                $ligne->setMontant((float)$montant);
                             } elseif (str_contains($class, 'main')) {
                                 $type = $item->childNodes[1]->nodeValue;
                                 $libelle = $item->childNodes[3]->nodeValue;

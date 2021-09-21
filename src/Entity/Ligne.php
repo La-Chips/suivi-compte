@@ -47,6 +47,11 @@ class Ligne
      */
     private $statut;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Categorie::class, inversedBy="lignes")
+     */
+    private $categorie;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -120,6 +125,18 @@ class Ligne
     public function setStatut(?Statut $statut): self
     {
         $this->statut = $statut;
+
+        return $this;
+    }
+
+    public function getCategorie(): ?categorie
+    {
+        return $this->categorie;
+    }
+
+    public function setCategorie(?categorie $categorie): self
+    {
+        $this->categorie = $categorie;
 
         return $this;
     }
