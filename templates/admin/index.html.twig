@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello AdminController!
+{% endblock %}
+
+{% block body %}
+
+	{{form_start(add_statut)}}
+	{{form_end(add_statut)}}
+
+	<table class="table table-striped text-center w-25">
+		<thead>
+			<tr>
+				<th>Libelle</th>
+
+			</tr>
+		</thead>
+		<tbody>
+			{% for item in statuts %}
+				<tr>
+					<td>{{item}}</td>
+
+				</tr>
+			{% endfor %}
+
+		</tbody>
+	</table>
+{% endblock %}
