@@ -24,3 +24,4 @@ doctrine:
         MONTH: DoctrineExtensions\Query\Mysql\Month
         DAY: DoctrineExtensions\Query\Mysql\Day
         DATEADD: DoctrineExtensions\Query\Mysql\DateAdd
+        ROUND: DoctrineExtensions\Query\Mysql\Round

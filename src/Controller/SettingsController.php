@@ -25,19 +25,19 @@ class SettingsController extends AbstractController
         $createCategorie->handleRequest($request);
 
 
-        if($createCategorie->isSubmitted() && $createCategorie->isValid()){
+        if ($createCategorie->isSubmitted() && $createCategorie->isValid()) {
             $em->persist($categorie);
             $em->flush();
 
             return $this->redirectToRoute('settings');
         }
 
-        
+
         $filter = new Filter();
         $createFilter = $this->createForm(CreateFilterType::class, $filter);
         $createFilter->handleRequest($request);
 
-        if($createFilter->isSubmitted() && $createFilter->isValid()){
+        if ($createFilter->isSubmitted() && $createFilter->isValid()) {
             $em->persist($filter);
             $em->flush();
 
@@ -45,7 +45,7 @@ class SettingsController extends AbstractController
         }
 
         return $this->render('settings/index.html.twig', [/*  */
-            'categories'=>$categories,
+            'categories' => $categories,
             'createCategorie' => $createCategorie->createView(),
             'createFilter' => $createFilter->createView(),
 
@@ -53,7 +53,7 @@ class SettingsController extends AbstractController
     }
 
     #[Route('/delete/{option}/{id}', name: 'delete')]
-    public function delete($option,$id)
+    public function delete($option, $id)
     {
         $em = $this->getDoctrine()->getManager();
         switch ($option) {
@@ -62,12 +62,12 @@ class SettingsController extends AbstractController
                 $em->remove($categorie);
                 $em->flush();
                 break;
-             case 'filter':
+            case 'filter':
                 $filter = $this->getDoctrine()->getRepository(Filter::class)->find($id);
                 $em->remove($filter);
                 $em->flush();
                 break;
-            
+
 
             default:
                 # code...
@@ -75,7 +75,7 @@ class SettingsController extends AbstractController
         }
         return $this->redirectToRoute('settings');
     }
-    
+
     #[Route('/sync', name: 'sync')]
     public function sync()
     {
@@ -83,11 +83,17 @@ class SettingsController extends AbstractController
         $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['categorie' => null]);
         $filters = $this->getDoctrine()->getRepository(Filter::class)->findAll();
 
-        foreach ($lignes as $ligne){
-            foreach ($filters as $filter){
+        $revenu = $this->getDoctrine()->getRepository(Categorie::class)->find(5);
+        foreach ($lignes as $ligne) {
+            if ($ligne->getMontant() > 0) {
+                $ligne->setCategorie($revenu);
+                $em->flush();
+                continue;
+            }
+            foreach ($filters as $filter) {
                 $libelle = strtolower($ligne->getLibelle());
                 $kw = strtolower($filter->getKeyword());
-                if(str_contains($libelle,$kw)){
+                if (str_contains($libelle, $kw)) {
                     $ligne->setCategorie($filter->getCategorie());
                     $em->flush();
                 }

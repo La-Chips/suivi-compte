@@ -34,13 +34,37 @@ class HomeController extends AbstractController
 
 
         return $this->render('home/index.html.twig', [
-            'categories'=>$categories,
+            'categories' => $categories,
             'to_filter' => $to_filter,
             'lignes' => $lignes,
             'to_pay' => $to_pay,
             'du' => $du,
             'total_to_pay' => $to_pay_total,
             'total_du' => $du_total,
+        ]);
+    }
+
+    #[Route('/resume', name: 'resume')]
+    public function resume()
+    {
+        $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
+
+        $sumByMonth = $this->getDoctrine()->getRepository(Ligne::class)->sumByMonthByCat();
+
+
+        return $this->render('home/resume.html.twig', [
+            'categories' => $categories,
+            'sumByMonth' => $sumByMonth,
+        ]);
+    }
+    #[Route('/resume/see/{year}/{month}', name: 'resume.see')]
+    public function see($year, $month)
+    {
+        $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findByMonth($year, $month);
+
+
+        return $this->render('home/see.html.twig', [
+            'lignes' => $lignes
         ]);
     }
 
@@ -84,13 +108,12 @@ class HomeController extends AbstractController
     public function categoriser(Request $request)
     {
         foreach ($request->request as $key => $value) {
-            $ligne = explode('_',$key)[1];
+            $ligne = explode('_', $key)[1];
             $ligne = $this->getDoctrine()->getRepository(Ligne::class)->find($ligne);
             $categorie = $this->getDoctrine()->getRepository(Categorie::class)->find($value);
 
             $ligne->setCategorie($categorie);
             $this->getDoctrine()->getManager()->flush();
-
         }
         return $this->redirectToRoute('home');
     }
@@ -145,9 +168,12 @@ class HomeController extends AbstractController
                                 $ligne->setDate($date);
                             } elseif (str_contains($class, 'Operation-value-')) {
                                 $montant = substr($value, 0, -8);
-                                
+
+                                $montant = str_replace('+', '', $montant);
                                 $montant = str_replace(' ', '', $montant);
+                                $montant = str_replace(chr(194) . chr(160), '', $montant);
                                 $montant = str_replace(',', '.', $montant);
+
                                 $ligne->setMontant((float)$montant);
                             } elseif (str_contains($class, 'main')) {
                                 $type = $item->childNodes[1]->nodeValue;

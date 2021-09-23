@@ -19,6 +19,52 @@ class LigneRepository extends ServiceEntityRepository
         parent::__construct($registry, Ligne::class);
     }
 
+    public function getMonth($year)
+    {
+        $qb = $this->createQueryBuilder('line')
+            ->select('DISTINCT MONTHNAME(line.date) as month')
+            ->where('YEAR(line.date) = :year')
+            ->setParameter('year', $year);
+
+        $result = $qb->getQuery()->getResult();
+        return $result;
+    }
+
+    public function getSumCatByMonth($monthname)
+    {
+        $qb = $this->createQueryBuilder('line')
+            ->LeftJoin('line.categorie', 'cat')
+            ->select('cat.libelle as libelle , ROUND(sum(line.montant),2) as total')
+            ->where('MONTHNAME(line.date) = :monthname')
+            ->setParameter('monthname', $monthname)
+            ->groupBy('cat');
+
+        $result = $qb->getQuery()->getResult();
+
+        $out = array();
+
+        foreach ($result as $key => $value) {
+            $out[$value['libelle']] = $value['total'];
+        }
+
+        return $out;
+    }
+
+    public function sumByMonthByCat()
+    {
+        $monthname = $this->getMonth(2021);
+
+        $out = array();
+
+        foreach ($monthname as $key => $value) {
+            $value = $value['month'];
+            $out[$value] = $this->getSumCatByMonth($value);
+        }
+
+
+        return $out;
+    }
+
     // /**
     //  * @return Ligne[] Returns an array of Ligne objects
     //  */
@@ -48,11 +94,11 @@ class LigneRepository extends ServiceEntityRepository
     }
     */
 
-    public function findByMonth()
+    public function findByMonth($year, $monthname)
     {
         $qb = $this->createQueryBuilder('l')
-            ->select('count(l.id)')
-            ->groupBy('MONTH(l.date)');
+            ->where('MONTHNAME(l.date) = :month and YEAR(l.date) = :year')
+            ->setParameters(array('year' => $year, 'month' => $monthname));
 
         return $qb->getQuery()->getResult();
     }

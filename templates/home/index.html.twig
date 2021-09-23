@@ -4,212 +4,183 @@
 {% endblock %}
 
 {% block stylesheets %}
-<link rel="stylesheet" href="/css/home.css">
+	<link rel="stylesheet" href="/css/home.css">
 {% endblock %}
 
 {% block body %}
 
-<div >
-	<div class="d-flex mx-3">
-		<fieldset>
-			<legend>Montant a payer</legend>
-			<div>
-				<table class="table table-striped text-center">
+	<div>
+		<div class="d-flex mx-3">
+			<fieldset>
+				<legend>Montant a payer</legend>
+				<div>
+					{% if to_pay | length > 0 %}
+
+						<table class="table table-striped text-center">
 
 
-					<thead>
+							<thead>
 
-						<tr>
+								<tr>
 
-							<th>Date</th>
-							<th>Type</th>
-							<th>Libelle</th>
-							<th>Montant</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for item in to_pay %}
-						<tr>
-							<td>{{item.date}}</td>
-							<td>{{item.type}}</td>
-							<td>{{item.libelle}}</td>
-							<td>{{item.montant}}
-								€</td>
-							<td>
-								<a href="{{path('line.set.statut',{id:item.id,statut : 3})}}"
-									class="btn btn-info">Payée</a>
-							</td>
+									<th>Date</th>
+									<th>Type</th>
+									<th>Libelle</th>
+									<th>Montant</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for item in to_pay %}
+									<tr>
+										<td>{{item.date}}</td>
+										<td>{{item.type}}</td>
+										<td>{{item.libelle}}</td>
+										<td>{{item.montant}}
+											€</td>
+										<td>
+											<a href="{{path('line.set.statut',{id:item.id,statut : 3})}}" class="btn btn-info">Payée</a>
+										</td>
 
-						</tr>
-						{% endfor %}
-						<tr>
-							<td></td>
-						</tr>
-						<tr>
-							<td></td>
-							<td></td>
-							<td>TOTAL :</td>
-							<td>{{total_to_pay}}€</td>
+									</tr>
 
-							<td></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+								{% endfor %}
+								<tr>
+									<td></td>
+								</tr>
+								<tr>
+									<td></td>
+									<td></td>
+									<td>TOTAL :</td>
+									<td>{{total_to_pay}}€</td>
 
-		</fieldset>
-		<fieldset>
-			<legend>Montant dû</legend>
-			<div>
-				<table class="table table-striped text-center">
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+					{% else %}
+						<div>
+							Il n'y a rien a payer.
+						</div>
+					{% endif %}
+				</div>
 
-
-					<thead>
-
-						<tr>
-
-							<th>Date</th>
-							<th>Type</th>
-							<th>Libelle</th>
-							<th>Montant</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for item in du %}
-						<tr>
-							<td>{{item.date}}</td>
-							<td>{{item.type}}</td>
-							<td>{{item.libelle}}</td>
-							<td>{{item.montant}}
-								€</td>
-							<td>
-								<a href="{{path('line.set.statut',{id:item.id,statut : 4})}}"
-									class="btn btn-info">Soldée</a>
-							</td>
+			</fieldset>
+			<fieldset>
+				<legend>Montant dû</legend>
+				<div>
+					{% if du | length > 0 %}
+						<table class="table table-striped text-center">
 
 
-						</tr>
-						{% endfor %}
-						<tr>
-							<td></td>
-						</tr>
-						<tr>
-							<td></td>
-							<td></td>
-							<td>TOTAL :</td>
-							<td>{{total_du}}€</td>
-							<td></td>
-						</tr>
+							<thead>
 
-					</tbody>
-				</table>
-			</div>
+								<tr>
 
-		</fieldset>
+									<th>Date</th>
+									<th>Type</th>
+									<th>Libelle</th>
+									<th>Montant</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for item in du %}
+									<tr>
+										<td>{{item.date}}</td>
+										<td>{{item.type}}</td>
+										<td>{{item.libelle}}</td>
+										<td>{{item.montant}}
+											€</td>
+										<td>
+											<a href="{{path('line.set.statut',{id:item.id,statut : 4})}}" class="btn btn-info">Soldée</a>
+										</td>
+
+
+									</tr>
+
+								{% endfor %}
+								<tr>
+									<td></td>
+								</tr>
+								<tr>
+									<td></td>
+									<td></td>
+									<td>TOTAL :</td>
+									<td>{{total_du}}€</td>
+									<td></td>
+								</tr>
+
+							</tbody>
+						</table>
+					{% else %}
+						<div>Vous n'avez rien à recevoir</div>
+					{% endif %}
+				</div>
+
+			</fieldset>
+		</div>
+		<div class="d-flex flex-column mx-3">
+			<fieldset class="me-3">
+				<legend>Opération à catégoriser ({{to_filter | length}})</legend>
+				<form action="{{path('categoriser')}}" method="post">
+
+
+					<table class="table table-striped me-3">
+						<thead>
+
+							<tr>
+								<th>Categorie</th>
+								<th>Date</th>
+								<th>Type</th>
+								<th>Libelle</th>
+								<th>Montant</th>
+								<th>
+									<button type="submit" class="btn btn-success">Valider</button>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for item in to_filter %}
+								<tr>
+									{% if item.categorie != null %}
+										{% set bg = "bg-"~item.categorie.color %}
+									{% else %}
+										{% set bg = 'none' %}
+									{% endif %}
+									<td {% if bg is defined %} class="{{bg}}" {% endif %}>{{item.categorie}}</td>
+									<td>{{item.date}}</td>
+									<td>{{item.type}}</td>
+									<td>{{item.libelle}}</td>
+									<td>{{item.montant}}
+										€</td>
+
+									<td class="d-flex justify-content-between p-1">
+										<select name="categorie_{{item.id}}" id="ligne_{{item.id}}" class="form-select">
+											<option value="null"></option>
+											{% for cat in categories %}
+												<option value="{{cat.id}}">{{cat}}</option>
+											{% endfor %}
+
+										</select>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+
+					</table>
+				</form>
+
+			</fieldset>
+
+			<fieldset>
+				<legend></legend>
+				{% include "./templates/tables_lignes.html.twig" with {lignes : lignes} %}
+
+			</fieldset>
+		</div>
+
 	</div>
-	<div class="d-flex mx-3">
-		<fieldset class="me-3">
-			<legend>Opération à catégoriser ({{to_filter | length}})</legend>
-			<form action="{{path('categoriser')}}" method="post">
-
-
-				<table class="table table-striped me-3">
-					<thead>
-	
-						<tr>
-							<th>Categorie</th>
-							<th>Date</th>
-							<th>Type</th>
-							<th>Libelle</th>
-							<th>Montant</th>
-							<th>
-								<button type="submit" class="btn btn-success">Valider</button>
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for item in to_filter %}
-						<tr>
-							{% if item.categorie != null %}
-							{% set bg = "bg-"~item.categorie.color %}
-							{% else %}
-							{% set bg = 'none' %}
-							{% endif %}
-							<td {% if bg is defined %}class="{{bg}}" {% endif %}>{{item.categorie}}</td>
-							<td>{{item.date}}</td>
-							<td>{{item.type}}</td>
-							<td>{{item.libelle}}</td>
-							<td>{{item.montant}}
-								€</td>
-	
-							<td class="d-flex justify-content-between p-1">
-								<select name="categorie_{{item.id}}" id="ligne_{{item.id}}" class="form-select">
-									<option value="null"></option>
-									{% for cat in categories %}
-									<option value="{{cat.id}}">{{cat}}</option>
-									{% endfor %}
-	
-								</select>
-							</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-	
-				</table>
-			</form>
-
-		</fieldset>
-
-		<fieldset>
-			<legend></legend>
-			<table class="table table-striped text-center">
-
-
-				<thead>
-	
-					<tr>
-						<th>Categorie</th>
-	
-						<th>Date</th>
-						<th>Type</th>
-						<th>Libelle</th>
-						<th>Montant</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for item in lignes %}
-					<tr>
-						{% if item.categorie != null %}
-						{% set bg = "bg-"~item.categorie.color %}
-						{% else %}
-						{% set bg = 'none' %}
-						{% endif %}
-						<td {% if bg is defined %}class="{{bg}}" {% endif %}>{{item.categorie}}</td>
-	
-						<td>{{item.date}}</td>
-						<td>{{item.type}}</td>
-						<td>{{item.libelle}}</td>
-						<td>{{item.montant}}
-							€</td>
-	
-						<td class="d-flex justify-content-between p-1">
-							<a href="{{path('line.set.statut',{id : item.id,statut : 1})}}"
-								class="btn btn-success m-1">Dû</a>
-							<a href="{{path('line.set.statut',{id : item.id,statut : 2})}}" class="btn btn-danger m-1">A
-								Payer</a>
-	
-						</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</fieldset>
-	</div>
-
-</div>
 
 
 {% endblock %}
