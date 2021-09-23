@@ -34,6 +34,7 @@ class HomeController extends AbstractController
 
 
         return $this->render('home/index.html.twig', [
+            'active' => 'home',
             'categories' => $categories,
             'to_filter' => $to_filter,
             'lignes' => $lignes,
@@ -53,6 +54,8 @@ class HomeController extends AbstractController
 
 
         return $this->render('home/resume.html.twig', [
+            'active' => 'resume',
+
             'categories' => $categories,
             'sumByMonth' => $sumByMonth,
         ]);
@@ -100,10 +103,39 @@ class HomeController extends AbstractController
 
                 break;
         }
+        $this->sync();
 
         return $this->redirectToRoute('home');
     }
 
+
+    #[Route('/sync', name: 'sync')]
+    public function sync()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['categorie' => null]);
+        $filters = $this->getDoctrine()->getRepository(Filter::class)->findAll();
+
+        $revenu = $this->getDoctrine()->getRepository(Categorie::class)->find(5);
+        foreach ($lignes as $ligne) {
+            if ($ligne->getMontant() > 0) {
+                $ligne->setCategorie($revenu);
+                $em->flush();
+                continue;
+            }
+            foreach ($filters as $filter) {
+                $libelle = strtolower($ligne->getLibelle());
+                $kw = strtolower($filter->getKeyword());
+                if (str_contains($libelle, $kw)) {
+                    $ligne->setCategorie($filter->getCategorie());
+                    $em->flush();
+                }
+            }
+        }
+
+
+        return $this->redirectToRoute('settings');
+    }
     #[Route('/categoriser', name: 'categoriser')]
     public function categoriser(Request $request)
     {

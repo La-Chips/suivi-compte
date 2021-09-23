@@ -10,7 +10,7 @@
 {% block body %}
 
 	<div>
-		<div class="d-flex mx-3">
+		<div class="d-flex justify-content-around mx-3">
 			<fieldset>
 				<legend>Montant a payer</legend>
 				<div>
@@ -33,7 +33,8 @@
 							<tbody>
 								{% for item in to_pay %}
 									<tr>
-										<td>{{item.date}}</td>
+										<td>{{ item.date ? item.date|date('Y-m-d H:i:s') : '' }}</td>
+
 										<td>{{item.type}}</td>
 										<td>{{item.libelle}}</td>
 										<td>{{item.montant}}
@@ -87,7 +88,9 @@
 							<tbody>
 								{% for item in du %}
 									<tr>
-										<td>{{item.date}}</td>
+										<td>{{ item.date ? item.date|date('Y-m-d H:i:s') : '' }}</td>
+
+
 										<td>{{item.type}}</td>
 										<td>{{item.libelle}}</td>
 										<td>{{item.montant}}
@@ -149,7 +152,9 @@
 										{% set bg = 'none' %}
 									{% endif %}
 									<td {% if bg is defined %} class="{{bg}}" {% endif %}>{{item.categorie}}</td>
-									<td>{{item.date}}</td>
+									<td>{{ item.date ? item.date|date('Y-m-d H:i:s') : '' }}</td>
+
+
 									<td>{{item.type}}</td>
 									<td>{{item.libelle}}</td>
 									<td>{{item.montant}}

@@ -1,3 +1,5 @@
+<a href="{{path('ligne_new')}}" class="btn btn-success">Ajouter</a>
+
 <table class="table table-striped text-center">
 
 
@@ -11,6 +13,7 @@
 			<th>Libelle</th>
 			<th>Montant</th>
 			<th></th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -23,7 +26,9 @@
 				{% endif %}
 				<td {% if bg is defined %} class="{{bg}}" {% endif %}>{{item.categorie}}</td>
 
-				<td>{{item.date}}</td>
+				<td>{{ item.date ? item.date|date('Y-m-d H:i:s') : '' }}</td>
+
+
 				<td>{{item.type}}</td>
 				<td>{{item.libelle}}</td>
 				<td>{{item.montant}}
@@ -32,7 +37,11 @@
 				<td class="d-flex justify-content-between p-1">
 					<a href="{{path('line.set.statut',{id : item.id,statut : 1})}}" class="btn btn-success m-1">Dû</a>
 					<a href="{{path('line.set.statut',{id : item.id,statut : 2})}}" class="btn btn-danger m-1">A
-																																																																																																																								Payer</a>
+																																																																																																																																																																		Payer</a>
+
+				</td>
+				<td>
+					<a href="{{path('ligne_edit',{id : item.id})}}" class="btn btn-info m-1">Modifier</a>
 
 				</td>
 			</tr>

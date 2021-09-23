@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Ligne
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<h1>Create new Ligne</h1>
+
+		<div class="container">{{ include('ligne/_form.html.twig') }}</div>
+
+
+		<a href="{{ path('resume') }}" class="btn btn-dark">Retour</a>
+	</div>
+
+{% endblock %}

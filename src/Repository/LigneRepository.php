@@ -19,6 +19,14 @@ class LigneRepository extends ServiceEntityRepository
         parent::__construct($registry, Ligne::class);
     }
 
+    public function findAll()
+    {
+        $qb = $this->createQueryBuilder('l')
+            ->orderBy('l.date', 'DESC');
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function getMonth($year)
     {
         $qb = $this->createQueryBuilder('line')
@@ -98,7 +106,8 @@ class LigneRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('l')
             ->where('MONTHNAME(l.date) = :month and YEAR(l.date) = :year')
-            ->setParameters(array('year' => $year, 'month' => $monthname));
+            ->setParameters(array('year' => $year, 'month' => $monthname))
+            ->orderBy('l.date', 'DESC');
 
         return $qb->getQuery()->getResult();
     }

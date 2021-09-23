@@ -59,7 +59,7 @@ class Ligne
 
     public function getDate()
     {
-        return $this->date->format('d/m/Y');
+        return $this->date;
     }
 
     public function setDate(\DateTimeInterface $date): self
