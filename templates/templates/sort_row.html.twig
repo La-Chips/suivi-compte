@@ -1,0 +1,10 @@
+<div class="d-flex flex-column align-items-center mx-2">
+	<a href="?sort={{col}}&order=ASC">
+
+		<img src="/img/caret.svg" alt="" class="caret-up{% if sort == col and order == 'ASC' %} caret active{% endif %}">
+
+
+	</a>
+	<a href="?sort={{col}}&order=DESC"><img src="/img/caret.svg" alt="" {% if sort == col and order == 'DESC' %} class="caret active" {% endif %}></a>
+
+</div>

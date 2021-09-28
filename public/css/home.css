@@ -5,3 +5,14 @@ fieldset {
     padding: 1rem;
     background-color: white;
 }
+
+.caret-up {
+    transform: rotate(180deg);
+}
+
+.caret.active {
+    background-color: white;
+    filter: invert(1);
+    border: solid 1px black;
+    border-radius: 5px;
+}

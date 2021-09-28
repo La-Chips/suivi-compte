@@ -17,10 +17,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'home')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $sort = $request->query->get('sort');
+        $order = $request->query->get('order');
+        if ($order == null) {
+            $sort = 'date';
+            $order = 'DESC';
+        }
 
-        $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findAll();
+        $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findBy(array(), array($sort => $order));
         $to_filter = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['categorie' => null]);
         $du = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['statut' => 1]);
         $to_pay = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['statut' => 2]);
@@ -33,6 +39,7 @@ class HomeController extends AbstractController
             $this->getDoctrine()->getRepository(Ligne::class)->sumToPay()[0]['total'];
 
 
+
         return $this->render('home/index.html.twig', [
             'active' => 'home',
             'categories' => $categories,
@@ -42,6 +49,8 @@ class HomeController extends AbstractController
             'du' => $du,
             'total_to_pay' => $to_pay_total,
             'total_du' => $du_total,
+            'sort' => $sort,
+            'order' => $order,
         ]);
     }
 
@@ -61,13 +70,17 @@ class HomeController extends AbstractController
         ]);
     }
     #[Route('/resume/see/{year}/{month}', name: 'resume.see')]
-    public function see($year, $month)
+    public function see($year, $month, Request $request)
     {
-        $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findByMonth($year, $month);
 
+        $sort = $request->query->get('sort');
+        $order = $request->query->get('order');
+        $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findByMonth($year, $month, $sort, $order);
 
         return $this->render('home/see.html.twig', [
-            'lignes' => $lignes
+            'lignes' => $lignes,
+            'sort' => $sort,
+            'order' => $order,
         ]);
     }
 

@@ -6,12 +6,53 @@
 	<thead>
 
 		<tr>
-			<th>Categorie</th>
+			<th>
 
-			<th>Date</th>
-			<th>Type</th>
-			<th>Libelle</th>
-			<th>Montant</th>
+				<div class="d-flex align-items-center">
+					<div>Categorie</div>
+					{% include "templates/sort_row.html.twig" with { sort : sort , order :order, col :'categorie'} %}
+
+				</div>
+
+			</th>
+			<th>
+
+				<div class="d-flex align-items-center">
+					<div>Date</div>
+					{% include "templates/sort_row.html.twig" with { sort : sort , order :order , col:'date'} %}
+
+				</div>
+
+			</th>
+			<th>
+
+				<div class="d-flex align-items-center">
+					<div>Type</div>
+					{% include "templates/sort_row.html.twig" with { sort : sort , order :order , col :'type'} %}
+
+				</div>
+
+			</th>
+			<th>
+
+				<div class="d-flex align-items-center">
+					<div>Libelle</div>
+					{% include "templates/sort_row.html.twig" with { sort : sort , order :order , col:'libelle'} %}
+
+				</div>
+
+			</th>
+			<th>
+
+				<div class="d-flex align-items-center">
+					<div>Montant</div>
+					{% include "templates/sort_row.html.twig" with { sort : sort , order :order , col : 'montant'} %}
+
+				</div>
+
+			</th>
+
+
 			<th></th>
 			<th></th>
 		</tr>
@@ -37,7 +78,7 @@
 				<td class="d-flex justify-content-between p-1">
 					<a href="{{path('line.set.statut',{id : item.id,statut : 1})}}" class="btn btn-success m-1">Dû</a>
 					<a href="{{path('line.set.statut',{id : item.id,statut : 2})}}" class="btn btn-danger m-1">A
-																																																																																																																																																																		Payer</a>
+																																																																																																																																																																																																																																																																																				Payer</a>
 
 				</td>
 				<td>
