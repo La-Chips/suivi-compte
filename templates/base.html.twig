@@ -17,7 +17,7 @@
 		<link rel="stylesheet" href="/css/style.css">
 		<script src="js/index.js"></script>
 		{# Run `composer require symfony/webpack-encore-bundle`
-																																																																           and uncomment the following Encore helpers to start using Symfony UX #}
+																																																																																						           and uncomment the following Encore helpers to start using Symfony UX #}
 		{% block stylesheets %}
 			{#{{ encore_entry_link_tags('app') }}#}
 		{% endblock %}
@@ -27,23 +27,26 @@
 		{% endblock %}
 	</head>
 	<body>
-		<header class="bg-dark  p-3 d-flex justify-content-between">
+		{% block header %}
+			<header class="bg-dark  p-3 d-flex justify-content-between">
 
-			<div>
-				<a href="{{path('home')}}" {% if active is defined and active == 'home' %} class="active" {% endif %}>home</a>
+				<div>
+					<a href="{{path('home')}}" {% if active is defined and active == 'home' %} class="active" {% endif %}>home</a>
 
-				<a href="{{path('resume')}}" {% if active is defined and active == 'resume' %} class="active" {% endif %}>Resumer</a>
-				<a href="{{path('settings')}}" {% if active is defined and active == 'settings' %} class="active" {% endif %}>Parametres</a>
-				<a href="{{path('compagny')}}" {% if active is defined and active == 'compagny' %} class="active" {% endif %}>Tech&Dev</a>
+					<a href="{{path('resume')}}" {% if active is defined and active == 'resume' %} class="active" {% endif %}>Resumer</a>
+					<a href="{{path('settings')}}" {% if active is defined and active == 'settings' %} class="active" {% endif %}>Parametres</a>
+					<a href="{{path('compagny')}}" {% if active is defined and active == 'compagny' %} class="active" {% endif %}>Tech&Dev</a>
 
-			</div>
-			<div>
-				<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">Importer</button>
-				<a href="{{path('export')}}" class="btn btn btn-primary">Exporter</a>
-			</div>
+				</div>
+				<div>
+					<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">Importer</button>
+					<a href="{{path('export')}}" class="btn btn btn-primary">Exporter</a>
+				</div>
 
 
-		</header>
+			</header>
+
+		{% endblock %}
 		<main>
 			{% block body %}{% endblock %}
 		</main>
@@ -67,8 +70,15 @@
 
 						</ul>
 						<div class="tab-content" id="pills-tabContent">
-							<div class="tab-pane fade" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">...</div>
-							<div class="tab-pane fade show active" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+							<div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+								<form action="{{path('import',{option:'XLS'})}}" method="post" enctype="multipart/form-data">
+									<label for="xls">XLS</label>
+									<input type="file" name="xls" id="xls">
+									<button class="btn btn-success">Ajouter</button>
+								</form>
+
+							</div>
+							<div class="tab-pane fade " id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
 
 								<form action="{{path('import',{option : 'HTML'})}}" method="POST">
 									<textarea class="form-control" name="HTML" id="textarea_HTML" cols="30" rows="10"></textarea>

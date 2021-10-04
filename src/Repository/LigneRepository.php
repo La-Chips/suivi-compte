@@ -19,6 +19,24 @@ class LigneRepository extends ServiceEntityRepository
         parent::__construct($registry, Ligne::class);
     }
 
+    public function exist(Ligne $ligne)
+    {
+        $qb = $this->createQueryBuilder('l')
+            ->where('DAY(l.date) = DAY(:date)')
+            ->andWhere('MONTH(l.date) = MONTH(:date)')
+            ->andWhere('YEAR(l.date) = YEAR(:date)')
+            ->andWhere('l.type = :type')
+            ->andWhere('l.montant = :montant')
+
+            ->setParameters(array(
+                'date' => $ligne->getDate(),
+                'type' => $ligne->getType(),
+                'montant' => $ligne->getMontant(),
+            ));
+
+        return count($qb->getQuery()->getResult()) > 0;
+    }
+
     public function findAll()
     {
         $qb = $this->createQueryBuilder('l')
@@ -133,5 +151,23 @@ class LigneRepository extends ServiceEntityRepository
             ->where('l.statut = 2');
 
         return $qb->getQuery()->getScalarResult();
+    }
+
+    public function sum()
+    {
+        $qb = $this->createQueryBuilder('l')
+            ->select('sum(l.montant) as total');
+
+        return $qb->getQuery()->getScalarResult();
+    }
+
+    public function sumByMonth($monthname)
+    {
+        $qb = $this->createQueryBuilder('l')
+            ->select('sum(l.montant) as total')
+            ->where('MONTHNAME(l.date) = :month')
+            ->setParameter('month', $monthname);
+
+        return round($qb->getQuery()->getScalarResult()[0]['total'], 2);
     }
 }

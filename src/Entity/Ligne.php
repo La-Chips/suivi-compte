@@ -52,6 +52,11 @@ class Ligne
      */
     private $categorie;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $date_insert;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,6 +142,18 @@ class Ligne
     public function setCategorie(?categorie $categorie): self
     {
         $this->categorie = $categorie;
+
+        return $this;
+    }
+
+    public function getDateInsert(): ?\DateTimeInterface
+    {
+        return $this->date_insert;
+    }
+
+    public function setDateInsert(\DateTimeInterface $date_insert): self
+    {
+        $this->date_insert = $date_insert;
 
         return $this;
     }

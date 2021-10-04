@@ -7,12 +7,16 @@ use DOMXPath;
 use DOMDocument;
 use App\Entity\Ligne;
 use App\Entity\Etapes;
+use App\Entity\Filter;
 use App\Entity\Statut;
 use App\Entity\Categorie;
+use PhpOffice\PhpSpreadsheet\Reader\Xls;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Validator\Constraints\Range;
 
 class HomeController extends AbstractController
 {
@@ -37,6 +41,8 @@ class HomeController extends AbstractController
             $this->getDoctrine()->getRepository(Ligne::class)->sumDu()[0]['total'];
         $to_pay_total =
             $this->getDoctrine()->getRepository(Ligne::class)->sumToPay()[0]['total'];
+        $sum = $this->getDoctrine()->getRepository(Ligne::class)->sum()[0]['total'];
+        $sum = round($sum, 2);
 
 
 
@@ -47,6 +53,7 @@ class HomeController extends AbstractController
             'lignes' => $lignes,
             'to_pay' => $to_pay,
             'du' => $du,
+            'sum' => $sum,
             'total_to_pay' => $to_pay_total,
             'total_du' => $du_total,
             'sort' => $sort,
@@ -77,10 +84,13 @@ class HomeController extends AbstractController
         $order = $request->query->get('order');
         $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findByMonth($year, $month, $sort, $order);
 
+        $sum = $this->getDoctrine()->getRepository(Ligne::class)->sumByMonth($month);
+
         return $this->render('home/see.html.twig', [
             'lignes' => $lignes,
             'sort' => $sort,
             'order' => $order,
+            'sum' => $sum
         ]);
     }
 
@@ -112,6 +122,10 @@ class HomeController extends AbstractController
                 $this->importLinesFromHTML($request->request->get('HTML'));
                 break;
 
+            case 'XLS':
+                $this->importLinesFromXls($request->files->get('xls'));
+
+                break;
             default:
 
                 break;
@@ -181,6 +195,110 @@ class HomeController extends AbstractController
         }
         fclose($file);
         die();
+    }
+
+    public function findMatchLinesXls($dataArray)
+    {
+        foreach ($dataArray as $key =>  $data) {
+            $date = $data['A'];
+            $date = date_create_from_format('d/m/Y', $date, new \DateTimeZone('Europe/paris'));
+
+            $type = explode("\n", $data['B'])[0];
+            $libelle = explode("\n", $data['B']);
+            array_shift($libelle);
+            $libelle = implode("\n", $libelle);
+
+
+            if ($data['C'] == null) {
+                $montant = floatval($data['D']);
+            } else {
+                $montant = floatval($data['C']) * -1;
+            }
+            $ligne = new Ligne();
+            $ligne->setDate($date);
+            $ligne->setLibelle($libelle);
+            $ligne->setType($type);
+            $ligne->setMontant($montant);
+            $ligne->setDateInsert(new \DateTime('now', new \DateTimeZone('Europe/paris')));
+
+            $exist = $this->getDoctrine()->getRepository(Ligne::class)->exist($ligne);
+            if ($exist) {
+                return $key;
+            }
+        }
+        return null;
+    }
+
+    public function importLinesFromXls($file)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+
+        $dir = $this->getParameter('xls_dir');
+        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $filename = $originalFilename . '.xlsx';
+        $path = $dir . '/' . $filename;
+
+        $file->move($dir, $filename);
+        $reader = new Xlsx();
+        $spreadsheet = $reader->load($path);
+        $worksheet = $spreadsheet->getActiveSheet();
+
+        $highestRow = $worksheet->getHighestRow(); // e.g. 10
+        $highestColumn = $worksheet->getHighestColumn();
+
+        $range = 'A11:' . $highestColumn . $highestRow;
+
+        $dataArray = $spreadsheet->getActiveSheet()
+            ->rangeToArray(
+                $range,     // The worksheet range that we want to retrieve
+                NULL,        // Value that should be returned for empty cells
+                TRUE,        // Should formulas be calculated (the equivalent of getCalculatedValue() for each cell)
+                TRUE,        // Should values be formatted (the equivalent of getFormattedValue() for each cell)
+                TRUE         // Should the array be indexed by cell row and cell column
+            );
+
+        $match = $this->findMatchLinesXls($dataArray);
+
+        if ($match != null) {
+            $range = $range = 'A11:' . $highestColumn . $match;
+            $dataArray = $spreadsheet->getActiveSheet()
+                ->rangeToArray(
+                    $range,     // The worksheet range that we want to retrieve
+                    NULL,        // Value that should be returned for empty cells
+                    TRUE,        // Should formulas be calculated (the equivalent of getCalculatedValue() for each cell)
+                    TRUE,        // Should values be formatted (the equivalent of getFormattedValue() for each cell)
+                    TRUE         // Should the array be indexed by cell row and cell column
+                );
+        }
+
+
+        foreach ($dataArray as $data) {
+            $date = $data['A'];
+            $date = date_create_from_format('d/m/Y', $date, new \DateTimeZone('Europe/paris'));
+
+            $type = explode("\n", $data['B'])[0];
+            $libelle = explode("\n", $data['B']);
+            array_shift($libelle);
+            $libelle = implode("\n", $libelle);
+
+
+            if ($data['C'] == null) {
+                $montant = floatval($data['D']);
+            } else {
+                $montant = floatval($data['C']) * -1;
+            }
+            $ligne = new Ligne();
+            $ligne->setDate($date);
+            $ligne->setLibelle($libelle);
+            $ligne->setType($type);
+            $ligne->setMontant($montant);
+            $ligne->setDateInsert(new \DateTime('now', new \DateTimeZone('Europe/paris')));
+
+
+            $em->persist($ligne);
+            $em->flush();
+        }
     }
 
     public function importLinesFromHTML($html)
