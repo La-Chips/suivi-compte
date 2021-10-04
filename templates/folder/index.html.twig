@@ -3,25 +3,49 @@
 {% block title %}Hello FolderController!
 {% endblock %}
 
+{% block stylesheets %}
+	<link rel="stylesheet" href="/css/folder.css">
+{% endblock %}
+
 {% block body %}
 
 	<div>
-		<form action=""></form>
+		{{form_start(uploadFilesForm)}}
+		<input type="hidden" name="rootFolder" value="{{rootFolder.id}}">
+		{{form_end(uploadFilesForm)}}
 	</div>
 	<div>
 		<a href="" class="btn btn-success">Nouveau Dossier</a>
 	</div>
 
 
-	{% for folder in folders %}
-		{% for item in folder.getFolders() %}
-			<div class="folder">{{item}}</div>
+	<div class="m-3">
+	<h1>{{rootFolder}}</h1>
+	<div class="folder-container">
+		<div><button onclick="newFolder()"><i class="fas fa-folder-plus"></i></button></div>
+	
+	
+		{% for item in folders %}
+			<a class="folder" href="{{path('folder',{id : item.folder.id})}}"><i class="far fa-folder"></i>{{item.folder}}</a>
 		{% endfor %}
-		{% for item in folder.getFiles() %}
-			<div class="file">{{item}}</div>
-		{% endfor %}
+
+
+		{% for item in rootFolder.getFiles() %}
+			<div class="file">
+			<i class="fas fa-file"></i>
+			{{item}}</div>
 	{% else %}
-		<div>Il n'y a pas de fichier</div>
+		<div>Ce dossier est vide</div>
 	{% endfor %}
+
+			<div class="hide" id="new_folder_container"><i class="far fa-folder"></i> <input type="text" class="form-control" name="new_folder" id="new_folder_input"></div>
+
+	
+	</div>
+	</div>
+<script>
+	const rootFolder = 1;
+</script>
+<script src="/js/folder.js"></script>
 
 {% endblock %}

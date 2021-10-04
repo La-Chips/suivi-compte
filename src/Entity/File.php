@@ -32,6 +32,18 @@ class File
      */
     private $folder;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $originalName;
+
+    public function __construct($originalName, $uid,$size = null)
+    {
+        $this->name = $uid;
+        $this->originalName = $originalName;
+        $this->size = $size;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -71,5 +83,22 @@ class File
         $this->folder = $folder;
 
         return $this;
+    }
+
+    public function getOriginalName(): ?string
+    {
+        return $this->originalName;
+    }
+
+    public function setOriginalName(string $originalName): self
+    {
+        $this->originalName = $originalName;
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getOriginalName();
     }
 }

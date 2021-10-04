@@ -24,20 +24,28 @@ class Folder
      */
     private $name;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Folder::class, inversedBy="folder")
-     */
-    private $folder;
+
 
     /**
      * @ORM\OneToMany(targetEntity=File::class, mappedBy="folder")
      */
     private $files;
 
-    public function __construct()
+    /**
+     * @ORM\OneToOne(targetEntity=RootFolder::class, mappedBy="folder", cascade={"persist", "remove"})
+     */
+    private $rootFolder;
+
+
+   
+
+    public function __construct($name)
     {
         $this->folder = new ArrayCollection();
         $this->files = new ArrayCollection();
+        $this->folders = new ArrayCollection();
+        $this->name = $name;
+        $this->rootFolder = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -57,39 +65,7 @@ class Folder
         return $this;
     }
 
-    public function getFolder(): ?self
-    {
-        return $this->folder;
-    }
 
-    public function setFolder(?self $folder): self
-    {
-        $this->folder = $folder;
-
-        return $this;
-    }
-
-    public function addFolder(self $folder): self
-    {
-        if (!$this->folder->contains($folder)) {
-            $this->folder[] = $folder;
-            $folder->setFolder($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFolder(self $folder): self
-    {
-        if ($this->folder->removeElement($folder)) {
-            // set the owning side to null (unless already changed)
-            if ($folder->getFolder() === $this) {
-                $folder->setFolder(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection|File[]
@@ -120,4 +96,29 @@ class Folder
 
         return $this;
     }
+
+ 
+
+    public function __toString()
+    {
+        return $this->name;
+    }
+
+    public function getRootFolder(): ?RootFolder
+    {
+        return $this->rootFolder;
+    }
+
+    public function setRootFolder(RootFolder $rootFolder): self
+    {
+        // set the owning side of the relation if necessary
+        if ($rootFolder->getFolder() !== $this) {
+            $rootFolder->setFolder($this);
+        }
+
+        $this->rootFolder = $rootFolder;
+
+        return $this;
+    }
+
 }
