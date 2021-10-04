@@ -1,43 +1,44 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ligne index{% endblock %}
+{% block title %}Ligne index
+{% endblock %}
 
 {% block body %}
-    <h1>Ligne index</h1>
+	<h1>Ligne index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Date</th>
-                <th>Libelle</th>
-                <th>Libelle_2</th>
-                <th>Montant</th>
-                <th>Type</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for ligne in lignes %}
-            <tr>
-                <td>{{ ligne.id }}</td>
-                <td>{{ ligne.date ? ligne.date|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ ligne.libelle }}</td>
-                <td>{{ ligne.libelle2 }}</td>
-                <td>{{ ligne.montant }}</td>
-                <td>{{ ligne.type }}</td>
-                <td>
-                    <a href="{{ path('ligne_show', {'id': ligne.id}) }}">show</a>
-                    <a href="{{ path('ligne_edit', {'id': ligne.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Date</th>
+				<th>Libelle</th>
+				<th>Libelle_2</th>
+				<th>Montant</th>
+				<th>Type</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for ligne in lignes %}
+				<tr>
+					<td>{{ ligne.id }}</td>
+					<td>{{ ligne.date ? ligne.date|date('Y-m-d H:i:s') : '' }}</td>
+					<td>{{ ligne.libelle }}</td>
+					<td>{{ ligne.libelle2 }}</td>
+					<td>{{ ligne.montant }}</td>
+					<td>{{ ligne.type }}</td>
+					<td>
+						<a href="{{ path('ligne_show', {'id': ligne.id}) }}">show</a>
+						<a href="{{ path('ligne_edit', {'id': ligne.id}) }}">edit</a>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="7">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 
-    <a href="{{ path('ligne_new') }}">Create new</a>
+	<a href="{{ path('ligne_new') }}">Create new</a>
 {% endblock %}
