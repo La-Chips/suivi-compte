@@ -8,10 +8,17 @@
 {% endblock %}
 
 {% block body %}
+	<div>
+		<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">Importer</button>
+		<a href="{{path('export')}}" class="btn btn btn-primary">Exporter</a>
+	</div>
 
 	<div>
 		<div class="d-flex justify-content-around mx-3">
 			<fieldset>
+				<button class="btn btn-success">Ajouter</button>
+
+
 				<legend>Montant a payer</legend>
 				<div>
 					{% if to_pay | length > 0 %}
@@ -68,6 +75,7 @@
 
 			</fieldset>
 			<fieldset>
+				<button class=" btn btn-success">Ajouter</button>
 				<legend>Montant dû</legend>
 				<div>
 					{% if du | length > 0 %}

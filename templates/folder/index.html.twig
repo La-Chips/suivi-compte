@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello FolderController!
+{% endblock %}
+
+{% block body %}
+
+	<div>
+		<form action=""></form>
+	</div>
+	<div>
+		<a href="" class="btn btn-success">Nouveau Dossier</a>
+	</div>
+
+
+	{% for folder in folders %}
+		{% for item in folder.getFolders() %}
+			<div class="folder">{{item}}</div>
+		{% endfor %}
+		{% for item in folder.getFiles() %}
+			<div class="file">{{item}}</div>
+		{% endfor %}
+	{% else %}
+		<div>Il n'y a pas de fichier</div>
+	{% endfor %}
+
+{% endblock %}
