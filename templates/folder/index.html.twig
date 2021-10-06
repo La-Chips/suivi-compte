@@ -20,32 +20,45 @@
 
 
 	<div class="m-3">
-	<h1>{{rootFolder}}</h1>
-	<div class="folder-container">
-		<div><button onclick="newFolder()"><i class="fas fa-folder-plus"></i></button></div>
-	
-	
-		{% for item in folders %}
-			<a class="folder" href="{{path('folder',{id : item.folder.id})}}"><i class="far fa-folder"></i>{{item.folder}}</a>
-		{% endfor %}
+		<h1>{{rootFolder.getPath(path('folder',{id:0}))}}</h1>
+		<div class="folder-container">
+			<div>
+				<button onclick="newFolder()">
+					<i class="fas fa-folder-plus"></i>
+				</button>
+			</div>
 
 
-		{% for item in rootFolder.getFiles() %}
-			<div class="file">
-			<i class="fas fa-file"></i>
-			{{item}}</div>
-	{% else %}
-		<div>Ce dossier est vide</div>
-	{% endfor %}
+			{% for item in rootFolder.folders %}
+				<a class="folder" href="{{path('folder',{id : item.id})}}">
+					<i class="far fa-folder folder"></i>
 
-			<div class="hide" id="new_folder_container"><i class="far fa-folder"></i> <input type="text" class="form-control" name="new_folder" id="new_folder_input"></div>
+					{{item}}</a>
+			{% endfor %}
 
-	
+
+			{% for item in rootFolder.getFiles() %}
+				<div class="file">
+					<a href="/folder{{item.path}}" target="_blank">
+						<i class="{{item.icon}}"></i>
+					</a>
+
+
+					{{item}}</div>
+			{% else %}
+				<div>Ce dossier est vide</div>
+			{% endfor %}
+
+			<div class="hide" id="new_folder_container">
+				<i class="far fa-folder"></i>
+				<input type="text" class="form-control" name="new_folder" id="new_folder_input"></div>
+
+
+		</div>
 	</div>
-	</div>
-<script>
-	const rootFolder = 1;
-</script>
-<script src="/js/folder.js"></script>
+	<script>
+		const rootFolder = 1;
+	</script>
+	<script src="/js/folder.js"></script>
 
 {% endblock %}

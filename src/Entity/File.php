@@ -37,7 +37,12 @@ class File
      */
     private $originalName;
 
-    public function __construct($originalName, $uid,$size = null)
+    /**
+     * @ORM\ManyToOne(targetEntity=ExtentionIcon::class, inversedBy="files")
+     */
+    private $extention;
+
+    public function __construct($originalName, $uid, $size = null)
     {
         $this->name = $uid;
         $this->originalName = $originalName;
@@ -100,5 +105,29 @@ class File
     public function __toString()
     {
         return $this->getOriginalName();
+    }
+
+    public function getExtension(): ?ExtentionIcon
+    {
+        return $this->extention;
+    }
+
+    public function setExtension(?ExtentionIcon $extention): self
+    {
+        $this->extention = $extention;
+
+        return $this;
+    }
+
+    public function getIcon()
+    {
+
+        return $this->extention->getIconClass();
+    }
+
+    public function getPath()
+    {
+        $path = $this->folder->getPathURL() . '/' . $this->getName();
+        return $path;
     }
 }

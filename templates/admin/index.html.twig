@@ -3,10 +3,16 @@
 {% block title %}Hello AdminController!
 {% endblock %}
 
+{% block stylesheets %}
+
+	<link rel="stylesheet" href="/css/admin.css">
+{% endblock %}
+
+
 {% block body %}
 
 	{# {{form_start(add_statut)}}
-							{{form_end(add_statut)}} #}
+											{{form_end(add_statut)}} #}
 
 	<table class="table table-striped text-center w-25" style="display:none">
 		<thead>
@@ -27,6 +33,7 @@
 	</table>
 
 	<div class="m-3">{{ render(path('user_index', {id: app.user.id})) }}</div>
+	<div class="m-3">{{ render(path('extention_icon_index')) }}</div>
 
 
 {% endblock %}

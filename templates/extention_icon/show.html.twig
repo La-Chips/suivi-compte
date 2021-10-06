@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ExtentionIcon{% endblock %}
+
+{% block body %}
+    <h1>ExtentionIcon</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ extention_icon.id }}</td>
+            </tr>
+            <tr>
+                <th>Extension</th>
+                <td>{{ extention_icon.extension }}</td>
+            </tr>
+            <tr>
+                <th>Icon_class</th>
+                <td>{{ extention_icon.iconClass }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('extention_icon_index') }}">back to list</a>
+
+    <a href="{{ path('extention_icon_edit', {'id': extention_icon.id}) }}">edit</a>
+
+    {{ include('extention_icon/_delete_form.html.twig') }}
+{% endblock %}

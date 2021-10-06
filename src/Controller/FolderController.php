@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\ExtentionIcon;
 use App\Entity\File;
 use App\Entity\Folder;
-use App\Entity\RootFolder;
 use App\Form\UploadFilesType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,17 +15,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class FolderController extends AbstractController
 {
     #[Route('/{id}', name: 'folder')]
-    public function index(Request $request,$id): Response
+    public function index(Request $request, $id): Response
     {
         $rootFolder = $this->getDoctrine()->getRepository(Folder::class)->find($id);
-        $folders = $this->getDoctrine()->getRepository(RootFolder::class)->findBy(['rootFolder' => $rootFolder]);
 
         $em = $this->getDoctrine()->getManager();
 
         $uploadFilesForm = $this->createForm(UploadFilesType::class);
         $uploadFilesForm->handleRequest($request);
 
-        if ($uploadFilesForm->isSubmitted() && $uploadFilesForm->isValid()){
+        if ($uploadFilesForm->isSubmitted() && $uploadFilesForm->isValid()) {
             $rootFolder = $request->request->get('rootFolder');
 
             $files = $uploadFilesForm->get('files')->getData();
@@ -35,29 +34,31 @@ class FolderController extends AbstractController
 
             foreach ($files as $file) {
                 $originalFilename = $file->getClientOriginalName();
-                $filename = uniqid().'.'.$file->guessExtension();
+                $ext = $file->guessExtension();
+                $filename = uniqid() . '.' . $ext;
                 $size = $file->getSize() / 1024;
-                $size = round($size,2);
+                $size = round($size, 2);
                 $file->move($dir, $filename);
 
-                $file = new File($originalFilename,$filename,$size);
+                $ext = $this->getDoctrine()->getRepository(ExtentionIcon::class)->findOneBy(array('extension' => '.' . $ext));
+
+                $file = new File($originalFilename, $filename, $size);
                 $file->setFolder($rootFolder);
-                
+                $file->setExtension($ext);
+
                 $em->persist($file);
                 $em->flush();
-
             }
         }
 
         return $this->render('folder/index.html.twig', [
             'active' => 'folder',
-            'folders' => $folders,
             'rootFolder' => $rootFolder,
             'uploadFilesForm' => $uploadFilesForm->createView(),
         ]);
     }
 
-    #[Route('/new', name: 'folder.new')]
+    #[Route('/new/item', name: 'folder.new')]
     public function new(Request $request)
     {
         $name = $request->request->get('name');
@@ -68,17 +69,20 @@ class FolderController extends AbstractController
         $em = $this->getDoctrine()->getManager();
 
         $folder = new Folder($name);
-        $link = new RootFolder($rootFolder,$folder);
-        $folder->setRootFolder($link);
-
-
         $em->persist($folder);
         $em->flush();
 
-
-        $em->persist($link);
+        $rootFolder->addFolder($folder);
         $em->flush();
 
-        die();
+
+
+
+
+
+
+
+
+        return $this->redirectToRoute('folder', array('id' => $rootFolder->getId()));
     }
 }

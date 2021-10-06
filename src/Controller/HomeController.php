@@ -61,12 +61,12 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/resume', name: 'resume')]
-    public function resume()
+    #[Route('/resume/{year}', name: 'resume')]
+    public function resume($year)
     {
         $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
 
-        $sumByMonth = $this->getDoctrine()->getRepository(Ligne::class)->sumByMonthByCat();
+        $sumByMonth = $this->getDoctrine()->getRepository(Ligne::class)->sumByMonthByCat($year);
 
 
         return $this->render('home/resume.html.twig', [

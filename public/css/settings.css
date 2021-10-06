@@ -9,3 +9,7 @@ fieldset {
     padding: 1rem;
     background-color: white;
 }
+
+.dark-mode main {
+    color: #000;
+}

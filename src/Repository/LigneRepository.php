@@ -77,9 +77,9 @@ class LigneRepository extends ServiceEntityRepository
         return $out;
     }
 
-    public function sumByMonthByCat()
+    public function sumByMonthByCat($year)
     {
-        $monthname = $this->getMonth(2021);
+        $monthname = $this->getMonth($year);
 
         $out = array();
 

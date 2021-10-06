@@ -2,8 +2,6 @@ html,
 body,
 main {
     height: 100%;
-    background-color :rgba(43, 42, 51, 1);
-    color: #fff;
 }
 
 .bg-primary,
@@ -48,6 +46,14 @@ header a:hover {
     border-radius: 5px;
 }
 
-.hide{
+.hide {
     display: none !important;
+}
+
+
+/* dark mode  */
+
+.dark-mode {
+    background-color: rgba(43, 42, 51, 1);
+    color: #fff;
 }

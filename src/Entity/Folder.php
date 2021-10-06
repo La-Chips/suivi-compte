@@ -31,21 +31,30 @@ class Folder
      */
     private $files;
 
+
     /**
-     * @ORM\OneToOne(targetEntity=RootFolder::class, mappedBy="folder", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=Folder::class, inversedBy="folders")
      */
-    private $rootFolder;
+    private $root;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Folder::class, mappedBy="root")
+     */
+    private $folders;
 
 
-   
+
+
+
+
+
 
     public function __construct($name)
     {
-        $this->folder = new ArrayCollection();
         $this->files = new ArrayCollection();
-        $this->folders = new ArrayCollection();
         $this->name = $name;
-        $this->rootFolder = new ArrayCollection();
+        $this->rootFolders = new ArrayCollection();
+        $this->folders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -97,28 +106,87 @@ class Folder
         return $this;
     }
 
- 
+
 
     public function __toString()
     {
         return $this->name;
     }
 
-    public function getRootFolder(): ?RootFolder
-    {
-        return $this->rootFolder;
-    }
 
-    public function setRootFolder(RootFolder $rootFolder): self
+
+    public function getPath($route)
     {
-        // set the owning side of the relation if necessary
-        if ($rootFolder->getFolder() !== $this) {
-            $rootFolder->setFolder($this);
+        $route = substr($route, 0, -1);
+
+        $path =
+            $this->getName();
+
+        $folder  = $this;
+        while ($folder->getRoot() != null) {
+            $folder = $folder->getRoot();
+            echo '<a href="' . $route . $folder->getId() . '">' . $folder->getName() . '</a>';
+            echo  ' <i class="fas fa-chevron-right"></i> ';
         }
 
-        $this->rootFolder = $rootFolder;
+        return $path;
+    }
+
+    public function getPathURL()
+    {
+
+        $path = '';
+
+        $folder  = $this;
+        while ($folder->getRoot() != null) {
+            $folder = $folder->getRoot();
+            $path .= '/' . $folder->getName();
+        }
+
+        return $path;
+    }
+
+
+
+    public function getRoot(): ?self
+    {
+        return $this->root;
+    }
+
+    public function setRoot(?self $root): self
+    {
+        $this->root = $root;
 
         return $this;
     }
 
+    /**
+     * @return Collection|self[]
+     */
+    public function getFolders(): Collection
+    {
+        return $this->folders;
+    }
+
+    public function addFolder(self $folder): self
+    {
+        if (!$this->folders->contains($folder)) {
+            $this->folders[] = $folder;
+            $folder->setRoot($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFolder(self $folder): self
+    {
+        if ($this->folders->removeElement($folder)) {
+            // set the owning side to null (unless already changed)
+            if ($folder->getRoot() === $this) {
+                $folder->setRoot(null);
+            }
+        }
+
+        return $this;
+    }
 }
