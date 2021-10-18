@@ -10,7 +10,7 @@
 		<div class="container">{{ include('ligne/_form.html.twig') }}</div>
 
 
-		<a href="{{ path('resume') }}" class="btn btn-dark">Retour</a>
+		<a href="{{ path('resume',{year : "now" | date('Y')}) }}" class="btn btn-dark">Retour</a>
 	</div>
 
 {% endblock %}

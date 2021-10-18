@@ -57,6 +57,13 @@ class Ligne
      */
     private $date_insert;
 
+    public function __construct()
+    {
+        $this->date_insert = new \DateTime('now', new \DateTimeZone('Europe/paris'));
+    }
+
+
+
     public function getId(): ?int
     {
         return $this->id;

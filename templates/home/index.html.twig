@@ -16,7 +16,7 @@
 	<div>
 		<div class="d-flex justify-content-around mx-3">
 			<fieldset>
-				<button class="btn btn-success">Ajouter</button>
+				<a href="{{path('ligne_new',{option : 2})}}" class=" btn btn-success">Ajouter</a>
 
 
 				<legend>Montant a payer</legend>
@@ -75,7 +75,8 @@
 
 			</fieldset>
 			<fieldset>
-				<button class=" btn btn-success">Ajouter</button>
+				<a href="{{path('ligne_new',{option : 1})}}" class=" btn btn-success">Ajouter</a>
+
 				<legend>Montant dû</legend>
 				<div>
 					{% if du | length > 0 %}

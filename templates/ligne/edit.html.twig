@@ -10,7 +10,7 @@
 		<div class="container">{{ include('ligne/_form.html.twig', {'button_label': 'Update'}) }}
 
 			<div class="d-flex">
-				<a href="{{ path('resume') }}" class="btn btn-dark my-3">Retour</a>
+				<a href="{{ path('resume',{year : 'now' | date('Y')}) }}" class="btn btn-dark my-3">Retour</a>
 				{{ include('ligne/_delete_form.html.twig') }}</div>
 
 

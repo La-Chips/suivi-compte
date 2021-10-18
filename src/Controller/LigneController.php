@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Ligne;
+use App\Entity\Statut;
 use App\Form\LigneType;
 use App\Repository\LigneRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,8 +25,27 @@ class LigneController extends AbstractController
     #[Route('/new', name: 'ligne_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
+
+
         $ligne = new Ligne();
-        $form = $this->createForm(LigneType::class, $ligne);
+
+        if ($request->query->get('option') != null) {
+            $option = $request->query->get('option');
+            switch ($option) {
+                case 1:
+                    $statut = $this->getDoctrine()->getRepository(Statut::class)->find(1);
+                    break;
+                case 2:
+                    $statut = $this->getDoctrine()->getRepository(Statut::class)->find(2);
+
+                    break;
+
+                default:
+                    # code...
+                    break;
+            }
+        }
+        $form = $this->createForm(LigneType::class, $ligne, array('statut' => $statut));
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -59,7 +79,7 @@ class LigneController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('resume', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('resume', ['year' => Date('Y')], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('ligne/edit.html.twig', [

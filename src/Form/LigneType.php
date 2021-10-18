@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Ligne;
+use App\Entity\Statut;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,6 +18,7 @@ class LigneType extends AbstractType
         $builder
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
+                'data' => $options['date'],
 
                 // prevents rendering it as type="date", to avoid HTML5 date pickers
                 'html5' => true,
@@ -27,7 +30,14 @@ class LigneType extends AbstractType
             ->add('libelle_2')
             ->add('montant')
             ->add('type')
-            ->add('statut')
+            ->add('statut', EntityType::class, array(
+                'class' => Statut::class,
+                'choice_label' => 'libelle',
+                'data' => $options['statut'],
+                'attr' => array(
+                    'class' => 'form-select'
+                )
+            ))
             ->add('categorie');
     }
 
@@ -35,6 +45,8 @@ class LigneType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Ligne::class,
+            'date' => new \DateTime('now', new \DateTimeZone('Europe/paris')),
+            'statut' => null
         ]);
     }
 }
