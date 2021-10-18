@@ -45,8 +45,7 @@
 
 
 					{{item}}</div>
-			{% else %}
-				<div>Ce dossier est vide</div>
+
 			{% endfor %}
 
 			<div class="hide" id="new_folder_container">
@@ -57,7 +56,7 @@
 		</div>
 	</div>
 	<script>
-		const rootFolder = 1;
+		const rootFolder = {{ rootFolder.id }};
 	</script>
 	<script src="/js/folder.js"></script>
 

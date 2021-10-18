@@ -1,0 +1,61 @@
+{% block body %}
+	<div class="d-flex align-items-center">
+		<h1>Profesionnel index</h1>
+		<div>
+			<a href="{{ path('particulier_new') }}" class="btn btn-success mx-3">Create new</a>
+		</div>
+
+
+	</div>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Mail</th>
+				<th>Rue</th>
+				<th>Cp</th>
+				<th>Ville</th>
+				<th>Pays</th>
+				<th>Raison_social</th>
+				<th>Contact</th>
+				<th>Mail_2</th>
+				<th>Tel_1</th>
+				<th>Tel_2</th>
+				<th>SIRET</th>
+				<th>Image</th>
+				<th>Quota</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for profesionnel in profesionnels %}
+				<tr>
+					<td>{{ profesionnel.id }}</td>
+					<td>{{ profesionnel.mail }}</td>
+					<td>{{ profesionnel.rue }}</td>
+					<td>{{ profesionnel.cp }}</td>
+					<td>{{ profesionnel.ville }}</td>
+					<td>{{ profesionnel.pays }}</td>
+					<td>{{ profesionnel.raisonSocial }}</td>
+					<td>{{ profesionnel.contact }}</td>
+					<td>{{ profesionnel.mail2 }}</td>
+					<td>{{ profesionnel.tel1 }}</td>
+					<td>{{ profesionnel.tel2 }}</td>
+					<td>{{ profesionnel.SIRET }}</td>
+					<td>{{ profesionnel.image }}</td>
+					<td>{{ profesionnel.quota }}</td>
+					<td>
+						<a href="{{ path('profesionnel_show', {'id': profesionnel.id}) }}">show</a>
+						<a href="{{ path('profesionnel_edit', {'id': profesionnel.id}) }}">edit</a>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="15">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+{% endblock %}

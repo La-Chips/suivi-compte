@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Particulier{% endblock %}
+
+{% block body %}
+    <h1>Edit Particulier</h1>
+
+    {{ include('particulier/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('particulier_index') }}">back to list</a>
+
+    {{ include('particulier/_delete_form.html.twig') }}
+{% endblock %}

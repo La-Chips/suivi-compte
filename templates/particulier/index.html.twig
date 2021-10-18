@@ -1,0 +1,53 @@
+{% block body %}
+	<div class="d-flex align-items-center">
+		<h1>Particulier index</h1>
+		<div>
+			<a href="{{ path('particulier_new') }}" class="btn btn-success mx-3">Create new</a>
+		</div>
+
+
+	</div>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Mail</th>
+				<th>Rue</th>
+				<th>Cp</th>
+				<th>Ville</th>
+				<th>Pays</th>
+				<th>Telephone</th>
+				<th>Civilite</th>
+				<th>Nom</th>
+				<th>Prenom</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for particulier in particuliers %}
+				<tr>
+					<td>{{ particulier.id }}</td>
+					<td>{{ particulier.mail }}</td>
+					<td>{{ particulier.rue }}</td>
+					<td>{{ particulier.cp }}</td>
+					<td>{{ particulier.ville }}</td>
+					<td>{{ particulier.pays }}</td>
+					<td>{{ particulier.telephone }}</td>
+					<td>{{ particulier.civilite }}</td>
+					<td>{{ particulier.nom }}</td>
+					<td>{{ particulier.prenom }}</td>
+					<td>
+						<a href="{{ path('particulier_show', {'id': particulier.id}) }}">show</a>
+						<a href="{{ path('particulier_edit', {'id': particulier.id}) }}">edit</a>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="11">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+{% endblock %}
