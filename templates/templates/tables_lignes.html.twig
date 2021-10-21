@@ -57,10 +57,13 @@
 				{{sum}}
 				€</th>
 			<th></th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody>
+		{% set total = 0 %}
 		{% for item in lignes %}
+			{% set total = total + item.montant %}
 			<tr>
 				{% if item.categorie != null %}
 					{% set bg = "bg-"~item.categorie.color %}
@@ -76,11 +79,12 @@
 				<td>{{item.libelle}}</td>
 				<td>{{item.montant}}
 					€</td>
-
+				<td>{{total}}
+					€</td>
 				<td class="d-flex justify-content-between p-1">
 					<a href="{{path('line.set.statut',{id : item.id,statut : 1})}}" class="btn btn-success m-1">Dû</a>
 					<a href="{{path('line.set.statut',{id : item.id,statut : 2})}}" class="btn btn-danger m-1">A
-																																																																																																																																																																																																																																																																																																						Payer</a>
+																																																																																																																																																																																																																																																																																																																														Payer</a>
 
 				</td>
 				<td>
