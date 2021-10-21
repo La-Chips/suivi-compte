@@ -31,7 +31,10 @@
 
 			{% for item in rootFolder.folders %}
 				<a class="folder" href="{{path('folder',{id : item.id})}}">
-					<i class="far fa-folder folder"></i>
+
+
+					<i class="far fa-folder folder" ondrop="drop(event)" ondragenter="dragOverEnter(event)" ondragleave="dragOverOut(event)"></i>
+
 
 					{{item}}</a>
 			{% endfor %}
@@ -39,8 +42,8 @@
 
 			{% for item in rootFolder.getFiles() %}
 				<div class="file">
-					<a href="/folder{{item.path}}" target="_blank">
-						<i class="{{item.icon}}"></i>
+					<a href="/folder{{item.path}}" target="_blank" ondragstart='dragStart(event)'>
+						{{item.icon}}
 					</a>
 
 

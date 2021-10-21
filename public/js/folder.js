@@ -22,6 +22,23 @@ document.getElementById('new_folder_input').addEventListener('keypress', (e) => 
 });
 
 
+function dragStart(event) {}
+
+function dragOverEnter(event) {
+    event.preventDefault();
+    event.target.classList.add('drag-over');
+
+}
+
+function dragOverOut(event) {
+    event.preventDefault();
+    event.target.classList.remove('drag-over');
+}
+
+function drop(event) {
+    console.log(event);
+}
+
 
 // $(document).on('click', function (event) {
 //     let newFolder = docu

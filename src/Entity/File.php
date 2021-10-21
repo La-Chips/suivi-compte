@@ -121,8 +121,12 @@ class File
 
     public function getIcon()
     {
+        if ($this->extention->isImage()) {
+            echo '<img src="/folder/' . $this->getName() . '"  width="50" />';
+        } else {
 
-        return $this->extention->getIconClass();
+            echo '<i class="' . $this->extention->getIconClass() . '"></i>';
+        }
     }
 
     public function getPath()

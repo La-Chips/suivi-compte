@@ -98,6 +98,11 @@ class ExtentionIcon
         return $this;
     }
 
+    public function isImage()
+    {
+        return in_array($this->getExtension(), array('.png', '.jpg', '.jpeg', '.gif', '.tif', '.tiff'));
+    }
+
     public function __toString()
     {
         return $this->getExtension();
