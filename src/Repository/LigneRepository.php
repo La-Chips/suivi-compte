@@ -57,23 +57,25 @@ class LigneRepository extends ServiceEntityRepository
         return $result;
     }
 
-    public function getSumCatByMonth($monthname)
+    public function getSumCatByMonth($monthname, $year)
     {
         $qb = $this->createQueryBuilder('line')
-            ->LeftJoin('line.categorie', 'cat')
+            ->InnerJoin('line.categorie', 'cat')
             ->select('cat.libelle as libelle , ROUND(sum(line.montant),2) as total')
-            ->where('MONTHNAME(line.date) = :monthname')
-            ->setParameter('monthname', $monthname)
+            ->where('MONTHNAME(line.date) = :monthname and YEAR(line.date) = :year')
+            ->setParameters(array(
+                'monthname' => $monthname,
+                'year' => $year,
+            ))
             ->groupBy('cat');
 
-        $result = $qb->getQuery()->getResult();
 
+        $result = $qb->getQuery()->getResult();
         $out = array();
 
         foreach ($result as $key => $value) {
             $out[$value['libelle']] = $value['total'];
         }
-
         return $out;
     }
 
@@ -85,7 +87,7 @@ class LigneRepository extends ServiceEntityRepository
 
         foreach ($monthname as $key => $value) {
             $value = $value['month'];
-            $out[$value] = $this->getSumCatByMonth($value);
+            $out[$value] = $this->getSumCatByMonth($value, $year);
         }
 
 
