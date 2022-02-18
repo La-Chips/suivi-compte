@@ -2,3 +2,7 @@
 .dark-mode table {
     color: #FFF;
 }
+
+table.resume>thead {
+    background-color: rgba(43, 42, 51, 1);
+}

@@ -67,11 +67,12 @@ class HomeController extends AbstractController
         $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
 
         $sumByMonth = $this->getDoctrine()->getRepository(Ligne::class)->sumByMonthByCat($year);
-
+        $years = $this->getDoctrine()->getRepository(Ligne::class)->getYears();
 
         return $this->render('home/resume.html.twig', [
             'active' => 'resume',
-
+            'years' => $years,
+            'year' => $year,
             'categories' => $categories,
             'sumByMonth' => $sumByMonth,
         ]);
@@ -82,9 +83,12 @@ class HomeController extends AbstractController
 
         $sort = $request->query->get('sort');
         $order = $request->query->get('order');
+        if($sort == null){
+            $sort = 'categorie';
+        }
         $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findByMonth($year, $month, $sort, $order);
 
-        $sum = $this->getDoctrine()->getRepository(Ligne::class)->sumByMonth($month);
+        $sum = $this->getDoctrine()->getRepository(Ligne::class)->sumByMonth($month,$year);
 
         return $this->render('home/see.html.twig', [
             'lignes' => $lignes,

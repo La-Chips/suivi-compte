@@ -46,11 +46,21 @@ class LigneRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function getYears()
+    {
+        $qb = $this->createQueryBuilder('line')
+            ->select('DISTINCT YEAR(line.date) as year');
+
+        $result = $qb->getQuery()->getResult();
+        return $result;
+    }
+
     public function getMonth($year)
     {
         $qb = $this->createQueryBuilder('line')
-            ->select('DISTINCT MONTHNAME(line.date) as month')
+            ->select('DISTINCT MONTHNAME(line.date) as month,MONTH(line.date) as monthId')
             ->where('YEAR(line.date) = :year')
+            ->orderby('monthId', 'ASC')
             ->setParameter('year', $year);
 
         $result = $qb->getQuery()->getResult();
@@ -163,12 +173,13 @@ class LigneRepository extends ServiceEntityRepository
         return $qb->getQuery()->getScalarResult();
     }
 
-    public function sumByMonth($monthname)
+    public function sumByMonth($monthname,$year)
     {
         $qb = $this->createQueryBuilder('l')
             ->select('sum(l.montant) as total')
-            ->where('MONTHNAME(l.date) = :month')
-            ->setParameter('month', $monthname);
+            ->where('MONTHNAME(l.date) = :month and YEAR(l.date) = :year')
+            ->setParameters(array('year' => $year, 'month' => $monthname));
+
 
         return round($qb->getQuery()->getScalarResult()[0]['total'], 2);
     }

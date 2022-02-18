@@ -73,13 +73,16 @@ class LigneController extends AbstractController
     #[Route('/{id}/edit', name: 'ligne_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Ligne $ligne): Response
     {
-        $form = $this->createForm(LigneType::class, $ligne);
+        $form = $this->createForm(LigneType::class, $ligne,array('date' => $ligne->getDate()));
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('resume', ['year' => Date('Y')], Response::HTTP_SEE_OTHER);
+            $referer = $request->headers->get('referer');
+
+return $this->redirect($referer);
+
         }
 
         return $this->renderForm('ligne/edit.html.twig', [

@@ -1,5 +1,4 @@
 {% extends "base.html.twig" %}
-{% set year = "now" | date('Y') %}
 
 {% block stylesheets %}
 	<link rel="stylesheet" href="/css/resume.css">
@@ -8,9 +7,20 @@
 {% block body %}
 
 	<fieldset>
-		<legend>{{year}}</legend>
-		<table class="table table-striped">
-			<thead>
+		<div class="d-flex">
+		{% for item in years %}
+		{% set item = item | first %}
+		
+			{% if item == year %}
+				<legend>{{year}}</legend>
+			{% else %}
+				<a href="{{path('resume',{year : item})}}" class="btn btn-info">{{item}}</a>
+
+			{% endif %}
+		{% endfor %}
+		</div>
+		<table class="table table-striped resume">
+			<thead class="sticky-top">
 				<th></th>
 				<th>#</th>
 				{% for item in categories %}
@@ -24,7 +34,7 @@
 					{% set sum = 0 %}
 					<tr>
 						<td>
-							<a href="{{path('resume.see',{year : '2021' , month : month})}}" class="btn btn-primary">Voir</a>
+							<a href="{{path('resume.see',{year : year , month : month})}}" class="btn btn-primary">Voir</a>
 						</td>
 						<td>{{month}}</td>
 						{% for item in categories %}
