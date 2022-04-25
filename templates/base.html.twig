@@ -44,6 +44,8 @@
 					<a href="{{path('folder',{id:1})}}" {% if active is defined and active == 'folder' %} class="active" {% endif %}>Folder</a>
 					{% if app.user.isAdmin() %}
 						<a href="{{path('admin')}}">Admin</a>
+					{% else %}
+
 					{% endif %}
 					<i class="far fa-sun" onclick="switchDarkMode()"></i>
 

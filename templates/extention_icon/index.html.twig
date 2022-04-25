@@ -1,15 +1,14 @@
 {% block body %}
-	<h1>ExtentionIcon index</h1>
-	<a href="{{ path('extention_icon_new') }}" class="btn btn-success">Create new</a>
 
-
+	<h1>Index ExtentionIcon</h1>
+	<a href="{{ path('extention_icon_new') }}" class="btn btn-success">Créer nouvelle</a>
 	<table class="table">
 		<thead>
 			<tr>
-				<th>Id</th>
+				<th>ID</th>
 				<th>Extension</th>
 				<th>Icon_class</th>
-				<th>actions</th>
+				<th>Actions</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -19,16 +18,18 @@
 					<td>{{ extention_icon.extension }}</td>
 					<td>{{ extention_icon.iconClass }}</td>
 					<td>
-						<a href="{{ path('extention_icon_show', {'id': extention_icon.id}) }}">show</a>
-						<a href="{{ path('extention_icon_edit', {'id': extention_icon.id}) }}">edit</a>
+						<button class="btn btn-info m-1" onclick="window.location.href='/extention/icon/{{ extention_icon.id }}'">Afficher</button>
+						<button class="btn btn-info m-1" onclick="window.location.href='/extention/icon/{{ extention_icon.id }}/edit'">Modifier</button>
+
 					</td>
 				</tr>
 			{% else %}
 				<tr>
-					<td colspan="4">no records found</td>
+					<td colspan="4">Pas de données trouvées</td>
 				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
+
 
 {% endblock %}

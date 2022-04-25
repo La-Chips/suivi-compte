@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New ExtentionIcon{% endblock %}
+{% block title %}Nouvelle ExtentionIcon{% endblock %}
 
 {% block body %}
-    <h1>Create new ExtentionIcon</h1>
+    <h1>Créer nouvelle ExtentionIcon</h1>
 
     {{ include('extention_icon/_form.html.twig') }}
 
-    <a href="{{ path('extention_icon_index') }}">back to list</a>
+    <button class="btn btn-primary m-2" onclick="window.location.href='/admin'">Retour à la liste</button>
 {% endblock %}

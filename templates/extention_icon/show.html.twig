@@ -8,7 +8,7 @@
     <table class="table">
         <tbody>
             <tr>
-                <th>Id</th>
+                <th>ID</th>
                 <td>{{ extention_icon.id }}</td>
             </tr>
             <tr>
@@ -22,9 +22,11 @@
         </tbody>
     </table>
 
-    <a href="{{ path('extention_icon_index') }}">back to list</a>
+    <div class="d-flex">
+        <button class="btn btn-primary m-2" onclick="window.location.href='/admin'">Retour à la liste</button>
+        <button class="btn btn-info m-1" onclick="window.location.href='/extention/icon/{{ extention_icon.id }}/edit'">Modifier</button>
 
-    <a href="{{ path('extention_icon_edit', {'id': extention_icon.id}) }}">edit</a>
+        {{ include('extention_icon/_delete_form.html.twig') }}
+    </div>
 
-    {{ include('extention_icon/_delete_form.html.twig') }}
 {% endblock %}

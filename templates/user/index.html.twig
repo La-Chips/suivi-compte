@@ -1,13 +1,13 @@
 {% block body %}
-	<h1>User index</h1>
-
+	<h1>Index utilisateur</h1>
+	<button class="btn btn-success m-2" onclick="window.location.href='/user/new'">Nouvel utilisateur</button>
 	<table class="table">
 		<thead>
 			<tr>
-				<th>Id</th>
-				<th>Username</th>
+				<th>ID</th>
+				<th>Nom d'utilisateur</th>
 				<th>Roles</th>
-				<th>actions</th>
+				<th>Actions</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -17,17 +17,15 @@
 					<td>{{ user.username }}</td>
 					<td>{{ user.roles ? user.roles|json_encode : '' }}</td>
 					<td>
-						<a href="{{ path('user_show', {'id': user.id}) }}">show</a>
-						<a href="{{ path('user_edit', {'id': user.id}) }}">edit</a>
+						<button class="btn btn-primary m-1" onclick="window.location.href='/user/{{ user.id }}'">Afficher</button>
+						<button class="btn btn-info m-1" onclick="window.location.href='/user/{{ user.id }}/edit'">Modifier</button>
 					</td>
 				</tr>
 			{% else %}
 				<tr>
-					<td colspan="5">no records found</td>
+					<td colspan="5">Pas d'utilisateurs trouvés</td>
 				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
-
-	<a href="{{ path('user_new') }}">Create new</a>
 {% endblock %}
