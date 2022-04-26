@@ -57,6 +57,11 @@ class Ligne
      */
     private $date_insert;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="AllLignes")
+     */
+    private ?User $user;
+
     public function __construct()
     {
         $this->date_insert = new \DateTime('now', new \DateTimeZone('Europe/paris'));
@@ -163,5 +168,21 @@ class Ligne
         $this->date_insert = $date_insert;
 
         return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+    public function __toString()
+    {
+        return $this->id;
     }
 }

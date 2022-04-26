@@ -9,7 +9,6 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @method Ligne|null find($id, $lockMode = null, $lockVersion = null)
  * @method Ligne|null findOneBy(array $criteria, array $orderBy = null)
- * @method Ligne[]    findAll()
  * @method Ligne[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class LigneRepository extends ServiceEntityRepository
@@ -148,27 +147,32 @@ class LigneRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function sumDu()
+    public function sumDu($user): array|int|string
     {
+
         $qb = $this->createQueryBuilder('l')
             ->select('sum(l.montant) as total')
-            ->where('l.statut = 1');
+            ->where('l.statut = 1 and l.user = :user')
+            ->setParameter('user', $user->getId());
 
         return $qb->getQuery()->getScalarResult();
     }
-    public function sumToPay()
+    public function sumToPay($user)
     {
         $qb = $this->createQueryBuilder('l')
             ->select('sum(l.montant) as total')
-            ->where('l.statut = 2');
+            ->where('l.statut = 2 and l.user = :user')
+            ->setParameter('user', $user->getId());
 
         return $qb->getQuery()->getScalarResult();
     }
 
-    public function sum()
+    public function sum($user)
     {
         $qb = $this->createQueryBuilder('l')
-            ->select('sum(l.montant) as total');
+            ->select('sum(l.montant) as total')
+            ->where('l.user = :user')
+            ->setParameter('user', $user->getId());
 
         return $qb->getQuery()->getScalarResult();
     }

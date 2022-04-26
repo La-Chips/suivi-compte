@@ -6,10 +6,13 @@ use App\Entity\Ligne;
 use App\Entity\Statut;
 use App\Form\LigneType;
 use App\Repository\LigneRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+
 
 #[Route('/ligne')]
 class LigneController extends AbstractController
@@ -23,32 +26,36 @@ class LigneController extends AbstractController
     }
 
     #[Route('/new', name: 'ligne_new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    public function new(Request $request, LigneRepository $ligneRepository, UserRepository $userRepository,SessionInterface $session): Response
     {
 
 
         $ligne = new Ligne();
-
+        $statut = null;
         if ($request->query->get('option') != null) {
             $option = $request->query->get('option');
             switch ($option) {
                 case 1:
-                    $statut = $this->getDoctrine()->getRepository(Statut::class)->find(1);
+                    $statut = $ligneRepository->findOneBy(['id' => 1]);
                     break;
                 case 2:
-                    $statut = $this->getDoctrine()->getRepository(Statut::class)->find(2);
+                    $statut = $ligneRepository->findOneBy(['id' => 2]);
 
                     break;
 
                 default:
-                    # code...
+                    $statut = null;
                     break;
             }
         }
         $form = $this->createForm(LigneType::class, $ligne, array('statut' => $statut));
         $form->handleRequest($request);
 
+
         if ($form->isSubmitted() && $form->isValid()) {
+            $userID = $session->get('userID');
+            $user = $userRepository->findBy(['id' => $userID]);
+            $ligne->setUser($user[0]);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($ligne);
             $entityManager->flush();

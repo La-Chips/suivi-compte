@@ -15,6 +15,7 @@ class LigneType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+
         $builder
             ->add('date', DateType::class, [
                 'widget' => 'single_text',

@@ -42,11 +42,9 @@
 					<a href="{{path('settings')}}" {% if active is defined and active == 'settings' %} class="active" {% endif %}>Parametres</a>
 					<a href="{{path('compagny')}}" {% if active is defined and active == 'compagny' %} class="active" {% endif %}>Tech&Dev</a>
 					<a href="{{path('folder',{id:1})}}" {% if active is defined and active == 'folder' %} class="active" {% endif %}>Folder</a>
-					{% if app.user.isAdmin() %}
-						<a href="{{path('admin')}}">Admin</a>
-					{% else %}
-
-					{% endif %}
+{#					{% if app.user.isAdmin() %}#}
+{#						<a href="{{path('admin')}}">Admin</a>#}
+{#					{% endif %}#}
 					<i class="far fa-sun" onclick="switchDarkMode()"></i>
 
 				</div>

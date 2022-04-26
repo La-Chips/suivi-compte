@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use function PHPUnit\Framework\containsEqual;
+
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -37,6 +39,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string")
      */
     private $password;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Ligne::class, mappedBy="user")
+     */
+    private $AllLignes;
+
+
+    public function __construct()
+    {
+        $this->AllLignes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -125,5 +138,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isAdmin()
     {
         return in_array('ROLE_ADMIN', $this->roles);
+    }
+
+    /**
+     * @return Collection<int, Ligne>
+     */
+    public function getAllLignes(): Collection
+    {
+        return $this->AllLignes;
+    }
+
+    public function addAllLigne(Ligne $allLigne): self
+    {
+        if (!$this->AllLignes->contains($allLigne)) {
+            $this->AllLignes[] = $allLigne;
+            $allLigne->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAllLigne(Ligne $allLigne): self
+    {
+        if ($this->AllLignes->removeElement($allLigne)) {
+            // set the owning side to null (unless already changed)
+            if ($allLigne->getUser() === $this) {
+                $allLigne->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

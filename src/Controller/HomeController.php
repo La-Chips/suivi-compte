@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\LigneRepository;
+use App\Repository\UserRepository;
 use DateTime;
 use DOMXPath;
 use DOMDocument;
@@ -14,34 +16,49 @@ use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints\Range;
+
 
 class HomeController extends AbstractController
 {
-    #[Route('/', name: 'home')]
-    public function index(Request $request): Response
+    /**
+     * @var Security
+     */
+    private $security;
+
+    public function __construct(Security $security)
     {
+        $this->security = $security;
+    }
+
+    #[Route('/', name: 'home')]
+    public function index(Request $request,LigneRepository $ligneRepository,SessionInterface $session,UserRepository $userRepository): Response
+    {
+        $session->set('userID',$this->security->getUser()->getId());
+        $session->set('user',$this->security->getUser());
         $sort = $request->query->get('sort');
         $order = $request->query->get('order');
         if ($order == null) {
             $sort = 'date';
             $order = 'DESC';
         }
+        $userID = $session->get('userID');
+        $user = $userRepository->find($userID);
+        $lignes = $ligneRepository->findBy(['user'=>$userID], array($sort => $order));
+        //$lignes = $this->getDoctrine()->getRepository(Ligne::class)->findBy(array(), array($sort => $order));
+        $to_filter = $ligneRepository->findBy(['categorie' => null, 'user' => $userID]);
+        $du = $ligneRepository->findBy(['statut' => 1, 'user' => $userID]);
+        $to_pay = $ligneRepository->findBy(['statut' => 2, 'user' => $userID]);
+        $categories = $ligneRepository->findAll();
 
-        $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findBy(array(), array($sort => $order));
-        $to_filter = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['categorie' => null]);
-        $du = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['statut' => 1]);
-        $to_pay = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['statut' => 2]);
-        $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
-
-
-        $du_total =
-            $this->getDoctrine()->getRepository(Ligne::class)->sumDu()[0]['total'];
-        $to_pay_total =
-            $this->getDoctrine()->getRepository(Ligne::class)->sumToPay()[0]['total'];
-        $sum = $this->getDoctrine()->getRepository(Ligne::class)->sum()[0]['total'];
+        $du_total = $ligneRepository->sumDu($user)[0]['total'];
+        $to_pay_total = $ligneRepository->sumToPay($user)[0]['total'];
+        $sum = $ligneRepository->sum($user)[0]['total'];
         $sum = round($sum, 2);
 
 
@@ -110,14 +127,12 @@ class HomeController extends AbstractController
         $etape = new Etapes($line, $statut);
         $em->persist($etape);
         $em->flush();
-
-
         return $this->redirectToRoute('home');
     }
 
 
     #[Route('/import/{option}', name: 'import')]
-    public function import($option, Request $request): Response
+    public function import($option, Request $request,SessionInterface $session): Response
     {
 
         switch ($option) {
@@ -127,7 +142,7 @@ class HomeController extends AbstractController
                 break;
 
             case 'XLS':
-                $this->importLinesFromXls($request->files->get('xls'));
+                $this->importLinesFromXls($request->files->get('xls'),$session);
 
                 break;
             default:
@@ -233,10 +248,10 @@ class HomeController extends AbstractController
         return null;
     }
 
-    public function importLinesFromXls($file)
+    public function importLinesFromXls($file,SessionInterface $session)
     {
         $em = $this->getDoctrine()->getManager();
-
+        $user = $session->get('user');
 
         $dir = $this->getParameter('xls_dir');
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -275,8 +290,6 @@ class HomeController extends AbstractController
                     TRUE         // Should the array be indexed by cell row and cell column
                 );
         }
-
-
         foreach ($dataArray as $data) {
             $date = $data['A'];
             $date = date_create_from_format('d/m/Y', $date, new \DateTimeZone('Europe/paris'));
@@ -298,11 +311,12 @@ class HomeController extends AbstractController
             $ligne->setType($type);
             $ligne->setMontant($montant);
             $ligne->setDateInsert(new \DateTime('now', new \DateTimeZone('Europe/paris')));
-
-
+            //
             $em->persist($ligne);
             $em->flush();
+
         }
+
     }
 
     public function importLinesFromHTML($html)
