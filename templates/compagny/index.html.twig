@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CompagnyController!
+{% block title %}Tech&Dev
 {% endblock %}
 
 {% block stylesheets %}
-
-	<link rel="stylesheet" href="/css/compagny.css">
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('css/compagny.css') }}">
 {% endblock %}
 
 {% block body %}

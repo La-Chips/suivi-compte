@@ -1,13 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Profesionnel{% endblock %}
+{% block title %}Modifier contact - Tech&Dev {% endblock %}
 
 {% block body %}
-    <h1>Edit Profesionnel</h1>
+    <div class="container">
+        <h1>Modifier Contact {{ profesionnel.raisonSocial() }}</h1>
 
-    {{ include('profesionnel/_form.html.twig', {'button_label': 'Update'}) }}
+        {{ include('profesionnel/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('profesionnel_index') }}">back to list</a>
+        <a class="btn btn-dark m-2" href="{{ path('compagny') }}">Retour</a>
 
-    {{ include('profesionnel/_delete_form.html.twig') }}
+        {{ include('profesionnel/_delete_form.html.twig') }}
+    </div>
+
 {% endblock %}

@@ -59,7 +59,7 @@ class ProfesionnelController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('profesionnel_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('compagny', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('profesionnel/edit.html.twig', [
@@ -77,6 +77,6 @@ class ProfesionnelController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('profesionnel_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('compagny', [], Response::HTTP_SEE_OTHER);
     }
 }

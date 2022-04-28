@@ -1,31 +1,31 @@
 {% block body %}
 	<div class="d-flex align-items-center">
-		<h1>Profesionnel index</h1>
+		<h1>Index professionnel </h1>
 		<div>
-			<a href="{{ path('particulier_new') }}" class="btn btn-success mx-3">Create new</a>
+			<a href="{{ path('profesionnel_new') }}" class="btn btn-success mx-3">Créer nouveau contact</a>
 		</div>
 
 
 	</div>
 
-	<table class="table">
+	<table class="table text-white">
 		<thead>
 			<tr>
-				<th>Id</th>
+				<th>ID</th>
 				<th>Mail</th>
 				<th>Rue</th>
-				<th>Cp</th>
+				<th>Code Postal</th>
 				<th>Ville</th>
 				<th>Pays</th>
-				<th>Raison_social</th>
+				<th>Raison Social</th>
 				<th>Contact</th>
-				<th>Mail_2</th>
-				<th>Tel_1</th>
-				<th>Tel_2</th>
+				<th>Mail 2</th>
+				<th>Téléphone</th>
+				<th>Téléphone 2</th>
 				<th>SIRET</th>
 				<th>Image</th>
 				<th>Quota</th>
-				<th>actions</th>
+				<th>Actions</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -46,13 +46,13 @@
 					<td>{{ profesionnel.image }}</td>
 					<td>{{ profesionnel.quota }}</td>
 					<td>
-						<a href="{{ path('profesionnel_show', {'id': profesionnel.id}) }}">show</a>
-						<a href="{{ path('profesionnel_edit', {'id': profesionnel.id}) }}">edit</a>
+						<a class="btn btn-primary" href="{{ path('profesionnel_show', {'id': profesionnel.id}) }}">Afficher</a>
+						<a class="btn btn-success" href="{{ path('profesionnel_edit', {'id': profesionnel.id}) }}">Modifier</a>
 					</td>
 				</tr>
 			{% else %}
 				<tr>
-					<td colspan="15">no records found</td>
+					<td colspan="15">Pas de contacts trouvés</td>
 				</tr>
 			{% endfor %}
 		</tbody>

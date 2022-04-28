@@ -1,18 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Profesionnel{% endblock %}
+{% block title %}Contact Profesionnel - Tech&Dev {% endblock %}
 
 {% block body %}
-    <h1>Profesionnel</h1>
+    <h1>Fiche d'information {{ profesionnel.raisonSocial }}</h1>
 
-    <table class="table">
+    <table class="table text-white">
         <tbody>
             <tr>
-                <th>Id</th>
+                <th>ID</th>
                 <td>{{ profesionnel.id }}</td>
             </tr>
             <tr>
-                <th>Mail</th>
+                <th>Adresse mail</th>
                 <td>{{ profesionnel.mail }}</td>
             </tr>
             <tr>
@@ -20,7 +20,7 @@
                 <td>{{ profesionnel.rue }}</td>
             </tr>
             <tr>
-                <th>Cp</th>
+                <th>Code postal</th>
                 <td>{{ profesionnel.cp }}</td>
             </tr>
             <tr>
@@ -32,7 +32,7 @@
                 <td>{{ profesionnel.pays }}</td>
             </tr>
             <tr>
-                <th>Raison_social</th>
+                <th>Raison sociale</th>
                 <td>{{ profesionnel.raisonSocial }}</td>
             </tr>
             <tr>
@@ -40,15 +40,15 @@
                 <td>{{ profesionnel.contact }}</td>
             </tr>
             <tr>
-                <th>Mail_2</th>
+                <th>Adresse mail</th>
                 <td>{{ profesionnel.mail2 }}</td>
             </tr>
             <tr>
-                <th>Tel_1</th>
+                <th>Téléphone 1</th>
                 <td>{{ profesionnel.tel1 }}</td>
             </tr>
             <tr>
-                <th>Tel_2</th>
+                <th>Téléphone 2</th>
                 <td>{{ profesionnel.tel2 }}</td>
             </tr>
             <tr>
@@ -56,7 +56,7 @@
                 <td>{{ profesionnel.SIRET }}</td>
             </tr>
             <tr>
-                <th>Image</th>
+                <th>Logo</th>
                 <td>{{ profesionnel.image }}</td>
             </tr>
             <tr>
@@ -65,10 +65,9 @@
             </tr>
         </tbody>
     </table>
-
-    <a href="{{ path('profesionnel_index') }}">back to list</a>
-
-    <a href="{{ path('profesionnel_edit', {'id': profesionnel.id}) }}">edit</a>
-
-    {{ include('profesionnel/_delete_form.html.twig') }}
+    <div class="btn-group-vertical">
+        <a class="btn btn-dark  m-2 rounded"href="{{ path('compagny') }}">Retour</a>
+        <a class="btn btn-success m-2 rounded" href="{{ path('profesionnel_edit', {'id': profesionnel.id}) }}">Modifier</a>
+        {{ include('profesionnel/_delete_form.html.twig') }}
+        </div>
 {% endblock %}
