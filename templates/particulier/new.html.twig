@@ -1,11 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Particulier{% endblock %}
+{% block title %}Nouveau contact particulier - Tech&Dev{% endblock %}
 
 {% block body %}
-    <h1>Create new Particulier</h1>
+    <div class="container">
+        <h1>Nouveau contact particulier</h1>
 
-    {{ include('particulier/_form.html.twig') }}
+        {{ include('particulier/_form.html.twig') }}
 
-    <a href="{{ path('particulier_index') }}">back to list</a>
+        <a class="btn btn-dark m-2" href="{{ path('compagny') }}">Retour</a>
+    </div>
 {% endblock %}

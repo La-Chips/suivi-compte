@@ -3,16 +3,19 @@
 {% block title %}Particulier{% endblock %}
 
 {% block body %}
+    <div class="container">
+
+    </div>
     <h1>Particulier</h1>
 
-    <table class="table">
+    <table class="table text-white">
         <tbody>
             <tr>
-                <th>Id</th>
+                <th>ID</th>
                 <td>{{ particulier.id }}</td>
             </tr>
             <tr>
-                <th>Mail</th>
+                <th>Adresse mail</th>
                 <td>{{ particulier.mail }}</td>
             </tr>
             <tr>
@@ -20,7 +23,7 @@
                 <td>{{ particulier.rue }}</td>
             </tr>
             <tr>
-                <th>Cp</th>
+                <th>Code postale</th>
                 <td>{{ particulier.cp }}</td>
             </tr>
             <tr>
@@ -32,11 +35,11 @@
                 <td>{{ particulier.pays }}</td>
             </tr>
             <tr>
-                <th>Telephone</th>
+                <th>Téléphone</th>
                 <td>{{ particulier.telephone }}</td>
             </tr>
             <tr>
-                <th>Civilite</th>
+                <th>Civilité</th>
                 <td>{{ particulier.civilite }}</td>
             </tr>
             <tr>
@@ -44,15 +47,15 @@
                 <td>{{ particulier.nom }}</td>
             </tr>
             <tr>
-                <th>Prenom</th>
+                <th>Prénom</th>
                 <td>{{ particulier.prenom }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('particulier_index') }}">back to list</a>
+    <a class="btn btn-dark m-2" href="{{ path('compagny') }}">Retour</a>
 
-    <a href="{{ path('particulier_edit', {'id': particulier.id}) }}">edit</a>
+    <a class="btn btn-success m-2" href="{{ path('particulier_edit', {'id': particulier.id}) }}">Modifier</a>
 
     {{ include('particulier/_delete_form.html.twig') }}
 {% endblock %}
