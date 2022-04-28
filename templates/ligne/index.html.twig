@@ -5,17 +5,17 @@
 
 {% block body %}
 	<h1>Ligne index</h1>
-
-	<table class="table">
+	<a class="btn btn-success" href="{{ path('ligne_new') }}">Ajouter</a>
+	<table class="table text-white">
 		<thead>
 			<tr>
-				<th>Id</th>
+				<th>ID</th>
 				<th>Date</th>
-				<th>Libelle</th>
-				<th>Libelle_2</th>
+				<th>Libellé</th>
+				<th>Libellé 2</th>
 				<th>Montant</th>
 				<th>Type</th>
-				<th>actions</th>
+				<th>Actions</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -34,11 +34,11 @@
 				</tr>
 			{% else %}
 				<tr>
-					<td colspan="7">no records found</td>
+					<td colspan="7">Pas de données trouvées</td>
 				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 
-	<a href="{{ path('ligne_new') }}">Create new</a>
+
 {% endblock %}

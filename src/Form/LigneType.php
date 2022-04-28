@@ -21,6 +21,7 @@ class LigneType extends AbstractType
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
                 'data' => $options['date'],
+                'label' => 'Date de la transction',
 
                 // prevents rendering it as type="date", to avoid HTML5 date pickers
                 'html5' => true,
@@ -28,8 +29,12 @@ class LigneType extends AbstractType
                 // adds a class that can be selected in JavaScript
                 'attr' => ['class' => 'js-datepicker'],
             ])
-            ->add('libelle')
-            ->add('libelle_2')
+            ->add('libelle', null, [
+                'label' => 'Libellé',
+            ])
+            ->add('libelle_2', null, [
+                'label' => 'Libellé 2',
+            ])
             ->add('montant')
             ->add('type')
             ->add('statut', EntityType::class, array(
@@ -43,8 +48,8 @@ class LigneType extends AbstractType
             ->add('categorie',EntityType::class, array(
                 'class' => Categorie::class,
                 'choice_label' => 'libelle',
-                'data' => $options['categories'],
-                'empty_data' => null,
+                'label' => 'Catégorie',
+                'choices' => $options['categories'],
                 'attr' => array(
                     'class' => 'form-select'
                 )

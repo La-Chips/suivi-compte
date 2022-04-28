@@ -35,19 +35,11 @@ class LigneController extends AbstractController
         $statut = null;
         if ($request->query->get('option') != null) {
             $option = $request->query->get('option');
-            switch ($option) {
-                case 1:
-                    $statut = $statutRepository->findOneBy(['id' => 1]);
-                    break;
-                case 2:
-                    $statut = $statutRepository->findOneBy(['id' => 2]);
-
-                    break;
-
-                default:
-                    $statut = null;
-                    break;
-            }
+            $statut = match ($option) {
+                1 => $statutRepository->findOneBy(['id' => 1]),
+                2 => $statutRepository->findOneBy(['id' => 2]),
+                default => null,
+            };
         }
         $form = $this->createForm(LigneType::class, $ligne, ['statut' => $statut,'categories'=>$categories]);
         $form->handleRequest($request);
@@ -90,7 +82,7 @@ class LigneController extends AbstractController
 
             $referer = $request->headers->get('referer');
 
-return $this->redirect($referer);
+            return $this->redirect($referer);
 
         }
 
