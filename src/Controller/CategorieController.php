@@ -29,13 +29,13 @@ class CategorieController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $categorie->setUser($this->getUser());
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($categorie);
             $entityManager->flush();
 
             return $this->redirectToRoute('settings', [], Response::HTTP_SEE_OTHER);
         }
-
         return $this->renderForm('categorie/new.html.twig', [
             'categorie' => $categorie,
             'form' => $form,

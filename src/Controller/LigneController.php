@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\Entity\Ligne;
 use App\Entity\Statut;
 use App\Form\LigneType;
+use App\Repository\CategorieRepository;
 use App\Repository\LigneRepository;
+use App\Repository\StatutRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,20 +28,19 @@ class LigneController extends AbstractController
     }
 
     #[Route('/new', name: 'ligne_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, LigneRepository $ligneRepository, UserRepository $userRepository,SessionInterface $session): Response
+    public function new(Request $request, LigneRepository $ligneRepository,StatutRepository $statutRepository, UserRepository $userRepository,CategorieRepository $categorieRepository,SessionInterface $session): Response
     {
-
-
+        $categories = $categorieRepository->findBy(['User' => $this->getUser()]);
         $ligne = new Ligne();
         $statut = null;
         if ($request->query->get('option') != null) {
             $option = $request->query->get('option');
             switch ($option) {
                 case 1:
-                    $statut = $ligneRepository->findOneBy(['id' => 1]);
+                    $statut = $statutRepository->findOneBy(['id' => 1]);
                     break;
                 case 2:
-                    $statut = $ligneRepository->findOneBy(['id' => 2]);
+                    $statut = $statutRepository->findOneBy(['id' => 2]);
 
                     break;
 
@@ -48,7 +49,7 @@ class LigneController extends AbstractController
                     break;
             }
         }
-        $form = $this->createForm(LigneType::class, $ligne, array('statut' => $statut));
+        $form = $this->createForm(LigneType::class, $ligne, ['statut' => $statut,'categories'=>$categories]);
         $form->handleRequest($request);
 
 
@@ -78,9 +79,10 @@ class LigneController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'ligne_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Ligne $ligne): Response
+    public function edit(Request $request, Ligne $ligne,CategorieRepository $categorieRepository): Response
     {
-        $form = $this->createForm(LigneType::class, $ligne,array('date' => $ligne->getDate()));
+        $categories = $categorieRepository->findBy(['User' => $this->getUser()]);
+        $form = $this->createForm(LigneType::class, $ligne,array('date' => $ligne->getDate(),'categories'=>$categories));
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

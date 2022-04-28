@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 	<head>
 		<meta charset="UTF-8">
 		<title>
@@ -17,7 +17,7 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
-		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="{{ asset('css/style.css') }}">
 		{# <script src="/js/index.js"></script> #}
 		{# Run `composer require symfony/webpack-encore-bundle`
 																																																																																																																						           and uncomment the following Encore helpers to start using Symfony UX #}{% block stylesheets %}
@@ -36,10 +36,10 @@
 			<header class="bg-dark  p-3 d-flex justify-content-between">
 
 				<div>
-					<a href="{{path('home')}}" {% if active is defined and active == 'home' %} class="active" {% endif %}>home</a>
+					<a href="{{path('home')}}" {% if active is defined and active == 'home' %} class="active" {% endif %}>Accueil</a>
 
-					<a href="{{path('resume', {year:year})}}" {% if active is defined and active == 'resume' %} class="active" {% endif %}>Resumer</a>
-					<a href="{{path('settings')}}" {% if active is defined and active == 'settings' %} class="active" {% endif %}>Parametres</a>
+					<a href="{{path('resume', {year:year})}}" {% if active is defined and active == 'resume' %} class="active" {% endif %}>Résumé</a>
+					<a href="{{path('settings')}}" {% if active is defined and active == 'settings' %} class="active" {% endif %}>Paramètres</a>
 					<a href="{{path('compagny')}}" {% if active is defined and active == 'compagny' %} class="active" {% endif %}>Tech&Dev</a>
 					<a href="{{path('folder',{id:1})}}" {% if active is defined and active == 'folder' %} class="active" {% endif %}>Folder</a>
 {#					{% if app.user.isAdmin() %}#}
@@ -79,7 +79,7 @@
 							<div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
 								<form action="{{path('import',{option:'XLS'})}}" method="post" enctype="multipart/form-data">
 									<label for="xls">XLS</label>
-									<input type="file" name="xls" id="xls">
+									<input type="file" name="xls" id="xls" required>
 									<button class="btn btn-success">Ajouter</button>
 								</form>
 
@@ -87,7 +87,7 @@
 							<div class="tab-pane fade " id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
 
 								<form action="{{path('import',{option : 'HTML'})}}" method="POST">
-									<textarea class="form-control" name="HTML" id="textarea_HTML" cols="30" rows="10"></textarea>
+									<textarea class="form-control" name="HTML" id="textarea_HTML" cols="30" rows="10" required></textarea>
 									<button class="btn btn-success" type="submit">Ajouter</button>
 								</form>
 							</div>
@@ -102,4 +102,4 @@
 			</div>
 		</div>
 	</body>
-</html></body></html>
+</html>

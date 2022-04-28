@@ -7,6 +7,7 @@ use App\Entity\Filter;
 use App\Entity\Categorie;
 use App\Form\CreateFilterType;
 use App\Form\CreateCategorieType;
+use App\Repository\CategorieRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,17 +16,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class SettingsController extends AbstractController
 {
     #[Route('/settings', name: 'settings')]
-    public function index(Request $request): Response
+    public function index(Request $request,CategorieRepository $categorieRepository): Response
     {
         $em = $this->getDoctrine()->getManager();
-        $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
-
+        $categories = $categorieRepository->findBy(['User' => $this->getUser()]);
         $categorie = new Categorie();
         $createCategorie = $this->createForm(CreateCategorieType::class, $categorie);
         $createCategorie->handleRequest($request);
 
 
         if ($createCategorie->isSubmitted() && $createCategorie->isValid()) {
+            $categorie->setUser($this->getUser());
             $em->persist($categorie);
             $em->flush();
 
@@ -34,16 +35,16 @@ class SettingsController extends AbstractController
 
 
         $filter = new Filter();
-        $createFilter = $this->createForm(CreateFilterType::class, $filter);
+        $createFilter = $this->createForm(CreateFilterType::class, $filter, ['categories' => $categories]);
         $createFilter->handleRequest($request);
 
         if ($createFilter->isSubmitted() && $createFilter->isValid()) {
+            $filter->setUser($this->getUser());
             $em->persist($filter);
             $em->flush();
 
             return $this->redirectToRoute('settings');
         }
-
         return $this->render('settings/index.html.twig', [/*  */
             'active' => 'settings',
 

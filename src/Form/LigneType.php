@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Categorie;
 use App\Entity\Ligne;
 use App\Entity\Statut;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -13,9 +14,9 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class LigneType extends AbstractType
 {
+    private mixed $categories = [];
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         $builder
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
@@ -39,7 +40,15 @@ class LigneType extends AbstractType
                     'class' => 'form-select'
                 )
             ))
-            ->add('categorie');
+            ->add('categorie',EntityType::class, array(
+                'class' => Categorie::class,
+                'choice_label' => 'libelle',
+                'data' => $options['categories'],
+                'empty_data' => null,
+                'attr' => array(
+                    'class' => 'form-select'
+                )
+            ));
     }
 
     public function configureOptions(OptionsResolver $resolver)
@@ -47,7 +56,8 @@ class LigneType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Ligne::class,
             'date' => new \DateTime('now', new \DateTimeZone('Europe/paris')),
-            'statut' => null
+            'statut' => null,
+            'categories' => null,
         ]);
     }
 }

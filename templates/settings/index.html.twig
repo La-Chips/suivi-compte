@@ -26,7 +26,7 @@
 									<td>{{item}}</td>
 									<td class="d-flex">
 										<a href="{{path('delete',{option: 'categorie' , id: item.id})}}" class="btn btn-danger">
-											<img src="/img/cross-circle.svg" alt="del" width="30">
+											<img src="{{ asset('img/cross-circle.svg') }}" alt="del" width="30">
 										</a>
 										<a href="{{path('categorie_edit',{id : item.id})}}" class="btn btn-info mx-3">Modifier</a>
 									</td>
@@ -58,7 +58,7 @@
 											{% for tags in item.filters %}
 												<div class="bg-light-grey rounded-pill ps-2 m-1">{{tags.keyword}}
 													<a href="{{path('delete',{option: 'filter' , id: tags.id})}}" class="btn btn-danger py-1">
-														<img src="/img/cross-circle.svg" alt="del" width="20">
+														<img src="{{ asset('img/cross-circle.svg') }}" alt="del" width="20">
 
 													</a>
 												</div>
@@ -112,7 +112,7 @@
 					{{form_widget(createFilter)}}
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fermer</button>
 					<button type="submit" class="btn btn-success">Créer</button>
 				</div>
 				{{form_end(createFilter)}}

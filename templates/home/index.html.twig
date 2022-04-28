@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!
+{% block title %}Accueil - Tech&Dev
 {% endblock %}
 
 {% block stylesheets %}
-	<link rel="stylesheet" href="/css/home.css">
+	<link rel="stylesheet" href="{{ asset('css/home.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -19,7 +19,7 @@
 				<a href="{{path('ligne_new',{option : 2})}}" class=" btn btn-success">Ajouter</a>
 
 
-				<legend>Montant a payer</legend>
+				<legend>Montant à payer</legend>
 				<div>
 					{% if to_pay | length > 0 %}
 
@@ -65,7 +65,7 @@
 						</table>
 					{% else %}
 						<div>
-							Il n'y a rien a payer.
+							Il n'y a rien à payer.
 						</div>
 					{% endif %}
 				</div>
@@ -182,7 +182,7 @@
 
 			<fieldset>
 				<legend></legend>
-				{% include "./templates/tables_lignes.html.twig" with {lignes : lignes} %}
+				{% include "/templates/tables_lignes.html.twig" with {lignes : lignes} %}
 
 			</fieldset>
 		</div>

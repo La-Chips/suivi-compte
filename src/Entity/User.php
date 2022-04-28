@@ -45,10 +45,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $AllLignes;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Categorie::class, mappedBy="User")
+     */
+    private $categories;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Filter::class, mappedBy="user")
+     */
+    private $filters;
+
 
     public function __construct()
     {
         $this->AllLignes = new ArrayCollection();
+        $this->categories = new ArrayCollection();
+        $this->filters = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -164,6 +176,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($allLigne->getUser() === $this) {
                 $allLigne->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Categorie>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function addCategory(Categorie $category): self
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories[] = $category;
+            $category->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Categorie $category): self
+    {
+        if ($this->categories->removeElement($category)) {
+            // set the owning side to null (unless already changed)
+            if ($category->getUser() === $this) {
+                $category->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Filter>
+     */
+    public function getFilters(): Collection
+    {
+        return $this->filters;
+    }
+
+    public function addFilter(Filter $filter): self
+    {
+        if (!$this->filters->contains($filter)) {
+            $this->filters[] = $filter;
+            $filter->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFilter(Filter $filter): self
+    {
+        if ($this->filters->removeElement($filter)) {
+            // set the owning side to null (unless already changed)
+            if ($filter->getUser() === $this) {
+                $filter->setUser(null);
             }
         }
 

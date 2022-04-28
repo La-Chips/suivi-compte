@@ -2,9 +2,13 @@
 
 namespace App\Controller;
 
+use App\Repository\CategorieRepository;
+use App\Repository\FilterRepository;
 use App\Repository\LigneRepository;
 use App\Repository\UserRepository;
 use DateTime;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use DOMXPath;
 use DOMDocument;
 use App\Entity\Ligne;
@@ -12,6 +16,7 @@ use App\Entity\Etapes;
 use App\Entity\Filter;
 use App\Entity\Statut;
 use App\Entity\Categorie;
+use JetBrains\PhpStorm\NoReturn;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,7 +42,7 @@ class HomeController extends AbstractController
     }
 
     #[Route('/', name: 'home')]
-    public function index(Request $request,LigneRepository $ligneRepository,SessionInterface $session,UserRepository $userRepository): Response
+    public function index(Request $request,LigneRepository $ligneRepository,SessionInterface $session,UserRepository $userRepository,CategorieRepository $categorieRepository): Response
     {
         $session->set('userID',$this->security->getUser()->getId());
         $session->set('user',$this->security->getUser());
@@ -54,7 +59,7 @@ class HomeController extends AbstractController
         $to_filter = $ligneRepository->findBy(['categorie' => null, 'user' => $userID]);
         $du = $ligneRepository->findBy(['statut' => 1, 'user' => $userID]);
         $to_pay = $ligneRepository->findBy(['statut' => 2, 'user' => $userID]);
-        $categories = $ligneRepository->findAll();
+        $categories = $categorieRepository->findAll();
 
         $du_total = $ligneRepository->sumDu($user)[0]['total'];
         $to_pay_total = $ligneRepository->sumToPay($user)[0]['total'];
@@ -79,23 +84,26 @@ class HomeController extends AbstractController
     }
 
     #[Route('/resume/{year}', name: 'resume')]
-    public function resume($year)
+    public function resume($year,CategorieRepository $categorieRepository, LigneRepository $ligneRepository)
     {
-        $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
-
-        $sumByMonth = $this->getDoctrine()->getRepository(Ligne::class)->sumByMonthByCat($year);
-        $years = $this->getDoctrine()->getRepository(Ligne::class)->getYears();
-
+        $categories = $categorieRepository->findBy(['User'=> $this->getUser()]);
+        $sumByMonthYear =[];
+        foreach ($ligneRepository->getMonth($year) as $month) {
+            $sumByMonthYear +=[$month['month']=>$ligneRepository->sumByMonth($month['month'],$year,$this->getUser())];
+        }
+        $sumByMonthByCat = $ligneRepository->sumByMonthByCat($year,$this->getUser());
+        $years = $ligneRepository->getYears();
         return $this->render('home/resume.html.twig', [
             'active' => 'resume',
             'years' => $years,
             'year' => $year,
             'categories' => $categories,
-            'sumByMonth' => $sumByMonth,
+            'sumByMonth' => $sumByMonthByCat,
+            'sumByMonthYear' => $sumByMonthYear,
         ]);
     }
     #[Route('/resume/see/{year}/{month}', name: 'resume.see')]
-    public function see($year, $month, Request $request)
+    public function see($year, $month, Request $request , LigneRepository $ligneRepository)
     {
 
         $sort = $request->query->get('sort');
@@ -103,9 +111,9 @@ class HomeController extends AbstractController
         if($sort == null){
             $sort = 'categorie';
         }
-        $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findByMonth($year, $month, $sort, $order);
+        $lignes = $ligneRepository->findByMonth($year, $month, $sort, $order,$this->getUser());
 
-        $sum = $this->getDoctrine()->getRepository(Ligne::class)->sumByMonth($month,$year);
+        $sum = $ligneRepository->sumByMonth($month,$year,$this->getUser());
 
         return $this->render('home/see.html.twig', [
             'lignes' => $lignes,
@@ -132,46 +140,47 @@ class HomeController extends AbstractController
 
 
     #[Route('/import/{option}', name: 'import')]
-    public function import($option, Request $request,SessionInterface $session): Response
+    public function import($option, Request $request,EntityManagerInterface $entityManager,CategorieRepository $categorieRepository, LigneRepository $ligneRepository, FilterRepository $filterRepository): Response
     {
 
         switch ($option) {
             case 'HTML':
-                echo 'hey';
                 $this->importLinesFromHTML($request->request->get('HTML'));
                 break;
 
             case 'XLS':
-                $this->importLinesFromXls($request->files->get('xls'),$session);
+                $this->importLinesFromXls($request->files->get('xls'));
 
                 break;
             default:
 
                 break;
         }
-        $this->sync();
+        $this->sync($entityManager,$categorieRepository,$ligneRepository,$filterRepository);
 
         return $this->redirectToRoute('home');
     }
 
 
     #[Route('/sync', name: 'sync')]
-    public function sync()
+    public function sync(EntityManagerInterface $entityManager,CategorieRepository $categorieRepository, LigneRepository $ligneRepository, FilterRepository $filterRepository): Response
     {
-        $em = $this->getDoctrine()->getManager();
-        $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['categorie' => null]);
-        $filters = $this->getDoctrine()->getRepository(Filter::class)->findAll();
+        $em = $entityManager;
 
-        $revenu = $this->getDoctrine()->getRepository(Categorie::class)->find(5);
+        $lignes = $ligneRepository->findBy(['categorie' => null, 'user' => $this->getUser()]);
+        $filters = $filterRepository->findBy(['user' => $this->getUser()]);
+        $revenu = $categorieRepository->findBy(['User'=>$this->getUser(),'libelle'=>'Revenu']);
         foreach ($lignes as $ligne) {
-            if ($ligne->getMontant() > 0) {
-                $ligne->setCategorie($revenu);
+
+            if ($ligne->getMontant() > 0 and !empty($revenu)) {
+                $ligne->setCategorie($revenu[0]);
                 $em->flush();
                 continue;
             }
             foreach ($filters as $filter) {
                 $libelle = strtolower($ligne->getLibelle());
                 $kw = strtolower($filter->getKeyword());
+
                 if (str_contains($libelle, $kw)) {
                     $ligne->setCategorie($filter->getCategorie());
                     $em->flush();
@@ -197,7 +206,7 @@ class HomeController extends AbstractController
     }
 
 
-    #[Route('/export', name: 'export')]
+    #[NoReturn] #[Route('/export', name: 'export')]
     public function export(Request $request): Response
     {
         $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findAll();
@@ -205,18 +214,19 @@ class HomeController extends AbstractController
         $file = fopen('comptes.csv', 'w');
         foreach ($lignes as $ligne) {
             $array = array(
-                $ligne->getDate(),
+                $ligne->getDate()->format('d/m/Y'),
                 $ligne->getType(),
                 $ligne->getLibelle(),
                 $ligne->getMontant()
             );
+
             fputcsv($file, $array, ';');
         }
         fclose($file);
         die();
     }
 
-    public function findMatchLinesXls($dataArray)
+    public function findMatchLinesXls($dataArray): int|string|null
     {
         foreach ($dataArray as $key =>  $data) {
             $date = $data['A'];
@@ -248,10 +258,9 @@ class HomeController extends AbstractController
         return null;
     }
 
-    public function importLinesFromXls($file,SessionInterface $session)
+    public function importLinesFromXls($file)
     {
         $em = $this->getDoctrine()->getManager();
-        $user = $session->get('user');
 
         $dir = $this->getParameter('xls_dir');
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -311,7 +320,7 @@ class HomeController extends AbstractController
             $ligne->setType($type);
             $ligne->setMontant($montant);
             $ligne->setDateInsert(new \DateTime('now', new \DateTimeZone('Europe/paris')));
-            //
+            $ligne->setUser($this->getUser());
             $em->persist($ligne);
             $em->flush();
 
@@ -367,12 +376,13 @@ class HomeController extends AbstractController
                     }
                 }
             }
+            $ligne->setUser($this->getUser());
             $em->persist($ligne);
             $em->flush();
         }
     }
 
-    function convert_date_fr($date, $format_in = 'j F Y', $format_out = 'Y-m-d')
+    function convert_date_fr($date, $format_in = 'j F Y', $format_out = 'Y-m-d'): string
     {
         // French to english month names
         $months = array(

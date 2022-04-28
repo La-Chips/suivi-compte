@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\LigneRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * @ORM\Entity(repositoryClass=LigneRepository::class)
@@ -49,6 +50,7 @@ class Ligne
 
     /**
      * @ORM\ManyToOne(targetEntity=Categorie::class, inversedBy="lignes")
+     * @JoinColumn(onDelete="persist")
      */
     private $categorie;
 

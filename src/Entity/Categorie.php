@@ -6,6 +6,7 @@ use App\Repository\CategorieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JetBrains\PhpStorm\Pure;
 
 /**
  * @ORM\Entity(repositoryClass=CategorieRepository::class)
@@ -37,9 +38,14 @@ class Categorie
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $color;
+    private ?string $color;
 
-    public function __construct()
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="categories")
+     */
+    private ?User $User;
+
+    #[Pure] public function __construct()
     {
         $this->filters = new ArrayCollection();
         $this->lignes = new ArrayCollection();
@@ -68,7 +74,7 @@ class Categorie
     }
 
     /**
-     * @return Collection|Filter[]
+     * @return Collection
      */
     public function getFilters(): Collection
     {
@@ -103,7 +109,7 @@ class Categorie
     }
 
     /**
-     * @return Collection|Ligne[]
+     * @return Collection
      */
     public function getLignes(): Collection
     {
@@ -140,6 +146,18 @@ class Categorie
     public function setColor(?string $color): self
     {
         $this->color = $color;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->User;
+    }
+
+    public function setUser(?User $User): self
+    {
+        $this->User = $User;
 
         return $this;
     }
