@@ -59,7 +59,7 @@ class HomeController extends AbstractController
         $to_filter = $ligneRepository->findBy(['categorie' => null, 'user' => $userID]);
         $du = $ligneRepository->findBy(['statut' => 1, 'user' => $userID]);
         $to_pay = $ligneRepository->findBy(['statut' => 2, 'user' => $userID]);
-        $categories = $categorieRepository->findBy(['User' => $this->getUser()]);
+        $categories = $categorieRepository->findBy(['User' => $this->getUser()], array('libelle' => 'ASC'));
 
         $du_total = $ligneRepository->sumDu($user)[0]['total'];
         $to_pay_total = $ligneRepository->sumToPay($user)[0]['total'];
@@ -86,7 +86,7 @@ class HomeController extends AbstractController
     #[Route('/resume/{year}', name: 'resume')]
     public function resume($year,CategorieRepository $categorieRepository, LigneRepository $ligneRepository)
     {
-        $categories = $categorieRepository->findBy(['User'=> $this->getUser()]);
+        $categories = $categorieRepository->findBy(['User'=> $this->getUser()], array('libelle' => 'ASC'));
         $sumByMonthYear =[];
         foreach ($ligneRepository->getMonth($year) as $month) {
             $sumByMonthYear +=[$month['month']=>$ligneRepository->sumByMonth($month['month'],$year,$this->getUser())];

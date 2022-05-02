@@ -43,7 +43,7 @@
 					<td>{{ profesionnel.tel1 }}</td>
 					<td>{{ profesionnel.tel2 }}</td>
 					<td>{{ profesionnel.SIRET }}</td>
-					<td>{{ profesionnel.image }}</td>
+					<td><img class="img-thumbnail" src="{{ profesionnel.image }}"></td>
 					<td>{{ profesionnel.quota }}</td>
 					<td>
 						<a class="btn btn-primary" href="{{ path('profesionnel_show', {'id': profesionnel.id}) }}">Afficher</a>

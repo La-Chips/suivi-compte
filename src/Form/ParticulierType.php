@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Particulier;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -49,10 +50,12 @@ class ParticulierType extends AbstractType
                     'placeholder' => 'Téléphone',
                 ],
             ])
-            ->add('civilite', null, [
+            ->add('civilite', ChoiceType::class, [
                 'label' => 'Civilité',
-                'attr' => [
-                    'placeholder' => 'Civilité',
+                'choices' => [
+                    'M' => 'Monsieur',
+                    'Mme' => 'Madame',
+                    'Autre' => 'Autre',
                 ],
             ])
             ->add('nom', null, [

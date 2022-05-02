@@ -6,6 +6,7 @@
 parameters:
   xls_dir: '%kernel.project_dir%/public/xls'
   folder: '%kernel.project_dir%/public/folder'
+  images_directory: '%kernel.project_dir%/public/contact/logo'
 
 services:
   # default configuration for services in *this* file

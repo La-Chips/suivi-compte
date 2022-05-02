@@ -11,9 +11,25 @@
 			{{ include('ligne/_form.html.twig') }}
 			<a href="{{ path('resume',{year : "now" | date('Y')}) }}" class="btn btn-dark m-2">Retour</a>
 		</div>
-
-
-
+	</div>
+	<div class="modal fade text-dark" id="createCategorie" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title text-dark" id="exampleModalLabel">Créer une catégorie</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				{{form_start(createCategorie)}}
+				<div class="modal-body">
+					{{form_widget(createCategorie)}}
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-success">Créer</button>
+				</div>
+				{{form_end(createCategorie)}}
+			</div>
+		</div>
 	</div>
 
 {% endblock %}

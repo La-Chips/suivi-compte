@@ -19,7 +19,8 @@ class SettingsController extends AbstractController
     public function index(Request $request,CategorieRepository $categorieRepository): Response
     {
         $em = $this->getDoctrine()->getManager();
-        $categories = $categorieRepository->findBy(['User' => $this->getUser()]);
+        $categories = $categorieRepository->findBy(['User' => $this->getUser()],['libelle' => 'ASC']);
+
         $categorie = new Categorie();
         $createCategorie = $this->createForm(CreateCategorieType::class, $categorie);
         $createCategorie->handleRequest($request);

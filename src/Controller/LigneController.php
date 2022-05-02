@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Categorie;
 use App\Entity\Ligne;
 use App\Entity\Statut;
+use App\Form\CreateCategorieType;
 use App\Form\LigneType;
 use App\Repository\CategorieRepository;
 use App\Repository\LigneRepository;
@@ -30,26 +32,39 @@ class LigneController extends AbstractController
     #[Route('/new', name: 'ligne_new', methods: ['GET', 'POST'])]
     public function new(Request $request, LigneRepository $ligneRepository,StatutRepository $statutRepository, UserRepository $userRepository,CategorieRepository $categorieRepository,SessionInterface $session): Response
     {
-        $categories = $categorieRepository->findBy(['User' => $this->getUser()]);
+        $entityManager = $this->getDoctrine()->getManager();
+        $categories = $categorieRepository->findBy(['User' => $this->getUser()],['libelle' => 'ASC']);
         $ligne = new Ligne();
         $statut = null;
         if ($request->query->get('option') != null) {
             $option = $request->query->get('option');
+
             $statut = match ($option) {
-                1 => $statutRepository->findOneBy(['id' => 1]),
-                2 => $statutRepository->findOneBy(['id' => 2]),
+                "1" => $statutRepository->findOneBy(['id' => 1]),
+                "2" => $statutRepository->findOneBy(['id' => 2]),
                 default => null,
             };
         }
+
+        $categorie = new Categorie();
+        $createCategorie = $this->createForm(CreateCategorieType::class, $categorie);
+        $createCategorie->handleRequest($request);
+
+
+        if ($createCategorie->isSubmitted() && $createCategorie->isValid()) {
+            $categorie->setUser($this->getUser());
+            $entityManager->persist($categorie);
+            $entityManager->flush();
+            return $this->redirectToRoute('ligne_new');
+        }
+
         $form = $this->createForm(LigneType::class, $ligne, ['statut' => $statut,'categories'=>$categories]);
         $form->handleRequest($request);
-
-
         if ($form->isSubmitted() && $form->isValid()) {
             $userID = $session->get('userID');
             $user = $userRepository->findBy(['id' => $userID]);
             $ligne->setUser($user[0]);
-            $entityManager = $this->getDoctrine()->getManager();
+
             $entityManager->persist($ligne);
             $entityManager->flush();
 
@@ -59,6 +74,7 @@ class LigneController extends AbstractController
         return $this->renderForm('ligne/new.html.twig', [
             'ligne' => $ligne,
             'form' => $form,
+            'createCategorie' => $createCategorie,
         ]);
     }
 
