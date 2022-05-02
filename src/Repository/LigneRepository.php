@@ -54,13 +54,16 @@ class LigneRepository extends ServiceEntityRepository
         return $result;
     }
 
-    public function getMonth($year)
+    public function getMonth($year,$user)
     {
         $qb = $this->createQueryBuilder('line')
             ->select('DISTINCT MONTHNAME(line.date) as month,MONTH(line.date) as monthId')
-            ->where('YEAR(line.date) = :year')
+            ->where('YEAR(line.date) = :year and line.user = :user')
             ->orderby('monthId', 'ASC')
-            ->setParameter('year', $year);
+            ->setParameters(array(
+                'year' => $year,
+                'user' => $user,
+            ));
 
         $result = $qb->getQuery()->getResult();
         return $result;
@@ -87,9 +90,9 @@ class LigneRepository extends ServiceEntityRepository
         return $out;
     }
 
-    public function sumByMonthByCat($year,$user)
+    public function sumByMonthByCat($year,$user): array
     {
-        $monthname = $this->getMonth($year);
+        $monthname = $this->getMonth($year,$user);
         $out = array();
 
         foreach ($monthname as $key => $value) {

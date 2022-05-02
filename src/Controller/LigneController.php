@@ -64,7 +64,7 @@ class LigneController extends AbstractController
             $userID = $session->get('userID');
             $user = $userRepository->findBy(['id' => $userID]);
             $ligne->setUser($user[0]);
-
+            $ligne->setOrigine(0); //zero means it's a ligne add manually by the user
             $entityManager->persist($ligne);
             $entityManager->flush();
 
@@ -90,7 +90,7 @@ class LigneController extends AbstractController
     public function edit(Request $request, Ligne $ligne,CategorieRepository $categorieRepository): Response
     {
         $categories = $categorieRepository->findBy(['User' => $this->getUser()]);
-        $form = $this->createForm(LigneType::class, $ligne,array('date' => $ligne->getDate(),'categories'=>$categories));
+        $form = $this->createForm(LigneType::class, $ligne,array('date' => $ligne->getDate(),'categories'=>$categories,'type'=>$ligne->getType()));
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

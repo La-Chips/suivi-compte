@@ -7,6 +7,7 @@ use App\Entity\Ligne;
 use App\Entity\Statut;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,7 +19,7 @@ class LigneType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('date', DateType::class, [
+            ->add('date', DateTimeType::class, [
                 'widget' => 'single_text',
                 'data' => $options['date'],
                 'label' => 'Date de la transction',
@@ -36,7 +37,10 @@ class LigneType extends AbstractType
                 'label' => 'Libellé 2',
             ])
             ->add('montant')
-            ->add('type')
+            ->add('type',null, [
+                'data' => $options['type'],
+                'label' => 'Type de transaction',
+            ])
             ->add('statut', EntityType::class, array(
                 'class' => Statut::class,
                 'choice_label' => 'libelle',
@@ -53,6 +57,14 @@ class LigneType extends AbstractType
                 'attr' => array(
                     'class' => 'form-select'
                 )
+            ))
+            ->add('origine', ChoiceType::class, array(
+                'choices' => array(
+                    'Manuel' => 0,
+                    'Automatique' => 1,
+                ),
+                'data' => 0,
+                'label' => 'Origine',
             ));
     }
 
@@ -63,6 +75,7 @@ class LigneType extends AbstractType
             'date' => new \DateTime('now', new \DateTimeZone('Europe/paris')),
             'statut' => null,
             'categories' => null,
+            'type'=> null,
         ]);
     }
 }

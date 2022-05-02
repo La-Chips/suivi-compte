@@ -1,8 +1,8 @@
 {% extends "base.html.twig" %}
 
 {% block stylesheets %}
-
-	<link rel="stylesheet" href="{{ asset('css/resume.css') }}">a
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('css/resume.css') }}">
 {% endblock %}
 
 {% block title %}

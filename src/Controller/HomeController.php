@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\LastImport;
 use App\Repository\CategorieRepository;
 use App\Repository\FilterRepository;
+use App\Repository\LastImportRepository;
 use App\Repository\LigneRepository;
 use App\Repository\UserRepository;
 use DateTime;
@@ -88,11 +90,13 @@ class HomeController extends AbstractController
     {
         $categories = $categorieRepository->findBy(['User'=> $this->getUser()], array('libelle' => 'ASC'));
         $sumByMonthYear =[];
-        foreach ($ligneRepository->getMonth($year) as $month) {
+        foreach ($ligneRepository->getMonth($year,$this->getUser()) as $month) {
             $sumByMonthYear +=[$month['month']=>$ligneRepository->sumByMonth($month['month'],$year,$this->getUser())];
         }
         $sumByMonthByCat = $ligneRepository->sumByMonthByCat($year,$this->getUser());
         $years = $ligneRepository->getYears();
+        $sumByMonthByCat = $this->MonthsToMois($sumByMonthByCat);
+        $sumByMonthYear = $this->MonthsToMois($sumByMonthYear);
         return $this->render('home/resume.html.twig', [
             'active' => 'resume',
             'years' => $years,
@@ -105,7 +109,7 @@ class HomeController extends AbstractController
     #[Route('/resume/see/{year}/{month}', name: 'resume.see')]
     public function see($year, $month, Request $request , LigneRepository $ligneRepository)
     {
-
+        $month = $this->MoisToMonth($month);
         $sort = $request->query->get('sort');
         $order = $request->query->get('order');
         if($sort == null){
@@ -138,9 +142,18 @@ class HomeController extends AbstractController
 
 
     #[Route('/import/{option}', name: 'import')]
-    public function import($option, Request $request,EntityManagerInterface $entityManager,CategorieRepository $categorieRepository, LigneRepository $ligneRepository, FilterRepository $filterRepository): Response
+    public function import($option, Request $request,EntityManagerInterface $entityManager,CategorieRepository $categorieRepository, LigneRepository $ligneRepository, FilterRepository $filterRepository,LastImportRepository $lastImportRepository): Response
     {
-
+        $lastImport = $lastImportRepository->findBy(['user'=>$this->getUser()]);
+        if ($lastImport == null) {
+            $lastImport = new LastImport();
+            $lastImport->setUser($this->getUser());
+            $entityManager->persist($lastImport);
+            $entityManager->flush();
+        }
+        else {
+            $lastImport = $lastImport[0];
+        }
         switch ($option) {
             case 'HTML':
                 $this->importLinesFromHTML($request->request->get('HTML'));
@@ -155,7 +168,9 @@ class HomeController extends AbstractController
                 break;
         }
         $this->sync($entityManager,$categorieRepository,$ligneRepository,$filterRepository);
-
+        $lastImport->setLigne($ligneRepository->findOneBy(['user'=>$this->getUser()],['date'=>'DESC']));
+        $entityManager->persist($lastImport);
+        $entityManager->flush();
         return $this->redirectToRoute('home');
     }
 
@@ -222,6 +237,79 @@ class HomeController extends AbstractController
         }
         fclose($file);
         die();
+    }
+    private function MonthsToMois($months): array
+    {
+        $mois = [];
+        for ($i = 0; $i < sizeof($months); $i++) {
+            if (isset($months['January'])) {
+                $mois['Janvier'] = $months['January'];
+            }
+            if (isset($months['February'])) {
+                $mois['Février'] = $months['February'];
+            }
+            if (isset($months['March'])) {
+                $mois['Mars'] = $months['March'];
+            }
+            if (isset($months['April'])) {
+                $mois['Avril'] = $months['April'];
+            }
+            if (isset($months['May'])) {
+                $mois['Mai'] = $months['May'];
+            }
+            if (isset($months['June'])) {
+                $mois['Juin'] = $months['June'];
+            }
+            if (isset($months['July'])) {
+                $mois['Juillet'] = $months['July'];
+            }
+            if (isset($months['August'])) {
+                $mois['Août'] = $months['August'];
+            }
+            if (isset($months['September'])) {
+                $mois['Septembre'] = $months['September'];
+            }
+            if (isset($months['October'])) {
+                $mois['Octobre'] = $months['October'];
+            }
+            if (isset($months['November'])) {
+                $mois['Novembre'] = $months['November'];
+            }
+            if (isset($months['December'])) {
+                $mois['Décembre'] = $months['December'];
+            }
+        }
+        return $mois;
+    }
+    private function MoisToMonth($mois) {
+        switch ($mois)
+        {
+            case "Janvier":
+                return 'January';
+            case "Février":
+                return 'February';
+            case "Mars":
+                return 'March';
+            case "Avril":
+                return 'April';
+            case "Mai":
+                return 'May';
+            case "Juin":
+                return 'June';
+            case "Juillet":
+                return 'July';
+            case "Août":
+                return 'August';
+            case "Septembre":
+                return 'September';
+            case "Octobre":
+                return 'October';
+            case "Novembre":
+                return 'November';
+            case "Décembre":
+                return 'December';
+        }
+
     }
 
     public function findMatchLinesXls($dataArray): int|string|null
@@ -302,6 +390,7 @@ class HomeController extends AbstractController
             $date = date_create_from_format('d/m/Y', $date, new \DateTimeZone('Europe/paris'));
 
             $type = explode("\n", $data['B'])[0];
+            $type = trim($type);
             $libelle = explode("\n", $data['B']);
             array_shift($libelle);
             $libelle = implode("\n", $libelle);
@@ -312,6 +401,7 @@ class HomeController extends AbstractController
             } else {
                 $montant = floatval($data['C']) * -1;
             }
+
             $ligne = new Ligne();
             $ligne->setDate($date);
             $ligne->setLibelle($libelle);
@@ -319,6 +409,7 @@ class HomeController extends AbstractController
             $ligne->setMontant($montant);
             $ligne->setDateInsert(new \DateTime('now', new \DateTimeZone('Europe/paris')));
             $ligne->setUser($this->getUser());
+            $ligne->setOrigine(1); // 1 = import , automatic
             $em->persist($ligne);
             $em->flush();
 
@@ -375,6 +466,7 @@ class HomeController extends AbstractController
                 }
             }
             $ligne->setUser($this->getUser());
+            $ligne->setOrigine(1); // 1 = import , automatic
             $em->persist($ligne);
             $em->flush();
         }
@@ -443,5 +535,48 @@ class HomeController extends AbstractController
         }
 
         return DateTime::createFromFormat($format_in, $imploded)->format($format_out);
+    }
+    private function MoisToMonths($mois)
+    {
+        $months = [];
+        for ($i = 0; $i < sizeof($mois); $i++) {
+            if (isset($mois['Janvier'])) {
+                $month['January'] = $mois['Janvier'];
+            }
+            if (isset($mois['Février'])) {
+                $month['February'] = $mois['Février'];
+            }
+            if (isset($mois['Mars'])) {
+                $month['March'] = $mois['Mars'];
+            }
+            if (isset($mois['Avril'])) {
+                $month['April'] = $mois['Avril'];
+            }
+            if (isset($mois['Mai'])) {
+                $month['May'] = $mois['Mai'];
+            }
+            if (isset($mois['Juin'])) {
+                $month['June'] = $mois['Juin'];
+            }
+            if (isset($mois['Juillet'])) {
+                $month['July'] = $mois['Juillet'];
+            }
+            if (isset($mois['Août'])) {
+                $month['August'] = $mois['Août'];
+            }
+            if (isset($mois['Septembre'])) {
+                $month['September'] = $mois['Septembre'];
+            }
+            if (isset($mois['Octobre'])) {
+                $month['October'] = $mois['Octobre'];
+            }
+            if (isset($mois['Novembre'])) {
+                $month['November'] = $mois['Novembre'];
+            }
+            if (isset($mois['Décembre'])) {
+                $month['December'] = $mois['Décembre'];
+            }
+        }
+        return $months;
     }
 }

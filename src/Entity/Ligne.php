@@ -50,7 +50,7 @@ class Ligne
 
     /**
      * @ORM\ManyToOne(targetEntity=Categorie::class, inversedBy="lignes")
-     * @JoinColumn(onDelete="persist")
+     * @JoinColumn(onDelete="SET NULL")
      */
     private $categorie;
 
@@ -63,6 +63,11 @@ class Ligne
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="AllLignes")
      */
     private ?User $user;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $origine;
 
     public function __construct()
     {
@@ -186,5 +191,17 @@ class Ligne
     public function __toString()
     {
         return $this->id;
+    }
+
+    public function getOrigine(): ?int
+    {
+        return $this->origine;
+    }
+
+    public function setOrigine(int $origine): self
+    {
+        $this->origine = $origine;
+
+        return $this;
     }
 }
