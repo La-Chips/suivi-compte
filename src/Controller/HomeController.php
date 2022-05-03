@@ -11,6 +11,8 @@ use App\Repository\UserRepository;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use DOMXPath;
 use DOMDocument;
 use App\Entity\Ligne;
@@ -144,16 +146,7 @@ class HomeController extends AbstractController
     #[Route('/import/{option}', name: 'import')]
     public function import($option, Request $request,EntityManagerInterface $entityManager,CategorieRepository $categorieRepository, LigneRepository $ligneRepository, FilterRepository $filterRepository,LastImportRepository $lastImportRepository): Response
     {
-        $lastImport = $lastImportRepository->findBy(['user'=>$this->getUser()]);
-        if ($lastImport == null) {
-            $lastImport = new LastImport();
-            $lastImport->setUser($this->getUser());
-            $entityManager->persist($lastImport);
-            $entityManager->flush();
-        }
-        else {
-            $lastImport = $lastImport[0];
-        }
+
         switch ($option) {
             case 'HTML':
                 $this->importLinesFromHTML($request->request->get('HTML'));
@@ -167,10 +160,23 @@ class HomeController extends AbstractController
 
                 break;
         }
-        $this->sync($entityManager,$categorieRepository,$ligneRepository,$filterRepository);
+        $lastImport = $lastImportRepository->findBy(['user'=>$this->getUser()]);
+
+        if ($lastImport == null) {
+            $lastImport = new LastImport();
+            $lastImport->setUser($this->getUser());
+            $entityManager->persist($lastImport);
+            $entityManager->flush();
+        }
+        else {
+            $lastImport = $lastImport[0];
+            $lastligne = $lastImport->getLigne();
+            $ligneRepository->delete($lastligne);
+        }
         $lastImport->setLigne($ligneRepository->findOneBy(['user'=>$this->getUser()],['date'=>'DESC']));
         $entityManager->persist($lastImport);
         $entityManager->flush();
+        $this->sync($entityManager,$categorieRepository,$ligneRepository,$filterRepository);
         return $this->redirectToRoute('home');
     }
 

@@ -69,6 +69,11 @@ class Ligne
      */
     private $origine;
 
+    /**
+     * @ORM\OneToOne(targetEntity=LastImport::class, mappedBy="ligne", cascade={"persist", "remove"})
+     */
+    private $lastImport;
+
     public function __construct()
     {
         $this->date_insert = new \DateTime('now', new \DateTimeZone('Europe/paris'));
@@ -201,6 +206,28 @@ class Ligne
     public function setOrigine(int $origine): self
     {
         $this->origine = $origine;
+
+        return $this;
+    }
+
+    public function getLastImport(): ?LastImport
+    {
+        return $this->lastImport;
+    }
+
+    public function setLastImport(?LastImport $lastImport): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($lastImport === null && $this->lastImport !== null) {
+            $this->lastImport->setLigne(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($lastImport !== null && $lastImport->getLigne() !== $this) {
+            $lastImport->setLigne($this);
+        }
+
+        $this->lastImport = $lastImport;
 
         return $this;
     }

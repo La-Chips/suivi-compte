@@ -55,6 +55,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $filters;
 
+    /**
+     * @ORM\OneToOne(targetEntity=LastImport::class, mappedBy="user", cascade={"persist", "remove"})
+     */
+    private $lastImport;
+
 
     public function __construct()
     {
@@ -238,6 +243,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $filter->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLastImport(): ?LastImport
+    {
+        return $this->lastImport;
+    }
+
+    public function setLastImport(?LastImport $lastImport): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($lastImport === null && $this->lastImport !== null) {
+            $this->lastImport->setUser(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($lastImport !== null && $lastImport->getUser() !== $this) {
+            $lastImport->setUser($this);
+        }
+
+        $this->lastImport = $lastImport;
 
         return $this;
     }

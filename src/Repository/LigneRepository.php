@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Ligne;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use http\Client\Curl\User;
 
 /**
  * @method Ligne|null find($id, $lockMode = null, $lockVersion = null)
@@ -187,5 +188,12 @@ class LigneRepository extends ServiceEntityRepository
             ->setParameters(array('year' => $year, 'month' => $monthname, 'user' => $user));
 
         return round($qb->getQuery()->getScalarResult()[0]['total'], 2);
+    }
+
+    public function delete(?ligne $lastligne)
+    {
+        $em = $this->getEntityManager();
+        $em->remove($lastligne);
+        $em->flush();
     }
 }
