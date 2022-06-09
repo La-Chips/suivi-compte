@@ -119,6 +119,7 @@ class HomeController extends AbstractController
         }
         $lignes = $ligneRepository->findByMonth($year, $month, $sort, $order,$this->getUser());
         $sum = $ligneRepository->sumByMonth($month,$year,$this->getUser());
+
         return $this->render('home/see.html.twig', [
             'lignes' => $lignes,
             'sort' => $sort,
