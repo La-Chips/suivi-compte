@@ -30,7 +30,7 @@ class HomeController extends AbstractController
             $order = 'DESC';
         }
 
-        $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findBy(array(), array($sort => $order));
+        $lignes = $this->getUser()->getLignes();
         $to_filter = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['categorie' => null]);
         $du = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['statut' => 1]);
         $to_pay = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['statut' => 2]);

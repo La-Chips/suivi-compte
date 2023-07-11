@@ -67,12 +67,12 @@
 
 			<header class="bg-dark  p-3 d-flex justify-content-between">
 
-				<div>
+				<div class="d-flex justify-content-between">
 					{% for menu in menus %}
 						<a href= {{menu.route}} {% if active is defined and active == menu.route %}class="active"{% endif %}
 						>
 							<i class="{{menu.icon}} me-3"></i>
-						{{menu.name}}
+						{{menu.name | capitalize}}
 					</a>
 					{% endfor %}
 
@@ -82,6 +82,16 @@
 					{% endif %}
 					<i class="far fa-sun" onclick="switchDarkMode()"></i>
 
+				</div>
+				<div class="d-flex align-items-center">
+					<a href="{{path('app_logout')}}" class="btn btn-secondary">
+						<i class="fas fa-sign-out-alt"></i>
+				Deconnexion</a>
+					<div>
+						{# Avatar icon #}
+						
+							<i class="fas fa-user-circle"></i>
+					{{app.user | capitalize}}</div>
 				</div>
 
 

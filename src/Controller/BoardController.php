@@ -13,6 +13,8 @@ class BoardController extends AbstractController
     public function index(LigneRepository $ligneRepository): Response
     {
 
+     
+
         $income = $ligneRepository->getIncomeByMonth(date('m'), date('Y'));
 
         return $this->render('board/index.html.twig', [

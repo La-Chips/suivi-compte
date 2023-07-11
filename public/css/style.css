@@ -57,3 +57,9 @@ header a:hover {
     background-color: rgba(43, 42, 51, 1);
     color: #fff;
 }
+
+hr{
+    border-top: 2px solid #ccc !important;
+    margin: 1rem 0 1rem 0;
+    
+}
