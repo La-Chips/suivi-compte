@@ -1,7 +1,7 @@
 
 <div class="d-flex align-items-center">
 <a href="{{path('ligne_new')}}" class="btn btn-success">Ajouter</a>
-<div class="ms-3">Opération ({{lignes | length}}) : </div>
+<div class="ms-3">Opération à classifier ({{lignes | length}}) : </div>
 
 </div>
 
@@ -14,7 +14,7 @@
 			<th>
 
 				<div class="d-flex align-items-center">
-					<div>Categorie</div>
+					<div>Catégorie</div>
 					{% include "templates/sort_row.html.twig" with { sort : sort , order :order, col :'categorie'} %}
 
 				</div>
@@ -86,10 +86,9 @@
 					€</td>
 				<td>{{total}}
 					€</td>
-				<td class="d-flex justify-content-between p-1">
+				<td class="d-flex justify-content-between">
 					<a href="{{path('line.set.statut',{id : item.id,statut : 1})}}" class="btn btn-success m-1">Dû</a>
-					<a href="{{path('line.set.statut',{id : item.id,statut : 2})}}" class="btn btn-danger m-1">A
-																																																																																																																																																																																																																																																																																																																														Payer</a>
+					<a href="{{path('line.set.statut',{id : item.id,statut : 2})}}" class="btn btn-danger m-1">A Payer</a>
 
 				</td>
 				<td>

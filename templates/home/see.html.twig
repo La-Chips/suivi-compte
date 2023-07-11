@@ -1,14 +1,15 @@
 {% extends "base.html.twig" %}
 
 {% block stylesheets %}
-
-	<link rel="stylesheet" href="/css/resume.css">
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('css/resume.css') }}">
 {% endblock %}
 
+{% block title %}
+	Résumé {{ app.request.get('month')}} {{app.request.get('year') }} - Tech&Dev
+{% endblock %}
 
 {% block body %}
-
-	<div class="container py-3">{% include "./templates/tables_lignes.html.twig" with {lignes : lignes} %}</div>
-
+	<div class="container py-3">{% include "/templates/tables_lignes.html.twig" with {lignes : lignes} %}</div>
 
 {% endblock %}

@@ -33,7 +33,7 @@ class ParticulierController extends AbstractController
             $entityManager->persist($particulier);
             $entityManager->flush();
 
-            return $this->redirectToRoute('particulier_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('compagny', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('particulier/new.html.twig', [
@@ -59,7 +59,7 @@ class ParticulierController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('particulier_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('compagny', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('particulier/edit.html.twig', [
@@ -77,6 +77,6 @@ class ParticulierController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('particulier_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('compagny', [], Response::HTTP_SEE_OTHER);
     }
 }

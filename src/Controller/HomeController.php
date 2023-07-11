@@ -2,7 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\LastImport;
+use App\Repository\CategorieRepository;
+use App\Repository\FilterRepository;
+use App\Repository\LastImportRepository;
+use App\Repository\LigneRepository;
+use App\Repository\UserRepository;
 use DateTime;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use DOMXPath;
 use DOMDocument;
 use App\Entity\Ligne;
@@ -10,38 +20,54 @@ use App\Entity\Etapes;
 use App\Entity\Filter;
 use App\Entity\Statut;
 use App\Entity\Categorie;
+use JetBrains\PhpStorm\NoReturn;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints\Range;
+
 
 class HomeController extends AbstractController
 {
-    #[Route('/', name: 'home')]
-    public function index(Request $request): Response
+    /**
+     * @var Security
+     */
+    private $security;
+
+    public function __construct(Security $security)
     {
+        $this->security = $security;
+    }
+
+    #[Route('/', name: 'home')]
+    public function index(Request $request,LigneRepository $ligneRepository,SessionInterface $session,UserRepository $userRepository,CategorieRepository $categorieRepository): Response
+    {
+        $session->set('userID',$this->security->getUser()->getId());
+        $session->set('user',$this->security->getUser());
         $sort = $request->query->get('sort');
         $order = $request->query->get('order');
         if ($order == null) {
             $sort = 'date';
             $order = 'DESC';
         }
+        $userID = $session->get('userID');
+        $user = $userRepository->find($userID);
+        $lignes = $ligneRepository->findBy(['user'=>$userID], array($sort => $order));
+        //$lignes = $this->getDoctrine()->getRepository(Ligne::class)->findBy(array(), array($sort => $order));
+        $to_filter = $ligneRepository->findBy(['categorie' => null, 'user' => $userID]);
+        $du = $ligneRepository->findBy(['statut' => 1, 'user' => $userID]);
+        $to_pay = $ligneRepository->findBy(['statut' => 2, 'user' => $userID]);
+        $categories = $categorieRepository->findBy(['User' => $this->getUser()], array('libelle' => 'ASC'));
 
-        $lignes = $this->getUser()->getLignes();
-        $to_filter = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['categorie' => null]);
-        $du = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['statut' => 1]);
-        $to_pay = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['statut' => 2]);
-        $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
-
-
-        $du_total =
-            $this->getDoctrine()->getRepository(Ligne::class)->sumDu()[0]['total'];
-        $to_pay_total =
-            $this->getDoctrine()->getRepository(Ligne::class)->sumToPay()[0]['total'];
-        $sum = $this->getDoctrine()->getRepository(Ligne::class)->sum()[0]['total'];
+        $du_total = $ligneRepository->sumDu($user)[0]['total'];
+        $to_pay_total = $ligneRepository->sumToPay($user)[0]['total'];
+        $sum = $ligneRepository->sum($user)[0]['total'];
         $sum = round($sum, 2);
 
 
@@ -62,33 +88,37 @@ class HomeController extends AbstractController
     }
 
     #[Route('/resume/{year}', name: 'resume')]
-    public function resume($year)
+    public function resume($year,CategorieRepository $categorieRepository, LigneRepository $ligneRepository)
     {
-        $categories = $this->getDoctrine()->getRepository(Categorie::class)->findAll();
-
-        $sumByMonth = $this->getDoctrine()->getRepository(Ligne::class)->sumByMonthByCat($year);
-        $years = $this->getDoctrine()->getRepository(Ligne::class)->getYears();
-
+        $categories = $categorieRepository->findBy(['User'=> $this->getUser()], array('libelle' => 'ASC'));
+        $sumByMonthYear =[];
+        foreach ($ligneRepository->getMonth($year,$this->getUser()) as $month) {
+            $sumByMonthYear +=[$month['month']=>$ligneRepository->sumByMonth($month['month'],$year,$this->getUser())];
+        }
+        $sumByMonthByCat = $ligneRepository->sumByMonthByCat($year,$this->getUser());
+        $years = $ligneRepository->getYears();
+        $sumByMonthByCat = $this->MonthsToMois($sumByMonthByCat);
+        $sumByMonthYear = $this->MonthsToMois($sumByMonthYear);
         return $this->render('home/resume.html.twig', [
             'active' => 'resume',
             'years' => $years,
             'year' => $year,
             'categories' => $categories,
-            'sumByMonth' => $sumByMonth,
+            'sumByMonth' => $sumByMonthByCat,
+            'sumByMonthYear' => $sumByMonthYear,
         ]);
     }
     #[Route('/resume/see/{year}/{month}', name: 'resume.see')]
-    public function see($year, $month, Request $request)
+    public function see($year, $month, Request $request , LigneRepository $ligneRepository)
     {
-
+        $month = $this->MoisToMonth($month);
         $sort = $request->query->get('sort');
         $order = $request->query->get('order');
         if($sort == null){
             $sort = 'categorie';
         }
-        $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findByMonth($year, $month, $sort, $order);
-
-        $sum = $this->getDoctrine()->getRepository(Ligne::class)->sumByMonth($month,$year);
+        $lignes = $ligneRepository->findByMonth($year, $month, $sort, $order,$this->getUser());
+        $sum = $ligneRepository->sumByMonth($month,$year,$this->getUser());
 
         return $this->render('home/see.html.twig', [
             'lignes' => $lignes,
@@ -110,19 +140,16 @@ class HomeController extends AbstractController
         $etape = new Etapes($line, $statut);
         $em->persist($etape);
         $em->flush();
-
-
         return $this->redirectToRoute('home');
     }
 
 
     #[Route('/import/{option}', name: 'import')]
-    public function import($option, Request $request): Response
+    public function import($option, Request $request,EntityManagerInterface $entityManager,CategorieRepository $categorieRepository, LigneRepository $ligneRepository, FilterRepository $filterRepository,LastImportRepository $lastImportRepository): Response
     {
 
         switch ($option) {
             case 'HTML':
-                echo 'hey';
                 $this->importLinesFromHTML($request->request->get('HTML'));
                 break;
 
@@ -134,29 +161,46 @@ class HomeController extends AbstractController
 
                 break;
         }
-        $this->sync();
+        $lastImport = $lastImportRepository->findBy(['user'=>$this->getUser()]);
 
+        if ($lastImport == null) {
+            $lastImport = new LastImport();
+            $lastImport->setUser($this->getUser());
+            $entityManager->persist($lastImport);
+            $entityManager->flush();
+        }
+        else {
+            $lastImport = $lastImport[0];
+            $lastligne = $lastImport->getLigne();
+            $ligneRepository->delete($lastligne);
+        }
+        $lastImport->setLigne($ligneRepository->findOneBy(['user'=>$this->getUser()],['date'=>'DESC']));
+        $entityManager->persist($lastImport);
+        $entityManager->flush();
+        $this->sync($entityManager,$categorieRepository,$ligneRepository,$filterRepository);
         return $this->redirectToRoute('home');
     }
 
 
     #[Route('/sync', name: 'sync')]
-    public function sync()
+    public function sync(EntityManagerInterface $entityManager,CategorieRepository $categorieRepository, LigneRepository $ligneRepository, FilterRepository $filterRepository): Response
     {
-        $em = $this->getDoctrine()->getManager();
-        $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findBy(['categorie' => null]);
-        $filters = $this->getDoctrine()->getRepository(Filter::class)->findAll();
+        $em = $entityManager;
 
-        $revenu = $this->getDoctrine()->getRepository(Categorie::class)->find(5);
+        $lignes = $ligneRepository->findBy(['categorie' => null, 'user' => $this->getUser()]);
+        $filters = $filterRepository->findBy(['user' => $this->getUser()]);
+        $revenu = $categorieRepository->findBy(['User'=>$this->getUser(),'libelle'=>'Revenu']);
         foreach ($lignes as $ligne) {
-            if ($ligne->getMontant() > 0) {
-                $ligne->setCategorie($revenu);
+
+            if ($ligne->getMontant() > 0 and !empty($revenu)) {
+                $ligne->setCategorie($revenu[0]);
                 $em->flush();
                 continue;
             }
             foreach ($filters as $filter) {
                 $libelle = strtolower($ligne->getLibelle());
                 $kw = strtolower($filter->getKeyword());
+
                 if (str_contains($libelle, $kw)) {
                     $ligne->setCategorie($filter->getCategorie());
                     $em->flush();
@@ -182,7 +226,7 @@ class HomeController extends AbstractController
     }
 
 
-    #[Route('/export', name: 'export')]
+    #[NoReturn] #[Route('/export', name: 'export')]
     public function export(Request $request): Response
     {
         $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findAll();
@@ -190,18 +234,92 @@ class HomeController extends AbstractController
         $file = fopen('comptes.csv', 'w');
         foreach ($lignes as $ligne) {
             $array = array(
-                $ligne->getDate(),
+                $ligne->getDate()->format('d/m/Y'),
                 $ligne->getType(),
                 $ligne->getLibelle(),
                 $ligne->getMontant()
             );
+
             fputcsv($file, $array, ';');
         }
         fclose($file);
         die();
     }
+    private function MonthsToMois($months): array
+    {
+        $mois = [];
+        for ($i = 0; $i < sizeof($months); $i++) {
+            if (isset($months['January'])) {
+                $mois['Janvier'] = $months['January'];
+            }
+            if (isset($months['February'])) {
+                $mois['Février'] = $months['February'];
+            }
+            if (isset($months['March'])) {
+                $mois['Mars'] = $months['March'];
+            }
+            if (isset($months['April'])) {
+                $mois['Avril'] = $months['April'];
+            }
+            if (isset($months['May'])) {
+                $mois['Mai'] = $months['May'];
+            }
+            if (isset($months['June'])) {
+                $mois['Juin'] = $months['June'];
+            }
+            if (isset($months['July'])) {
+                $mois['Juillet'] = $months['July'];
+            }
+            if (isset($months['August'])) {
+                $mois['Août'] = $months['August'];
+            }
+            if (isset($months['September'])) {
+                $mois['Septembre'] = $months['September'];
+            }
+            if (isset($months['October'])) {
+                $mois['Octobre'] = $months['October'];
+            }
+            if (isset($months['November'])) {
+                $mois['Novembre'] = $months['November'];
+            }
+            if (isset($months['December'])) {
+                $mois['Décembre'] = $months['December'];
+            }
+        }
+        return $mois;
+    }
+    private function MoisToMonth($mois) {
+        switch ($mois)
+        {
+            case "Janvier":
+                return 'January';
+            case "Février":
+                return 'February';
+            case "Mars":
+                return 'March';
+            case "Avril":
+                return 'April';
+            case "Mai":
+                return 'May';
+            case "Juin":
+                return 'June';
+            case "Juillet":
+                return 'July';
+            case "Août":
+                return 'August';
+            case "Septembre":
+                return 'September';
+            case "Octobre":
+                return 'October';
+            case "Novembre":
+                return 'November';
+            case "Décembre":
+                return 'December';
+        }
 
-    public function findMatchLinesXls($dataArray)
+    }
+
+    public function findMatchLinesXls($dataArray): int|string|null
     {
         foreach ($dataArray as $key =>  $data) {
             $date = $data['A'];
@@ -236,7 +354,6 @@ class HomeController extends AbstractController
     public function importLinesFromXls($file)
     {
         $em = $this->getDoctrine()->getManager();
-
 
         $dir = $this->getParameter('xls_dir');
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -275,13 +392,12 @@ class HomeController extends AbstractController
                     TRUE         // Should the array be indexed by cell row and cell column
                 );
         }
-
-
         foreach ($dataArray as $data) {
             $date = $data['A'];
             $date = date_create_from_format('d/m/Y', $date, new \DateTimeZone('Europe/paris'));
 
             $type = explode("\n", $data['B'])[0];
+            $type = trim($type);
             $libelle = explode("\n", $data['B']);
             array_shift($libelle);
             $libelle = implode("\n", $libelle);
@@ -292,17 +408,20 @@ class HomeController extends AbstractController
             } else {
                 $montant = floatval($data['C']) * -1;
             }
+
             $ligne = new Ligne();
             $ligne->setDate($date);
             $ligne->setLibelle($libelle);
             $ligne->setType($type);
             $ligne->setMontant($montant);
             $ligne->setDateInsert(new \DateTime('now', new \DateTimeZone('Europe/paris')));
-
-
+            $ligne->setUser($this->getUser());
+            $ligne->setOrigine(1); // 1 = import , automatic
             $em->persist($ligne);
             $em->flush();
+
         }
+
     }
 
     public function importLinesFromHTML($html)
@@ -353,12 +472,14 @@ class HomeController extends AbstractController
                     }
                 }
             }
+            $ligne->setUser($this->getUser());
+            $ligne->setOrigine(1); // 1 = import , automatic
             $em->persist($ligne);
             $em->flush();
         }
     }
 
-    function convert_date_fr($date, $format_in = 'j F Y', $format_out = 'Y-m-d')
+    function convert_date_fr($date, $format_in = 'j F Y', $format_out = 'Y-m-d'): string
     {
         // French to english month names
         $months = array(
@@ -421,5 +542,48 @@ class HomeController extends AbstractController
         }
 
         return DateTime::createFromFormat($format_in, $imploded)->format($format_out);
+    }
+    private function MoisToMonths($mois)
+    {
+        $months = [];
+        for ($i = 0; $i < sizeof($mois); $i++) {
+            if (isset($mois['Janvier'])) {
+                $month['January'] = $mois['Janvier'];
+            }
+            if (isset($mois['Février'])) {
+                $month['February'] = $mois['Février'];
+            }
+            if (isset($mois['Mars'])) {
+                $month['March'] = $mois['Mars'];
+            }
+            if (isset($mois['Avril'])) {
+                $month['April'] = $mois['Avril'];
+            }
+            if (isset($mois['Mai'])) {
+                $month['May'] = $mois['Mai'];
+            }
+            if (isset($mois['Juin'])) {
+                $month['June'] = $mois['Juin'];
+            }
+            if (isset($mois['Juillet'])) {
+                $month['July'] = $mois['Juillet'];
+            }
+            if (isset($mois['Août'])) {
+                $month['August'] = $mois['Août'];
+            }
+            if (isset($mois['Septembre'])) {
+                $month['September'] = $mois['Septembre'];
+            }
+            if (isset($mois['Octobre'])) {
+                $month['October'] = $mois['Octobre'];
+            }
+            if (isset($mois['Novembre'])) {
+                $month['November'] = $mois['Novembre'];
+            }
+            if (isset($mois['Décembre'])) {
+                $month['December'] = $mois['Décembre'];
+            }
+        }
+        return $months;
     }
 }

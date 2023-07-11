@@ -1,11 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Profesionnel{% endblock %}
+{% block title %}Nouveau contact profesionnel - Tech&Dev {% endblock %}
 
 {% block body %}
-    <h1>Create new Profesionnel</h1>
 
-    {{ include('profesionnel/_form.html.twig') }}
+    <div class="container">
+        <h1 class="">Nouveau contact profesionnel</h1>
+        {{ include('profesionnel/_form.html.twig') }}
+        <a class="btn btn-dark m-2" href="{{ path('compagny') }}">Retour</a>
+    </div>
 
-    <a href="{{ path('profesionnel_index') }}">back to list</a>
+
+
 {% endblock %}

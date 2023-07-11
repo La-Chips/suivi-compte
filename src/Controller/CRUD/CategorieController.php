@@ -76,7 +76,3 @@ class CategorieController extends AbstractController
             $entityManager->remove($categorie);
             $entityManager->flush();
         }
-
-        return $this->redirectToRoute('settings', [], Response::HTTP_SEE_OTHER);
-    }
-}

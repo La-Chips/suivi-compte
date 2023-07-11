@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!
+{% block title %}Se connecter - Tech&Dev
 {% endblock %}
 
 {% block header %}{% endblock %}
@@ -33,10 +33,10 @@
 				</div>
 			{% endif %}
 
-			<h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-			<label for="inputUsername">Username</label>
+			<h1 class="h3 mb-3 font-weight-normal">Connexion</h1>
+			<label for="inputUsername">Nom d'utilisateur</label>
 			<input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" autocomplete="username" required autofocus>
-			<label for="inputPassword">Password</label>
+			<label for="inputPassword">Mot de passe</label>
 			<input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
 
 			<input
@@ -54,7 +54,7 @@
 								    #}
 
 			<button class="btn btn-lg btn-primary mt-3" type="submit">
-				Sign in
+				Se connecter
 			</button>
 		</form>
 	</div>

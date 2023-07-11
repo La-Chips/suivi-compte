@@ -1,7 +1,10 @@
 {% extends "base.html.twig" %}
 
 {% block stylesheets %}
-	<link rel="stylesheet" href="/css/resume.css">
+	<link rel="stylesheet" href="{{ asset('css/resume.css') }}">
+{% endblock %}
+{% block title %}
+	Récapitulatif - Tech&Dev
 {% endblock %}
 
 {% block body %}
@@ -12,7 +15,7 @@
 		{% set item = item | first %}
 		
 			{% if item == year %}
-				<legend>{{year}}</legend>
+				<legend>Année {{year}}</legend>
 			{% else %}
 				<a href="{{path('resume',{year : item})}}" class="btn btn-info">{{item}}</a>
 
@@ -21,15 +24,15 @@
 		</div>
 		<table class="table table-striped resume">
 			<thead class="sticky-top">
-				<th></th>
-				<th>#</th>
+				<th>Action</th>
+				<th>Mois</th>
 				{% for item in categories %}
 					<th>{{item}}</th>
 				{% endfor %}
-				<th></th>
+				<th>Total catégorisé</th>
+				<th>Total</th>
 			</thead>
 			<tbody>
-
 				{% for month in sumByMonth | keys %}
 					{% set sum = 0 %}
 					<tr>
@@ -49,8 +52,8 @@
 								<td>0 €</td>
 							{% endif %}
 						{% endfor %}
-						<td>{{sum}}
-							€</td>
+						<td>{{sum}} €</td>
+						<td>{{sumByMonthYear[month]}} €</td>
 					</tr>
 				{% endfor %}
 			</tbody>

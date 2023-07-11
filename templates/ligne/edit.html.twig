@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Ligne
+{% block title %}Modifier ligne n°{{ ligne.id}} - Tech&Dev
 {% endblock %}
 
 {% block body %}
 	<div class="container">
-		<h1>Edit Ligne</h1>
+		<h1>Modifier ligne n°{{ ligne.id}} </h1>
 
-		<div class="container">{{ include('ligne/_form.html.twig', {'button_label': 'Update'}) }}
+		<div class="container">{{ include('ligne/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-			<div class="d-flex">
-				<a href="{{ path('resume',{year : 'now' | date('Y')}) }}" class="btn btn-dark my-3">Retour</a>
-				{{ include('ligne/_delete_form.html.twig') }}</div>
+			<a href="{{ path('resume',{year : 'now' | date('Y')}) }}" class="btn btn-dark m-2">Retour</a>
+			{{ include('ligne/_delete_form.html.twig') }}</div>
+
 
 
 		</div>

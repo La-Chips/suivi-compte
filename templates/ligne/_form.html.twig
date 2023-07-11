@@ -1,4 +1,6 @@
 {{ form_start(form) }}
 {{ form_widget(form) }}
-<button class="btn btn-success m-3">{{ button_label|default('Save') }}</button>
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCategorie">Créer catégorie</button>
+<button class="btn btn-success m-2">{{ button_label|default('Sauvegarder') }}</button>
+
 {{ form_end(form) }}

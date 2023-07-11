@@ -11,15 +11,26 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CreateFilterType extends AbstractType
 {
+    private mixed $categories;
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $this->categories = $options['categories'];
         $builder
-            ->add('keyword')
+            ->add('keyword',null,[
+                'label' => 'Mot clé',
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Mot clé',
+                ],
+            ])
             ->add('categorie',EntityType::class,[
                 'class' => Categorie::class,
                 'choice_label' => 'libelle',
                 'required' => true,
-                'attr' => ['class' => 'form-select']
+                'label' => 'Catégorie',
+                'attr' => ['class' => 'form-select'],
+                'choices' => $this->categories,
             ])
         ;
     }
@@ -28,6 +39,7 @@ class CreateFilterType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Filter::class,
+            'categories' => [],
         ]);
     }
 }

@@ -6,6 +6,7 @@ use App\Repository\LigneRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * @ORM\Entity(repositoryClass=LigneRepository::class)
@@ -51,6 +52,7 @@ class Ligne
 
     /**
      * @ORM\ManyToOne(targetEntity=Categorie::class, inversedBy="lignes")
+     * @JoinColumn(onDelete="SET NULL")
      */
     private $categorie;
 
@@ -58,6 +60,17 @@ class Ligne
      * @ORM\Column(type="datetime")
      */
     private $date_insert;
+
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $origine;
+
+    /**
+     * @ORM\OneToOne(targetEntity=LastImport::class, mappedBy="ligne", cascade={"persist", "remove"})
+     */
+    private $lastImport;
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="lignes")
@@ -193,6 +206,45 @@ class Ligne
     public function removeOwner(User $owner): self
     {
         $this->owner->removeElement($owner);
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->id;
+    }
+
+    public function getOrigine(): ?int
+    {
+        return $this->origine;
+    }
+
+    public function setOrigine(int $origine): self
+    {
+        $this->origine = $origine;
+
+        return $this;
+    }
+
+    public function getLastImport(): ?LastImport
+    {
+        return $this->lastImport;
+    }
+
+    public function setLastImport(?LastImport $lastImport): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($lastImport === null && $this->lastImport !== null) {
+            $this->lastImport->setLigne(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($lastImport !== null && $lastImport->getLigne() !== $this) {
+            $lastImport->setLigne($this);
+        }
+
+        $this->lastImport = $lastImport;
 
         return $this;
     }
