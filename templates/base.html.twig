@@ -30,18 +30,53 @@
 	</head>
 	<body class="dark-mode">
 
+	{% if year is not defined %}
+		{% set year = "now" | date("Y") %}
+
+{% endif %}
+	
+
+	{% set menus = {
+		'board' : {
+			'route' : path('app_board'),
+			'name' : 'Tableau de bord',
+			'icon' : 'fas fa-tachometer-alt'
+		},
+		'home' : {
+			'route' : path('home'),
+			'name' : 'home',
+			'icon' : 'fas fa-home'
+		},
+		'resume' : {
+			'route' : path('resume', {year:year}),
+			'name' : 'Resumer',
+			'icon' : 'fas fa-file-alt'
+		},
+		'settings' : {
+			'route' : path('settings'),
+			'name' : 'Parametres',
+			'icon' : 'fas fa-cog'
+		},
+
+		}
+
+%}
+
 		{% block header %}
 			{% set year = "now" | date("Y") %}
 
 			<header class="bg-dark  p-3 d-flex justify-content-between">
 
 				<div>
-					<a href="{{path('home')}}" {% if active is defined and active == 'home' %} class="active" {% endif %}>home</a>
+					{% for menu in menus %}
+						<a href= {{menu.route}} {% if active is defined and active == menu.route %}class="active"{% endif %}
+						>
+							<i class="{{menu.icon}} me-3"></i>
+						{{menu.name}}
+					</a>
+					{% endfor %}
 
-					<a href="{{path('resume', {year:year})}}" {% if active is defined and active == 'resume' %} class="active" {% endif %}>Resumer</a>
-					<a href="{{path('settings')}}" {% if active is defined and active == 'settings' %} class="active" {% endif %}>Parametres</a>
-					<a href="{{path('compagny')}}" {% if active is defined and active == 'compagny' %} class="active" {% endif %}>Tech&Dev</a>
-					<a href="{{path('folder',{id:1})}}" {% if active is defined and active == 'folder' %} class="active" {% endif %}>Folder</a>
+
 					{% if app.user.isAdmin() %}
 						<a href="{{path('admin')}}">Admin</a>
 					{% endif %}

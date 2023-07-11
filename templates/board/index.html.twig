@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Hello BoardController!
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/board.css') }}">
+    {% endblock %}
+
+    {% block javascripts %}
+        {{ parent() }}
+        <script src="{{ asset('js/board.js') }}"></script>
+    {% endblock %}
+
+    {% block body %}
+
+    <div class="container">
+<div class="fs-1 my-3 ">{{"now" | date("F")}}</div>
+<hr>
+            <div class="d-flex">
+                {# Balance container #}
+                <div class="card bg-dark mb-3">
+                    <div class="card-header fs-4">
+                        Balance
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Dépenses
+                                    </th>
+                                    <th>
+                                        Revenus
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="bg-danger rounded">
+                                            {{ balance.expenses }} €
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="bg-success rounded">
+                                            {{ balance.incomes }} €
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <div class="bg-warning text-dark rounded text-center fw-bold">
+                                            {{ balance.total }} €
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            <hr>
+
+                <div>
+                <h3>Dépenses partagés</h3>
+                
+                </div>
+
+            {% endblock %}
+            

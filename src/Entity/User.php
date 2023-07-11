@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -36,6 +38,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string")
      */
     private $password;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Ligne::class, mappedBy="owner")
+     */
+    private $lignes;
+
+    public function __construct()
+    {
+        $this->lignes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -124,5 +136,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isAdmin()
     {
         return in_array('ROLE_ADMIN', $this->roles);
+    }
+
+    /**
+     * @return Collection<int, Ligne>
+     */
+    public function getLignes(): Collection
+    {
+        return $this->lignes;
+    }
+
+    public function addLigne(Ligne $ligne): self
+    {
+        if (!$this->lignes->contains($ligne)) {
+            $this->lignes[] = $ligne;
+            $ligne->addOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLigne(Ligne $ligne): self
+    {
+        if ($this->lignes->removeElement($ligne)) {
+            $ligne->removeOwner($this);
+        }
+
+        return $this;
     }
 }

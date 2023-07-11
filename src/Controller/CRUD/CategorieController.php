@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\CRUD;
 
 use App\Entity\Categorie;
 use App\Form\CategorieType;
@@ -16,7 +16,7 @@ class CategorieController extends AbstractController
     #[Route('/', name: 'categorie_index', methods: ['GET'])]
     public function index(CategorieRepository $categorieRepository): Response
     {
-        return $this->render('categorie/index.html.twig', [
+        return $this->render('crud/categorie/index.html.twig', [
             'categories' => $categorieRepository->findAll(),
         ]);
     }
@@ -36,7 +36,7 @@ class CategorieController extends AbstractController
             return $this->redirectToRoute('settings', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('categorie/new.html.twig', [
+        return $this->renderForm('crud/categorie/new.html.twig', [
             'categorie' => $categorie,
             'form' => $form,
         ]);
@@ -45,7 +45,7 @@ class CategorieController extends AbstractController
     #[Route('/{id}', name: 'categorie_show', methods: ['GET'])]
     public function show(Categorie $categorie): Response
     {
-        return $this->render('categorie/show.html.twig', [
+        return $this->render('crud/categorie/show.html.twig', [
             'categorie' => $categorie,
         ]);
     }
@@ -62,7 +62,7 @@ class CategorieController extends AbstractController
             return $this->redirectToRoute('settings', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('categorie/edit.html.twig', [
+        return $this->renderForm('crud/categorie/edit.html.twig', [
             'categorie' => $categorie,
             'form' => $form,
         ]);

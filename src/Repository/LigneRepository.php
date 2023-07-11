@@ -104,6 +104,39 @@ class LigneRepository extends ServiceEntityRepository
         return $out;
     }
 
+    // Find income by month
+    public function getIncomeByMonth($month, int $year)
+    {
+        
+        $qb = $this->createQueryBuilder('line')
+            ->select('ROUND(sum(line.montant),2) as total')
+            ->where('MONTHNAME(line.date) = :month and YEAR(line.date) = :year')
+            ->andWhere('line.montant > 0')
+            ->setParameters(array(
+                'month' => $month,
+                'year' => $year,
+            ));
+
+        $result = $qb->getQuery()->getResult();
+        return $result[0]['total'] ?? 0;
+    }
+
+    // Find expense by month
+    public function getExpenseByMonth($month, int $year)
+    {
+        $qb = $this->createQueryBuilder('line')
+            ->select('ROUND(sum(line.montant),2) as total')
+            ->where('MONTHNAME(line.date) = :month and YEAR(line.date) = :year')
+            ->andWhere('line.montant < 0')
+            ->setParameters(array(
+                'month' => $month,
+                'year' => $year,
+            ));
+
+        $result = $qb->getQuery()->getResult();
+        return $result[0]['total'] ?? 0;
+    }
+
     // /**
     //  * @return Ligne[] Returns an array of Ligne objects
     //  */

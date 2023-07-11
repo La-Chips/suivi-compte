@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\LigneRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -57,9 +59,15 @@ class Ligne
      */
     private $date_insert;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="lignes")
+     */
+    private $owner;
+
     public function __construct()
     {
         $this->date_insert = new \DateTime('now', new \DateTimeZone('Europe/paris'));
+        $this->owner = new ArrayCollection();
     }
 
 
@@ -161,6 +169,30 @@ class Ligne
     public function setDateInsert(\DateTimeInterface $date_insert): self
     {
         $this->date_insert = $date_insert;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getOwner(): Collection
+    {
+        return $this->owner;
+    }
+
+    public function addOwner(User $owner): self
+    {
+        if (!$this->owner->contains($owner)) {
+            $this->owner[] = $owner;
+        }
+
+        return $this;
+    }
+
+    public function removeOwner(User $owner): self
+    {
+        $this->owner->removeElement($owner);
 
         return $this;
     }
