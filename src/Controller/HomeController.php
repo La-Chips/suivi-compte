@@ -130,6 +130,43 @@ class HomeController extends AbstractController
         ]);
     }
 
+    #[Route('/graphs',name:'graphs')]
+    public function graph(Request $request,CategorieRepository $categorieRepository, LigneRepository $ligneRepository){
+
+        $request->query->get('year') ? $year = $request->query->get('year') : $year = date('Y');
+        $categories = $categorieRepository->findBy(['User'=> $this->getUser()], array('libelle' => 'ASC'));
+        $sumByMonthYear =[];
+        foreach ($ligneRepository->getMonth($year,$this->getUser()->getId()) as $month) {
+            $sumByMonthYear +=[$month['month']=>$ligneRepository->sumByMonth($month['month'],$year,$this->getUser())];
+        }
+        $sumByMonthByCat = $ligneRepository->sumByMonthByCat($year,$this->getUser()->getId());
+        $years = $ligneRepository->getYears();
+        $sumByMonthByCat = $this->MonthsToMois($sumByMonthByCat);
+        $sumByMonthYear = $this->MonthsToMois($sumByMonthYear);
+
+        $sumByCatByMonth = [];
+
+        foreach ($sumByMonthByCat as $key => $value) {
+            foreach ($value as $k => $v) {
+                if(isset($sumByCatByMonth[$k][$key])){
+                    $sumByCatByMonth[$k][$key] += abs($v);
+                }
+                else{
+                    $sumByCatByMonth[$k][$key] = abs($v);
+                }
+            }
+        }
+
+
+        return $this->render('home/graph.html.twig',[
+            'years' => $years,
+            'year' => $year,
+            'categories' => $categories,
+            'sumByCatByMonth' => $sumByCatByMonth,
+            'sumByMonthYear' => $sumByMonthYear,
+        ]);
+    }
+
     #[Route('/line/set/status/{id}/{statut}', name: 'line.set.statut')]
     public function setStatut($id, $statut)
     {

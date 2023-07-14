@@ -1,0 +1,120 @@
+{% extends "base.html.twig" %}
+
+
+{% block javascripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script defer >
+ 
+
+const data = {
+    labels : ["{{ sumByMonthYear | keys | join('", "')| raw   }}"],
+    datasets : [
+        {% for cat , array in sumByCatByMonth %}
+            {% set r = random(0,255) %}
+            {% set g = random(0,255) %}
+            {% set b = random(0,255) %}
+
+        {
+            label: '{{ cat }}',
+            data :  [{{ array | join(',')| raw   }}],
+            borderColor: 'rgb({{r}}, {{g}}, {{b}})',
+            backgroundColor: 'rgb({{r}}, {{g}}, {{b}})',
+            yAxisID: 'y',
+        },
+        {% endfor %}
+        
+      
+    ]
+
+}
+const config = {
+  type: 'line',
+  data: data,
+  options: {
+    responsive: true,
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
+    stacked: false,
+    plugins: {
+      title: {
+        display: true,
+        text: 'Chart.js Line Chart - Multi Axis'
+      }
+    },
+    scales: {
+      y: {
+        type: 'linear',
+        display: true,
+        position: 'left',
+      },
+      y1: {
+        type: 'linear',
+        display: true,
+        position: 'right',
+
+        // grid line settings
+        grid: {
+          drawOnChartArea: false, // only want the grid lines for one axis to show up
+        },
+      },
+    }
+  },
+};
+
+
+$(document).ready(function() {
+    const ctx = document.getElementById('myChart').getContext('2d');
+    new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: config
+    });
+
+    $('#select_year').change(function(){
+				var year = $(this).val();
+				window.location.href = "{{path('graphs')}}?year="+year;
+			});
+});
+
+
+
+</script>
+
+
+
+{% endblock %}
+
+{% block title %}
+	Graphs - Tech&Dev
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+
+    <div class="d-flex align-items-center">
+				<h1>Graphs</h1>
+				<div>
+					<select class="form-select mx-3" id="select_year">
+					{% for item in years %}
+					{% set item = item | first %}
+								<option value="{{item}}" 
+							{% if item == year %}selected="selected"{% endif %}
+								>{{item}}</option>
+
+					{% endfor %}
+					</select>
+				</div>
+    </div>
+
+    <div id="chart">
+        <canvas id="myChart" width="400" height="200"></canvas>
+</div>
+
+</div>
+
+
+{% endblock %}
