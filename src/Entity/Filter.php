@@ -44,6 +44,8 @@ class Filter
 
     public function setKeyword(string $keyword): self
     {
+        $keywork = strtolower($keyword);
+        $keyword = trim($keyword);
         $this->keyword = $keyword;
 
         return $this;
