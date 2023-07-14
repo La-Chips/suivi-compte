@@ -58,8 +58,9 @@ class LigneRepository extends ServiceEntityRepository
     public function getMonth($year,$user)
     {
         $qb = $this->createQueryBuilder('line')
+        ->innerJoin('line.owner', 'own')
             ->select('DISTINCT MONTHNAME(line.date) as month,MONTH(line.date) as monthId')
-            ->where('YEAR(line.date) = :year and line.user = :user')
+            ->where('YEAR(line.date) = :year and :user in (own.id)')
             ->orderby('monthId', 'ASC')
             ->setParameters(array(
                 'year' => $year,
@@ -73,9 +74,10 @@ class LigneRepository extends ServiceEntityRepository
     public function getSumCatByMonth($monthname, $year,$user)
     {
         $qb = $this->createQueryBuilder('line')
-            ->InnerJoin('line.categorie', 'cat')
+        ->innerJoin('line.owner', 'own')
+        ->InnerJoin('line.categorie', 'cat')
             ->select('cat.libelle as libelle , ROUND(sum(line.montant),2) as total')
-            ->where('MONTHNAME(line.date) = :monthname and YEAR(line.date) = :year and line.user = :user')
+            ->where('MONTHNAME(line.date) = :monthname and YEAR(line.date) = :year and :user in (own.id)')
             ->setParameters(array(
                 'monthname' => $monthname,
                 'year' => $year,
@@ -106,16 +108,19 @@ class LigneRepository extends ServiceEntityRepository
     }
 
     // Find income by month
-    public function getIncomeByMonth($month, int $year)
+    public function getIncomeByMonth($month, int $year, $user)
     {
         
         $qb = $this->createQueryBuilder('line')
+        ->innerJoin('line.owner', 'own')
             ->select('ROUND(sum(line.montant),2) as total')
             ->where('MONTHNAME(line.date) = :month and YEAR(line.date) = :year')
             ->andWhere('line.montant > 0')
+            ->andWhere(':own in (own.id)')
             ->setParameters(array(
                 'month' => $month,
                 'year' => $year,
+                'own' => $user->getId(),
             ));
 
         $result = $qb->getQuery()->getResult();
@@ -123,19 +128,40 @@ class LigneRepository extends ServiceEntityRepository
     }
 
     // Find expense by month
-    public function getExpenseByMonth($month, int $year)
+    public function getExpenseByMonth($month, int $year, $user)
     {
         $qb = $this->createQueryBuilder('line')
+            ->innerJoin('line.owner', 'own')
             ->select('ROUND(sum(line.montant),2) as total')
             ->where('MONTHNAME(line.date) = :month and YEAR(line.date) = :year')
             ->andWhere('line.montant < 0')
+            ->andWhere(':own in (own.id)')
             ->setParameters(array(
                 'month' => $month,
                 'year' => $year,
+                'own' => $user->getId(),
             ));
 
         $result = $qb->getQuery()->getResult();
+        
         return $result[0]['total'] ?? 0;
+    }
+
+    // Find shares by month
+    public function findSharesByMonth($month, int $year, $user)
+    {
+        $qb = $this->createQueryBuilder('line')
+            ->innerJoin('line.owner', 'own')
+            ->where('MONTHNAME(line.date) = :month and YEAR(line.date) = :year')
+            ->andWhere(':own in (own.id)')
+            ->setParameters(array(
+                'month' => $month,
+                'year' => $year,
+                'own' => $user->getId(),
+            ));
+
+        $result = $qb->getQuery()->getResult();
+        return $result;
     }
 
     // /**
@@ -170,7 +196,10 @@ class LigneRepository extends ServiceEntityRepository
     public function findByMonth($year, $monthname, $sort, $order,$user)
     {
         $qb = $this->createQueryBuilder('l')
-            ->where('MONTHNAME(l.date) = :month and YEAR(l.date) = :year and l.user = :user')
+        ->innerJoin('l.owner', 'own')
+
+            ->where('MONTHNAME(l.date) = :month and YEAR(l.date) = :year')
+            ->andWhere(':user in (own.id)')
             ->setParameters(array('year' => $year, 'month' => $monthname, 'user' => $user));
         if ($sort == null) {
             $qb->orderBy('l.date', 'DESC');
@@ -186,8 +215,10 @@ class LigneRepository extends ServiceEntityRepository
     {
 
         $qb = $this->createQueryBuilder('l')
+        ->innerJoin('l.owner', 'own')
             ->select('sum(l.montant) as total')
-            ->where('l.statut = 1 and l.user = :user')
+            ->where('l.statut = 1 ')
+            ->andWhere(':user in (own.id)')
             ->setParameter('user', $user->getId());
 
         return $qb->getQuery()->getScalarResult();
@@ -195,8 +226,10 @@ class LigneRepository extends ServiceEntityRepository
     public function sumToPay($user)
     {
         $qb = $this->createQueryBuilder('l')
+        ->innerJoin('l.owner', 'own')
             ->select('sum(l.montant) as total')
-            ->where('l.statut = 2 and l.user = :user')
+            ->where('l.statut = 2 ')
+            ->andWhere(':user in (own.id)')
             ->setParameter('user', $user->getId());
 
         return $qb->getQuery()->getScalarResult();
@@ -205,8 +238,9 @@ class LigneRepository extends ServiceEntityRepository
     public function sum($user)
     {
         $qb = $this->createQueryBuilder('l')
-            ->select('sum(l.montant) as total')
-            ->where('l.user = :user')
+        ->innerJoin('l.owner', 'own')
+        ->select('sum(l.montant) as total')
+            ->where(':user in (own.id)')
             ->setParameter('user', $user->getId());
 
         return $qb->getQuery()->getScalarResult();
@@ -216,8 +250,10 @@ class LigneRepository extends ServiceEntityRepository
     {
 
         $qb = $this->createQueryBuilder('l')
-            ->select('sum(l.montant) as total')
-            ->where('MONTHNAME(l.date) = :month and YEAR(l.date) = :year and l.user = :user')
+        ->innerJoin('l.owner', 'own')
+        ->select('sum(l.montant) as total')
+        ->innerJoin('line.owner', 'own')
+        ->where('MONTHNAME(l.date) = :month and YEAR(l.date) = :year and :user in (own.id)')
             ->setParameters(array('year' => $year, 'month' => $monthname, 'user' => $user));
 
         return round($qb->getQuery()->getScalarResult()[0]['total'], 2);

@@ -3,9 +3,52 @@
 {% block title %}Nouvelle ligne - Tech&Dev
 {% endblock %}
 
+{% block javascripts %}
+	{{parent()}}
+
+	<script>
+		$(document).ready(function () {
+			$('#income').change(function () {
+				let value = $("#ligne_montant").val();
+				$("#ligne_montant").val(Math.abs(value));
+			});
+			$('#expense').change(function () {
+				let value = $("#ligne_montant").val();
+				$("#ligne_montant").val(-Math.abs(value));
+			});
+
+			$('#ligne_montant').change(function () {
+				let value = $("#ligne_montant").val();
+				let income = $('#income').is(':checked');
+
+				if (income) {
+					$("#ligne_montant").val(Math.abs(value));
+				} else {
+					$("#ligne_montant").val(-Math.abs(value));
+				}
+			});
+		});
+	
+	</script>
+
+{% endblock %}
+
 {% block body %}
 	<div class="container">
+		<div class="d-flex justify-content-between align-items-center">
 		<h1>Créer nouvelle ligne </h1>
+			<div class="d-flex"> 
+					<div class="d-flex align-items-center bg-success p-1 rounded" >
+						<input type="radio" name="type" id="income" >
+					<label for="income" >Revenu</label>
+					</div>
+					<div  class="d-flex align-items-center ms-5 bg-danger p-1 rounded"  >
+					<input type="radio" name="type" id="expense" checked>
+				<label for="expense">Dépense</label>
+			</div>
+			</div>
+		
+		</div>
 
 		<div class="container">
 			{{ include('ligne/_form.html.twig') }}

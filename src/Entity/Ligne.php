@@ -67,20 +67,22 @@ class Ligne
      */
     private $origine;
 
-    /**
-     * @ORM\OneToOne(targetEntity=LastImport::class, mappedBy="ligne", cascade={"persist", "remove"})
-     */
-    private $lastImport;
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="lignes")
      */
     private $owner;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="lignes_created")
+     */
+    private $user;
+
     public function __construct()
     {
         $this->date_insert = new \DateTime('now', new \DateTimeZone('Europe/paris'));
         $this->owner = new ArrayCollection();
+        
     }
 
 
@@ -227,25 +229,17 @@ class Ligne
         return $this;
     }
 
-    public function getLastImport(): ?LastImport
+    public function getUser(): ?User
     {
-        return $this->lastImport;
+        return $this->user;
     }
 
-    public function setLastImport(?LastImport $lastImport): self
+    public function setUser(?User $user): self
     {
-        // unset the owning side of the relation if necessary
-        if ($lastImport === null && $this->lastImport !== null) {
-            $this->lastImport->setLigne(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($lastImport !== null && $lastImport->getLigne() !== $this) {
-            $lastImport->setLigne($this);
-        }
-
-        $this->lastImport = $lastImport;
+        $this->user = $user;
 
         return $this;
     }
+
+    
 }

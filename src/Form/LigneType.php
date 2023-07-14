@@ -58,14 +58,19 @@ class LigneType extends AbstractType
                     'class' => 'form-select'
                 )
             ))
-            ->add('origine', ChoiceType::class, array(
-                'choices' => array(
-                    'Manuel' => 0,
-                    'Automatique' => 1,
-                ),
-                'data' => 0,
-                'label' => 'Origine',
-            ));
+            // ->add('origine', ChoiceType::class, array(
+            //     'choices' => array(
+            //         'Manuel' => 0,
+            //         'Automatique' => 1,
+            //     ),
+            //     'data' => 0,
+            //     'label' => 'Origine',
+            // ))
+
+            ->add('owner', null, [
+                'label' => 'Participants',
+            ])
+            ;
     }
 
     public function configureOptions(OptionsResolver $resolver)

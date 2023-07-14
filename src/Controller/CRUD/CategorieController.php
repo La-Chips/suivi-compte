@@ -76,3 +76,5 @@ class CategorieController extends AbstractController
             $entityManager->remove($categorie);
             $entityManager->flush();
         }
+    }
+}

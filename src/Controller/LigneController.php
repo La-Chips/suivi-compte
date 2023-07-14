@@ -61,9 +61,7 @@ class LigneController extends AbstractController
         $form = $this->createForm(LigneType::class, $ligne, ['statut' => $statut,'categories'=>$categories]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $userID = $session->get('userID');
-            $user = $userRepository->findBy(['id' => $userID]);
-            $ligne->setUser($user[0]);
+            $ligne->setUser($this->getUser());
             $ligne->setOrigine(0); //zero means it's a ligne add manually by the user
             $entityManager->persist($ligne);
             $entityManager->flush();

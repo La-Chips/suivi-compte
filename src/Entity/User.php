@@ -5,8 +5,6 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -47,9 +45,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $lignes;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Ligne::class, mappedBy="user")
+     */
+    private $lignes_created;
+
     public function __construct()
     {
         $this->lignes = new ArrayCollection();
+        $this->lignes_created = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -171,5 +175,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString()
     {
         return $this->username;
+    }
+
+    /**
+     * @return Collection<int, Ligne>
+     */
+    public function getLignesCreated(): Collection
+    {
+        return $this->lignes_created;
+    }
+
+    public function addLignesCreated(Ligne $lignesCreated): self
+    {
+        if (!$this->lignes_created->contains($lignesCreated)) {
+            $this->lignes_created[] = $lignesCreated;
+            $lignesCreated->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLignesCreated(Ligne $lignesCreated): self
+    {
+        if ($this->lignes_created->removeElement($lignesCreated)) {
+            // set the owning side to null (unless already changed)
+            if ($lignesCreated->getUser() === $this) {
+                $lignesCreated->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

@@ -56,19 +56,21 @@ class HomeController extends AbstractController
             $sort = 'date';
             $order = 'DESC';
         }
-        $userID = $session->get('userID');
-        $user = $userRepository->find($userID);
-        $lignes = $ligneRepository->findBy(['user'=>$userID], array($sort => $order));
-        //$lignes = $this->getDoctrine()->getRepository(Ligne::class)->findBy(array(), array($sort => $order));
-        $to_filter = $ligneRepository->findBy(['categorie' => null, 'user' => $userID]);
-        $du = $ligneRepository->findBy(['statut' => 1, 'user' => $userID]);
-        $to_pay = $ligneRepository->findBy(['statut' => 2, 'user' => $userID]);
+        $user = $this->getUser();
+        $lignes = $user->getLignes();
+        $to_filter = $ligneRepository->findBy(['categorie' => null]);
+        $du = $ligneRepository->findBy(['statut' => 1]);
+        $to_pay = $ligneRepository->findBy(['statut' => 2]);
         $categories = $categorieRepository->findBy(['User' => $this->getUser()], array('libelle' => 'ASC'));
 
-        $du_total = $ligneRepository->sumDu($user)[0]['total'];
-        $to_pay_total = $ligneRepository->sumToPay($user)[0]['total'];
-        $sum = $ligneRepository->sum($user)[0]['total'];
-        $sum = round($sum, 2);
+        // $du_total = $ligneRepository->sumDu($user)[0]['total'];
+        // $to_pay_total = $ligneRepository->sumToPay($user)[0]['total'];
+        // $sum = $ligneRepository->sum($user)[0]['total'];
+        // $sum = round($sum, 2);
+
+        $du_total = 0;
+        $to_pay_total = 0;
+        $sum = 0;
 
 
 
@@ -174,7 +176,7 @@ class HomeController extends AbstractController
             $lastligne = $lastImport->getLigne();
             $ligneRepository->delete($lastligne);
         }
-        $lastImport->setLigne($ligneRepository->findOneBy(['user'=>$this->getUser()],['date'=>'DESC']));
+        $lastImport->setLigne($ligneRepository->findOneBy(['owner'=>$this->getUser()],['date'=>'DESC']));
         $entityManager->persist($lastImport);
         $entityManager->flush();
         $this->sync($entityManager,$categorieRepository,$ligneRepository,$filterRepository);
