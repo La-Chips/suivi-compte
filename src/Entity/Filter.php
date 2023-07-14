@@ -32,6 +32,11 @@ class Filter
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $amount;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -73,5 +78,23 @@ class Filter
         $this->user = $user;
 
         return $this;
+    }
+
+    public function getAmount(): ?float
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(?float $amount): self
+    {
+        $this->amount = $amount;
+
+        return $this;
+    }
+
+    // has amount 
+    public function hasAmount(): bool
+    {
+        return $this->amount !== null;
     }
 }

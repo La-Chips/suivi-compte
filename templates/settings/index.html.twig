@@ -56,8 +56,14 @@
 										<td>{{item}}</td>
 										<td class="d-flex flex-wrap">
 											{% for tags in item.filters %}
-												<div class="bg-light-grey rounded-pill ps-2 m-1">{{tags.keyword}}
-													<a href="{{path('delete',{option: 'filter' , id: tags.id})}}" class="btn btn-danger py-1">
+												<div class="bg-light-grey rounded-pill ps-2 m-1 fw-bold">{{tags.keyword | capitalize}}
+
+												{% if tags.amount %}
+													<span class="badge bg-success rounded-pill">{{tags.amount}}</span>
+											{% endif %}
+												
+
+													<a href="{{path('delete',{option: 'filter' , id: tags.id})}}" class="btn btn-danger  rounded-circle">
 														<img src="{{ asset('img/cross-circle.svg') }}" alt="del" width="20">
 
 													</a>

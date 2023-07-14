@@ -7,6 +7,7 @@ use App\Entity\Categorie;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CreateFilterType extends AbstractType
@@ -22,6 +23,13 @@ class CreateFilterType extends AbstractType
                 'required' => true,
                 'attr' => [
                     'placeholder' => 'Mot clé',
+                ],
+            ])
+            ->add('amount',MoneyType::class,[
+                'label' => 'Montant',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Montant',
                 ],
             ])
             ->add('categorie',EntityType::class,[

@@ -188,8 +188,16 @@ class HomeController extends AbstractController
             foreach ($filters as $filter) {
                 $libelle = strtolower($ligne->getLibelle());
                 $kw = strtolower($filter->getKeyword());
-
-                if (str_contains($libelle, $kw)) {
+                
+                if($filter->hasAmount()){
+                    $amount = $filter->getAmount() * -1;
+                    if($amount == $ligne->getMontant() && str_contains($libelle, $kw)){
+                        $ligne->setCategorie($filter->getCategorie());
+                        $em->flush();
+                        continue;
+                    }
+                }
+                else if (str_contains($libelle, $kw)) {
                     $ligne->setCategorie($filter->getCategorie());
                     $em->flush();
                 }
