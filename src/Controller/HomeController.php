@@ -145,14 +145,25 @@ class HomeController extends AbstractController
         $sumByMonthYear = $this->MonthsToMois($sumByMonthYear);
 
         $sumByCatByMonth = [];
+        $months = $this->getMonths();
 
         foreach ($sumByMonthByCat as $key => $value) {
             foreach ($value as $k => $v) {
+
                 if(isset($sumByCatByMonth[$k][$key])){
                     $sumByCatByMonth[$k][$key] += abs($v);
                 }
                 else{
                     $sumByCatByMonth[$k][$key] = abs($v);
+                }
+            }
+        }
+
+        foreach ($sumByCatByMonth as $key => $value) {
+            foreach ($months as $k => $v) {
+                $uc = ucfirst($k);
+                if(!isset($sumByCatByMonth[$key][$uc])){
+                    $sumByCatByMonth[$key][$uc] = 0;
                 }
             }
         }
@@ -512,11 +523,10 @@ class HomeController extends AbstractController
             $em->flush();
         }
     }
-
-    function convert_date_fr($date, $format_in = 'j F Y', $format_out = 'Y-m-d'): string
-    {
-        // French to english month names
-        $months = array(
+    
+    public function getMonths() : array {
+         // French to english month names
+         $months = array(
             'janvier' => 'january',
             'février' => 'february',
             'mars' => 'march',
@@ -530,6 +540,12 @@ class HomeController extends AbstractController
             'novembre' => 'november',
             'décembre' => 'december',
         );
+        return $months;
+    }
+
+    function convert_date_fr($date, $format_in = 'j F Y', $format_out = 'Y-m-d'): string
+    {
+       $months = $this->getMonths();
 
         // List of available formats for date
         $formats_list = array('d', 'D', 'j', 'l', 'N', 'S', 'w', 'z', 'S', 'W', 'M', 'F', 'm', 'M', 'n', 't', 'A', 'L', 'o', 'Y', 'y', 'H', 'a', 'A', 'B', 'g', 'G', 'h', 'H', 'i', 's', 'u', 'v', 'F', 'e', 'I', 'O', 'P', 'T', 'Z', 'D', 'c', 'r', 'U');
