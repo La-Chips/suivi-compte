@@ -10,17 +10,20 @@
 {% block body %}
 
 	<fieldset>
-		<div class="d-flex">
+		<div class="d-flex align-items-center">
+			<h1>Récapitulatif</h1>
+				<div>
+		<select class="form-select mx-3" id="select_year">
 		{% for item in years %}
 		{% set item = item | first %}
-		
-			{% if item == year %}
-				<legend>Année {{year}}</legend>
-			{% else %}
-				<a href="{{path('resume',{year : item})}}" class="btn btn-info">{{item}}</a>
+					<option value="{{item}}" 
+				{% if item == year %}selected="selected"{% endif %}
+					>{{item}}</option>
 
-			{% endif %}
 		{% endfor %}
+	</select>
+	</div>
+		
 		</div>
 		<table class="table table-striped resume">
 			<thead class="sticky-top">
@@ -61,5 +64,22 @@
 		</table>
 
 	</fieldset>
+
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+
+	<script>
+	
+		$(document).ready(function(){
+			$('#select_year').change(function(){
+				var year = $(this).val();
+				window.location.href = "{{path('resume')}}?year="+year;
+			});
+		});
+
+	
+	</script>
 
 {% endblock %}

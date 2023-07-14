@@ -55,33 +55,35 @@ class LigneRepository extends ServiceEntityRepository
         return $result;
     }
 
-    public function getMonth($year,$user)
+    public function getMonth(int $year, int $user_id)
     {
         $qb = $this->createQueryBuilder('line')
-        ->innerJoin('line.owner', 'own')
+            ->innerJoin('line.user', 'user')
             ->select('DISTINCT MONTHNAME(line.date) as month,MONTH(line.date) as monthId')
-            ->where('YEAR(line.date) = :year and :user in (own.id)')
+            ->where('YEAR(line.date) = :year and user.id = :user')
             ->orderby('monthId', 'ASC')
             ->setParameters(array(
                 'year' => $year,
-                'user' => $user,
+                'user' => $user_id,
             ));
 
         $result = $qb->getQuery()->getResult();
         return $result;
     }
 
-    public function getSumCatByMonth($monthname, $year,$user)
+    
+
+    public function getSumCatByMonth(string $monthname,int $year,int $user_id)
     {
         $qb = $this->createQueryBuilder('line')
-        ->innerJoin('line.owner', 'own')
-        ->InnerJoin('line.categorie', 'cat')
+            ->innerJoin('line.user', 'user')
+            ->InnerJoin('line.categorie', 'cat')
             ->select('cat.libelle as libelle , ROUND(sum(line.montant),2) as total')
-            ->where('MONTHNAME(line.date) = :monthname and YEAR(line.date) = :year and :user in (own.id)')
+            ->where('MONTHNAME(line.date) = :monthname and YEAR(line.date) = :year and user.id = :user')
             ->setParameters(array(
                 'monthname' => $monthname,
                 'year' => $year,
-                'user' => $user,
+                'user' => $user_id,
             ))
             ->groupBy('cat');
         $result = $qb->getQuery()->getResult();
@@ -196,10 +198,10 @@ class LigneRepository extends ServiceEntityRepository
     public function findByMonth($year, $monthname, $sort, $order,$user)
     {
         $qb = $this->createQueryBuilder('l')
-        ->innerJoin('l.owner', 'own')
+            ->leftJoin('l.owner', 'own')
 
             ->where('MONTHNAME(l.date) = :month and YEAR(l.date) = :year')
-            ->andWhere(':user in (own.id)')
+            ->andWhere('l.user = :user OR :user in (own.id)')
             ->setParameters(array('year' => $year, 'month' => $monthname, 'user' => $user));
         if ($sort == null) {
             $qb->orderBy('l.date', 'DESC');
@@ -250,10 +252,10 @@ class LigneRepository extends ServiceEntityRepository
     {
 
         $qb = $this->createQueryBuilder('l')
-        ->innerJoin('l.owner', 'own')
+        ->leftJoin('l.owner', 'own')
         ->select('sum(l.montant) as total')
-        ->innerJoin('line.owner', 'own')
-        ->where('MONTHNAME(l.date) = :month and YEAR(l.date) = :year and :user in (own.id)')
+        ->where('MONTHNAME(l.date) = :month and YEAR(l.date) = :year')
+        ->andWhere(':user in (own.id) OR l.user = :user')
             ->setParameters(array('year' => $year, 'month' => $monthname, 'user' => $user));
 
         return round($qb->getQuery()->getScalarResult()[0]['total'], 2);

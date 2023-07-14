@@ -88,15 +88,16 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/resume/{year}', name: 'resume')]
-    public function resume($year,CategorieRepository $categorieRepository, LigneRepository $ligneRepository)
+    #[Route('/resume', name: 'resume')]
+    public function resume(Request $request,CategorieRepository $categorieRepository, LigneRepository $ligneRepository)
     {
+        $request->query->get('year') ? $year = $request->query->get('year') : $year = date('Y');
         $categories = $categorieRepository->findBy(['User'=> $this->getUser()], array('libelle' => 'ASC'));
         $sumByMonthYear =[];
-        foreach ($ligneRepository->getMonth($year,$this->getUser()) as $month) {
+        foreach ($ligneRepository->getMonth($year,$this->getUser()->getId()) as $month) {
             $sumByMonthYear +=[$month['month']=>$ligneRepository->sumByMonth($month['month'],$year,$this->getUser())];
         }
-        $sumByMonthByCat = $ligneRepository->sumByMonthByCat($year,$this->getUser());
+        $sumByMonthByCat = $ligneRepository->sumByMonthByCat($year,$this->getUser()->getId());
         $years = $ligneRepository->getYears();
         $sumByMonthByCat = $this->MonthsToMois($sumByMonthByCat);
         $sumByMonthYear = $this->MonthsToMois($sumByMonthYear);
@@ -118,8 +119,8 @@ class HomeController extends AbstractController
         if($sort == null){
             $sort = 'categorie';
         }
-        $lignes = $ligneRepository->findByMonth($year, $month, $sort, $order,$this->getUser());
-        $sum = $ligneRepository->sumByMonth($month,$year,$this->getUser());
+        $lignes = $ligneRepository->findByMonth($year, $month, $sort, $order,$this->getUser()->getId());
+        $sum = $ligneRepository->sumByMonth($month,$year,$this->getUser()->getId());
 
         return $this->render('home/see.html.twig', [
             'lignes' => $lignes,
