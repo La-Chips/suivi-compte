@@ -1,7 +1,6 @@
 
 <div class="d-flex align-items-center">
 <a href="{{path('ligne_new')}}" class="btn btn-success">Ajouter</a>
-<div class="ms-3">Opération à classifier ({{lignes | length}}) : </div>
 
 </div>
 
@@ -82,7 +81,7 @@
 			
 			</td>
 
-				<td>{{ item.date ? item.date|date('Y-m-d H:i:s') : '' }}</td>
+				<td>{{ item.date ? item.date|date('Y-F-d H:i:s') : '' }}</td>
 
 
 				<td>{{item.type}}</td>

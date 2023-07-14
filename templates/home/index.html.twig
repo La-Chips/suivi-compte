@@ -154,7 +154,7 @@
 										{% set bg = 'none' %}
 									{% endif %}
 									<td {% if bg is defined %} class="{{bg}}" {% endif %}>{{item.categorie}}</td>
-									<td>{{ item.date ? item.date|date('Y-m-d H:i:s') : '' }}</td>
+									<td>{{ item.date ? item.date|date('Y-F-d H:i:s') : '' }}</td>
 
 
 									<td>{{item.type}}</td>
