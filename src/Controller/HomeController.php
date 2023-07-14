@@ -57,7 +57,7 @@ class HomeController extends AbstractController
             $order = 'DESC';
         }
         $user = $this->getUser();
-        $lignes = $user->getLignes();
+        $lignes = $user->getLignesCreated($sort, $order);
         $to_filter = $ligneRepository->findBy(['categorie' => null]);
         $du = $ligneRepository->findBy(['statut' => 1]);
         $to_pay = $ligneRepository->findBy(['statut' => 2]);

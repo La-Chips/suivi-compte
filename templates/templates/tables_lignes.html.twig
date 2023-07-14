@@ -75,7 +75,12 @@
 				{% else %}
 					{% set bg = 'none' %}
 				{% endif %}
-				<td {% if bg is defined %} class="{{bg}}" {% endif %}>{{item.categorie}}</td>
+				<td >
+					<div {% if bg is defined %} class="{{bg}} rounded py-3" {% endif %}>
+					{{item.categorie}}
+				</div>
+			
+			</td>
 
 				<td>{{ item.date ? item.date|date('Y-m-d H:i:s') : '' }}</td>
 
@@ -96,6 +101,11 @@
 
 				</td>
 			</tr>
+
+			{% else %}
+				<tr>
+					<td colspan="8">Pas de ligne</td>
+				</tr>
 		{% endfor %}
 	</tbody>
 </table>
