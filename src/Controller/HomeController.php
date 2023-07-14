@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\LastImport;
 use App\Repository\CategorieRepository;
 use App\Repository\FilterRepository;
-use App\Repository\LastImportRepository;
 use App\Repository\LigneRepository;
 use App\Repository\UserRepository;
 use DateTime;
@@ -147,7 +146,7 @@ class HomeController extends AbstractController
 
 
     #[Route('/import/{option}', name: 'import')]
-    public function import($option, Request $request,EntityManagerInterface $entityManager,CategorieRepository $categorieRepository, LigneRepository $ligneRepository, FilterRepository $filterRepository,LastImportRepository $lastImportRepository): Response
+    public function import($option, Request $request,EntityManagerInterface $entityManager,CategorieRepository $categorieRepository, LigneRepository $ligneRepository, FilterRepository $filterRepository): Response
     {
 
         switch ($option) {
@@ -163,22 +162,9 @@ class HomeController extends AbstractController
 
                 break;
         }
-        $lastImport = $lastImportRepository->findBy(['user'=>$this->getUser()]);
+        
 
-        if ($lastImport == null) {
-            $lastImport = new LastImport();
-            $lastImport->setUser($this->getUser());
-            $entityManager->persist($lastImport);
-            $entityManager->flush();
-        }
-        else {
-            $lastImport = $lastImport[0];
-            $lastligne = $lastImport->getLigne();
-            $ligneRepository->delete($lastligne);
-        }
-        $lastImport->setLigne($ligneRepository->findOneBy(['owner'=>$this->getUser()],['date'=>'DESC']));
-        $entityManager->persist($lastImport);
-        $entityManager->flush();
+      
         $this->sync($entityManager,$categorieRepository,$ligneRepository,$filterRepository);
         return $this->redirectToRoute('home');
     }
