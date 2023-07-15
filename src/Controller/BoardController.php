@@ -3,22 +3,24 @@
 namespace App\Controller;
 
 use App\Repository\LigneRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class BoardController extends AbstractController
 {
     #[Route('/board', name: 'app_board')]
-    public function index(LigneRepository $ligneRepository): Response
+    public function index(Request $request,LigneRepository $ligneRepository): Response
     {
-
+        $request->query->get('month') != null ? $month = $request->query->get('month') : $month = date('F');
+        $request->query->get('year') != null ? $year = $request->query->get('year') : $year = date('Y');
      
 
-        $income = $ligneRepository->getIncomeByMonth(date('F'), date('Y'), $this->getUser());
-        $expense = $ligneRepository->getExpenseByMonth(date('F'), date('Y'), $this->getUser());
+        $income = $ligneRepository->getIncomeByMonth($month, $year, $this->getUser());
+        $expense = $ligneRepository->getExpenseByMonth($month, $year, $this->getUser());
 
-        $shares = $ligneRepository->findSharesByMonth(date('F'), date('Y'), $this->getUser());
+        $shares = $ligneRepository->findSharesByMonth($month, $year, $this->getUser());
 
 
         $shares_by_user = [];
@@ -42,7 +44,7 @@ class BoardController extends AbstractController
         }
 
 
-  
+        
         
 
         return $this->render('board/index.html.twig', [
@@ -53,6 +55,8 @@ class BoardController extends AbstractController
             ],
             'shares' => $shares,
             'sharesByUser' => $shares_by_user,
+            'month' => $month,
+            'year' => $year,
         ]);
     }
 }

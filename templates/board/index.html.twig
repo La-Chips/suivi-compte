@@ -17,7 +17,14 @@
     {% block body %}
 
     <div class="container">
-<div class="fs-1 my-3 ">{{"now" | date("F")}}</div>
+
+    <div class="d-flex">
+<div class="fs-1 my-3 ">{{ month }} {{year}}</div>
+
+
+</div>
+
+
 <hr>
             <div class="d-flex">
                 {# Balance container #}
@@ -93,6 +100,11 @@
                                     <div class="{{class}} rounded w-25 text-center">{{ difference }} €</div>
                                  </td>
                             </tr>
+
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">Aucune dépense partagée</td>
+                            </tr>
                         {% endfor %}
                 
                 </table>
@@ -121,6 +133,11 @@
                                 <td>{{ item.libelle }}</td>
                                 <td>{{item.type}}</td>
                       
+                            </tr>
+
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">Aucune dépense partagée</td>
                             </tr>
                         {% endfor %}
                     
