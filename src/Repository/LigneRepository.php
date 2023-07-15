@@ -213,6 +213,25 @@ class LigneRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findByMonthAndCategorie(int $year, string $month, ?int $categorie = null, int $user_id)
+    {
+        $qb = $this->createQueryBuilder('line')
+            ->innerJoin('line.user', 'user')
+            ->where('MONTHNAME(line.date) = :month and YEAR(line.date) = :year and user.id = :user')
+            ->setParameters(array(
+                'month' => $month,
+                'year' => $year,
+                'user' => $user_id,
+            ));
+
+        if ($categorie != null) {
+            $qb->andWhere('line.categorie = :categorie')
+                ->setParameter('categorie', $categorie);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function sumDu($user): array|int|string
     {
 

@@ -1,15 +1,29 @@
 {% extends "base.html.twig" %}
 
+{% block stylesheets %}
+<style>
+#table{
+    margin-top: 1rem;
+}
+#table *{
+  color: #fff !important;
+}
+
+</style>
+
+{% endblock %}
 
 {% block javascripts %}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script defer >
- 
+ const months = ["{{ sumByMonthYear | keys | join('", "')| raw   }}"];
+const categories = ["{{ sumByCatByMonth | keys | join('", "')| raw   }}"];
+
 
 const data = {
-    labels : ["{{ sumByMonthYear | keys | join('", "')| raw   }}"],
+    labels : months,
     datasets : [
         {% for cat , array in sumByCatByMonth %}
             {% set r = random(0,255) %}
@@ -29,50 +43,78 @@ const data = {
     ]
 
 }
-const config = {
-  type: 'line',
-  data: data,
-  options: {
-    responsive: true,
-    interaction: {
-      mode: 'index',
-      intersect: false,
-    },
-    stacked: false,
-    plugins: {
-      title: {
-        display: true,
-        text: 'Chart.js Line Chart - Multi Axis'
-      }
-    },
-    scales: {
-      y: {
-        type: 'linear',
-        display: true,
-        position: 'left',
-      },
-      y1: {
-        type: 'linear',
-        display: true,
-        position: 'right',
 
-        // grid line settings
-        grid: {
-          drawOnChartArea: false, // only want the grid lines for one axis to show up
+    // Configuration du graphique
+    const config = {
+      type: 'line',
+      data: data,
+      options: {
+        responsive: true,
+        interaction: {
+          mode: 'index',
+          intersect: false,
         },
-      },
-    }
-  },
-};
+        stacked: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Chart.js Line Chart - Multi Axis'
+          }
+        },
+        scales: {
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+          },
+          y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
 
+            // grid line settings
+            grid: {
+              drawOnChartArea: false, // only want the grid lines for one axis to show up
+            },
+          },
+        },
+        
+      }
+    };
 
 $(document).ready(function() {
     const ctx = document.getElementById('myChart').getContext('2d');
-    new Chart(ctx, {
+    let myChart = new Chart(ctx, {
     type: 'line',
     data: data,
     options: config
     });
+
+    ctx.canvas.onclick = (evt) => {
+        const activePoints = myChart.getElementsAtEventForMode(evt, 'point', config);
+        if (activePoints.length == 0)
+            return;
+        const firstPoint = activePoints[0];
+        const label = myChart.data.labels[firstPoint.index];
+ 
+        
+
+        $.ajax({
+            url: "{{path('resume.see.categorie', {'year': year})}}",
+            type: "GET",
+            data: {
+              month : label,
+              categorie : categories[firstPoint.datasetIndex],
+
+
+
+            },
+            success: function(data){
+                $('#table').html(data);
+                $('#table_title').html(label);
+            }
+        });
+    };
 
     $('#select_year').change(function(){
 				var year = $(this).val();
@@ -114,6 +156,14 @@ $(document).ready(function() {
         <canvas id="myChart" width="400" height="200"></canvas>
 </div>
 
+<hr>
+
+  <h3 id="table_title"></h3>
+
+<div id="table">
+
+
+</div>
 </div>
 
 

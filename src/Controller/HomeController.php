@@ -130,6 +130,24 @@ class HomeController extends AbstractController
         ]);
     }
 
+    #[Route('/resume/see/{year}', name: 'resume.see.categorie')]
+    public function seePrecise(Request $request,int $year,CategorieRepository $categorieRepository)
+    {
+        $request->query->get('month') ? $month = $request->query->get('month') : $month = date('F');
+        $month = $this->MoisToMonth($month);
+
+        $request->query->get('categorie') ? $categorie = $request->query->get('categorie') : $categorie = null;
+        $categorie = $categorieRepository->findOneBy(['User'=> $this->getUser(),'libelle' => $categorie], array('libelle' => 'ASC'));
+        $request->query->get('sort') ? $sort = $request->query->get('sort') : $sort = 'date';
+        $request->query->get('order') ? $order = $request->query->get('order') : $order = 'DESC';
+
+        return $this->render('templates/tables_lignes.html.twig', [
+            'lignes' => $this->getDoctrine()->getRepository(Ligne::class)->findByMonthAndCategorie($year, $month, $categorie->getId(), $this->getUser()->getId()),
+            'sort' => $sort,
+            'order' => $order,
+        ]);
+    }
+
     #[Route('/graphs',name:'graphs')]
     public function graph(Request $request,CategorieRepository $categorieRepository, LigneRepository $ligneRepository){
 
@@ -147,26 +165,27 @@ class HomeController extends AbstractController
         $sumByCatByMonth = [];
         $months = $this->getMonths();
 
+        foreach ($months as $key => $value) {
+            $key = ucfirst($key);
+            foreach ($categories as $categorie) {
+                if(isset($sumByCatByMonth[$categorie->getLibelle()]))
+                    $sumByCatByMonth[$categorie->getLibelle()] += [$key => 0];
+                else
+                    $sumByCatByMonth[$categorie->getLibelle()] = [$key => 0];
+            }
+        }
+
+
         foreach ($sumByMonthByCat as $key => $value) {
+            
             foreach ($value as $k => $v) {
 
                 if(isset($sumByCatByMonth[$k][$key])){
                     $sumByCatByMonth[$k][$key] += abs($v);
                 }
-                else{
-                    $sumByCatByMonth[$k][$key] = abs($v);
-                }
             }
         }
 
-        foreach ($sumByCatByMonth as $key => $value) {
-            foreach ($months as $k => $v) {
-                $uc = ucfirst($k);
-                if(!isset($sumByCatByMonth[$key][$uc])){
-                    $sumByCatByMonth[$key][$uc] = 0;
-                }
-            }
-        }
 
 
         return $this->render('home/graph.html.twig',[
