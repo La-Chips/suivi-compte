@@ -18,7 +18,16 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script defer >
- const months = ["{{ sumByMonthYear | keys | join('", "')| raw   }}"];
+ let lower_months = ["{{ months |keys  | join('", "')| raw   }}"]
+ let tmp = [];
+ 
+ lower_months.forEach(word => {
+      tmp.push(word.charAt(0).toUpperCase()
+  + word.slice(1));
+ });
+  const months = tmp;
+
+
 const categories = ["{{ sumByCatByMonth | keys | join('", "')| raw   }}"];
 
 

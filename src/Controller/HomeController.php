@@ -191,6 +191,7 @@ class HomeController extends AbstractController
         return $this->render('home/graph.html.twig',[
             'years' => $years,
             'year' => $year,
+            'months' => $months,
             'categories' => $categories,
             'sumByCatByMonth' => $sumByCatByMonth,
             'sumByMonthYear' => $sumByMonthYear,
