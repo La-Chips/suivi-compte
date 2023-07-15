@@ -34,43 +34,45 @@
 
 
 
+		<div class="table-responsive">
 		<table class="table table-striped resume">
-			<thead class="sticky-top">
-				<th>Action</th>
-				<th>Mois</th>
-				{% for item in categories %}
-					<th>{{item}}</th>
-				{% endfor %}
-				<th>Total catégorisé</th>
-				<th>Total</th>
-			</thead>
-			<tbody>
-				{% for month in sumByMonth | keys %}
-					{% set sum = 0 %}
-					<tr>
-						<td>
-							<a href="{{path('resume.see',{year : year , month : month})}}" class="btn btn-primary">Voir</a>
-						</td>
-						<td>{{month}}</td>
-						{% for item in categories %}
+		<thead class="sticky-top">
+			<th>Action</th>
+			<th>Mois</th>
+			{% for item in categories %}
+				<th>{{item}}</th>
+			{% endfor %}
+			<th>Total catégorisé</th>
+			<th>Total</th>
+		</thead>
+		<tbody>
+			{% for month in sumByMonth | keys %}
+				{% set sum = 0 %}
+				<tr>
+					<td>
+						<a href="{{path('resume.see',{year : year , month : month})}}" class="btn btn-primary">Voir</a>
+					</td>
+					<td>{{month}}</td>
+					{% for item in categories %}
 
-							{% set value = attribute(sumByMonth,month) %}
+						{% set value = attribute(sumByMonth,month) %}
 
-							{% if item.libelle in value|keys %}
-								{% set sum  = sum + value[item.libelle] %}
-								<td>{{value[item.libelle] }}
-									€</td>
-							{% else %}
-								<td>0 €</td>
-							{% endif %}
-						{% endfor %}
-						<td>{{sum}} €</td>
-						<td>{{sumByMonthYear[month]}} €</td>
-					</tr>
-				{% endfor %}
-			</tbody>
+						{% if item.libelle in value|keys %}
+							{% set sum  = sum + value[item.libelle] %}
+							<td>{{value[item.libelle] }}
+								€</td>
+						{% else %}
+							<td>0 €</td>
+						{% endif %}
+					{% endfor %}
+					<td>{{sum}} €</td>
+					<td>{{sumByMonthYear[month]}} €</td>
+				</tr>
+			{% endfor %}
+		</tbody>
 
-		</table>
+	</table>
+	</div>
 
 
 {% endblock %}

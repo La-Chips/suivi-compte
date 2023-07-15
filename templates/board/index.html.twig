@@ -75,7 +75,7 @@
 
                 <div>
                 <h3>Dépenses partagés</h3>
-                    <table class="table text-white align-middle">
+                    <table class="table text-white align-middle text-center">
                     <thead>
                         <tr>
                             <th>Utilisateurs</th>
@@ -86,18 +86,18 @@
                     </thead>
                     <tbody>
                         {% for item in sharesByUser %}
-                            <tr>
+                            <tr >
                                 <td>{{ item.user }}</td>
                                 <td>{{ item.amount }} €</td>
                                 <td>{{ item.shares }} €</td>
-                                <td>
+                                <td class="d-flex justify-content-center">
                                     {% set difference = item.amount - item.shares %}
                                     {% set class = "bg-danger" %}
                                     {% if difference > 0 %}
                                         {% set class = "bg-success" %}
                                     {% endif %}
 
-                                    <div class="{{class}} rounded w-25 text-center">{{ difference }} €</div>
+                                    <div class="{{class}} rounded w-50 text-center">{{ difference }} €</div>
                                  </td>
                             </tr>
 
@@ -111,6 +111,10 @@
                     <hr>
 
                         <h3>Details</h3>
+
+                            <div class="table-responsive">
+                        
+                       
                     <table class="table  text-white">
                     <thead><tr>
                         <th></th>
@@ -145,7 +149,7 @@
                     </tbody>
                 
                 </table>
-
+            </div>
                 <hr>
                 </div>
 

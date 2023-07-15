@@ -16,3 +16,10 @@ table.resume>thead {
     border: solid 1px black;
     border-radius: 5px;
 }
+
+@media screen and (max-width: 768px) {
+    .sticky-top {
+        position: relative !important;
+        z-index: 0 !important;
+    }
+}

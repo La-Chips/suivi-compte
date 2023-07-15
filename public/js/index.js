@@ -1,3 +1,18 @@
+
+function darkMode() {
+    return true;
+}
+
+
+
+function toggle_drawer(){
+    if (document.getElementById("drawer").classList.contains("active")){
+        document.getElementById("drawer").classList.remove("active");
+    } else {
+        document.getElementById("drawer").classList.add("active");
+    }
+}
+
 $(document).ready(function() {
     if (darkMode()) {
         document.getElementsByTagName('body')[0].classList.add('dark-mode');
@@ -9,7 +24,3 @@ $(document).ready(function() {
         format: 'yyyy-mm-dd'
     });
 });
-
-function darkMode() {
-    return true;
-}

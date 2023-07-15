@@ -22,6 +22,7 @@
 				<legend>Montant à payer</legend>
 				<div>
 					{% if to_pay | length > 0 %}
+					<div class="table-responsive">
 
 						<table class="table table-striped text-center">
 
@@ -63,6 +64,7 @@
 								</tr>
 							</tbody>
 						</table>
+						</div>
 					{% else %}
 						<div>
 							Il n'y a rien à payer.
@@ -77,6 +79,8 @@
 				<legend>Montant dû</legend>
 				<div>
 					{% if du | length > 0 %}
+				<div class="table-responsive">
+
 						<table class="table table-striped text-center">
 
 
@@ -118,6 +122,7 @@
 
 							</tbody>
 						</table>
+						</div>
 					{% else %}
 						<div>Vous n'avez rien à recevoir</div>
 					{% endif %}
@@ -130,63 +135,69 @@
 				<legend>Opération à catégoriser ({{to_filter | length}})</legend>
 				<form action="{{path('categoriser')}}" method="post">
 
-
+					<div class="table-responsive">
 					<table class="table table-striped me-3">
-						<thead>
+					<thead>
 
+						<tr>
+							<th>Catégorie</th>
+							<th>Date</th>
+							<th>Type</th>
+							<th>Libelle</th>
+							<th>Montant</th>
+							<th>
+								<button type="submit" class="btn btn-success">Valider</button>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for item in to_filter %}
 							<tr>
-								<th>Catégorie</th>
-								<th>Date</th>
-								<th>Type</th>
-								<th>Libelle</th>
-								<th>Montant</th>
-								<th>
-									<button type="submit" class="btn btn-success">Valider</button>
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for item in to_filter %}
-								<tr>
-									{% if item.categorie != null %}
-										{% set bg = "bg-"~item.categorie.color %}
-									{% else %}
-										{% set bg = 'none' %}
-									{% endif %}
-									<td {% if bg is defined %} class="{{bg}}" {% endif %}>{{item.categorie}}</td>
-									<td>{{ item.date ? item.date|date('Y-F-d H:i:s') : '' }}</td>
-
-
-									<td>{{item.type}}</td>
-									<td>{{item.libelle}}</td>
-									<td>{{item.montant}}
-										€</td>
-
-									<td class="d-flex justify-content-between p-1">
-										<select name="categorie_{{item.id}}" id="ligne_{{item.id}}" class="form-select">
-											<option value="null"></option>
-											{% for cat in categories %}
-												<option value="{{cat.id}}">{{cat}}</option>
-											{% endfor %}
-
-										</select>
-									</td>
-								</tr>
+								{% if item.categorie != null %}
+									{% set bg = "bg-"~item.categorie.color %}
 								{% else %}
-									<tr>
-										<td colspan="6" class="text-center">Aucun éléments</td>
-									</tr>
-							{% endfor %}
-						</tbody>
+									{% set bg = 'none' %}
+								{% endif %}
+								<td {% if bg is defined %} class="{{bg}}" {% endif %}>{{item.categorie}}</td>
+								<td>{{ item.date ? item.date|date('Y-F-d H:i:s') : '' }}</td>
 
-					</table>
+
+								<td>{{item.type}}</td>
+								<td>{{item.libelle}}</td>
+								<td>{{item.montant}}
+									€</td>
+
+								<td class="d-flex justify-content-between p-1">
+									<select name="categorie_{{item.id}}" id="ligne_{{item.id}}" class="form-select">
+										<option value="null"></option>
+										{% for cat in categories %}
+											<option value="{{cat.id}}">{{cat}}</option>
+										{% endfor %}
+
+									</select>
+								</td>
+							</tr>
+							{% else %}
+								<tr>
+									<td colspan="6" class="text-center">Aucun éléments</td>
+								</tr>
+						{% endfor %}
+					</tbody>
+
+				</table>
+				
+				</div>
+					
 				</form>
 
 			</fieldset>
 
 			<fieldset>
 				<legend></legend>
+				<div class="table-responsive">
 				{% include "/templates/tables_lignes.html.twig" with {lignes : lignes} %}
+			
+			</div>
 
 			</fieldset>
 		</div>

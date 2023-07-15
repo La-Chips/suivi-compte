@@ -13,3 +13,26 @@ fieldset {
 .dark-mode main {
     color: #000;
 }
+
+@media screen  and (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  td.flex-wrap{
+    flex-direction: column;
+  }
+  td.flex-wrap div{
+    display: flex;
+    flex-direction: column;
+    border-radius: 1rem !important;
+    padding: 0 !important;
+    text-align: center;
+  }
+
+  td.flex-wrap div a{
+    border-radius: 1rem !important;
+    margin-top : 0.5rem;
+  }
+}
+    
