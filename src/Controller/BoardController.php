@@ -19,42 +19,30 @@ class BoardController extends AbstractController
         $expense = $ligneRepository->getExpenseByMonth(date('F'), date('Y'), $this->getUser());
 
         $shares = $ligneRepository->findSharesByMonth(date('F'), date('Y'), $this->getUser());
-        $own_shares = $this->getUser()->getLignes();
 
-        $shares_data = [];
+
+        $shares_by_user = [];
+        $sum = 0;
 
         foreach ($shares as $share) {
-            $userId = $share->getUser()->getId();
-            if(isset($shares_data[$userId])) {
-                $shares_data[$userId]['amount'] += $share->getMontant();
+            $userId = $share['user_id'];
+            $sum += $share['amount'];
+            if(isset($shares_by_user[$userId])) {
+                $shares_by_user[$userId]['amount'] += $share['amount'];
             } else {
-                $shares_data[$userId] = [
-                    'user' => $share->getUser()->getUsername(),
-                    'amount' => $share->getMontant()
+                $shares_by_user[$userId] = [
+                    'user' => $share['username'],
+                    'amount' => $share['amount']
                 ];
             }
         }
 
-        foreach ($own_shares as $share) {
-            $userId = $share->getUser()->getId();
-            if(isset($shares_data[$userId])) {
-                $shares_data[$userId]['amount'] += $share->getMontant();
-            } else {
-                $shares_data[$userId] = [
-                    'user' => $share->getUser()->getUsername(),
-                    'amount' => $share->getMontant()
-                ];
-            }
-
-            foreach($share as $user) {
-                if(!isset($shares_data[$user->getId()])) {
-                    $shares_data[$user->getId()] = [
-                        'user' => $user,
-                        'amount' => 0
-                    ];
-                }
-            }
+        foreach ($shares_by_user as $key => $value) {
+            $shares_by_user[$key]['shares'] = $sum / count($shares_by_user);
         }
+
+
+  
         
 
         return $this->render('board/index.html.twig', [
@@ -64,8 +52,7 @@ class BoardController extends AbstractController
                 'total' => $income + $expense
             ],
             'shares' => $shares,
-            'shares_data' => $shares_data,
-            'own_shares' => $own_shares,
+            'sharesByUser' => $shares_by_user,
         ]);
     }
 }

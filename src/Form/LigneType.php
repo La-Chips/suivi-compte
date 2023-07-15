@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 
 class LigneType extends AbstractType
 {
@@ -22,7 +23,7 @@ class LigneType extends AbstractType
             ->add('date', DateTimeType::class, [
                 'widget' => 'single_text',
                 'data' => $options['date'],
-                'label' => 'Date de la transction',
+                'label' => 'Date de la transaction',
 
                 // prevents rendering it as type="date", to avoid HTML5 date pickers
                 'html5' => true,
@@ -32,14 +33,23 @@ class LigneType extends AbstractType
             ])
             ->add('libelle', null, [
                 'label' => 'Libellé',
+                'attr' => array(
+                    'placeholder' => 'Boulangerie, Carrefour, ...'
+                ),
             ])
             ->add('libelle_2', null, [
                 'label' => 'Libellé 2',
+                'attr' => array(
+                    'placeholder' => 'Boulangerie, Carrefour, ...'
+                ),
             ])
-            ->add('montant')
+            ->add('montant',MoneyType::class)
             ->add('type',null, [
                 'data' => $options['type'],
                 'label' => 'Type de transaction',
+                'attr' => array(
+                    'placeholder' => 'CB, Virement, Espèces, ...'
+                )
             ])
             ->add('statut', EntityType::class, array(
                 'class' => Statut::class,
@@ -68,7 +78,15 @@ class LigneType extends AbstractType
             // ))
 
             ->add('owner', null, [
+                'query_builder' => function (\Doctrine\ORM\EntityRepository $er) use ($options) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.id <> :id')
+                        ->setParameter('id', $options['user_id']);
+                },
+                'data' => $options['shared_with'],
                 'label' => 'Participants',
+                'mapped' => false,
+                'expanded' => true,
             ])
             ;
     }
@@ -81,6 +99,8 @@ class LigneType extends AbstractType
             'statut' => null,
             'categories' => null,
             'type'=> null,
+            'user_id' => 0,
+            'shared_with' => [],
         ]);
     }
 }

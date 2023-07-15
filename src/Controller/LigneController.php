@@ -30,10 +30,10 @@ class LigneController extends AbstractController
     }
 
     #[Route('/new', name: 'ligne_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, LigneRepository $ligneRepository,StatutRepository $statutRepository, UserRepository $userRepository,CategorieRepository $categorieRepository,SessionInterface $session): Response
+    public function new(Request $request, LigneRepository $ligneRepository, StatutRepository $statutRepository, UserRepository $userRepository, CategorieRepository $categorieRepository, SessionInterface $session): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $categories = $categorieRepository->findBy(['User' => $this->getUser()],['libelle' => 'ASC']);
+        $categories = $categorieRepository->findBy(['User' => $this->getUser()], ['libelle' => 'ASC']);
         $ligne = new Ligne();
         $statut = null;
         if ($request->query->get('option') != null) {
@@ -58,7 +58,7 @@ class LigneController extends AbstractController
             return $this->redirectToRoute('ligne_new');
         }
 
-        $form = $this->createForm(LigneType::class, $ligne, ['statut' => $statut,'categories'=>$categories]);
+        $form = $this->createForm(LigneType::class, $ligne, ['statut' => $statut, 'categories' => $categories, 'user_id' => $this->getUser()->getId()]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $ligne->setUser($this->getUser());
@@ -85,10 +85,22 @@ class LigneController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'ligne_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Ligne $ligne,CategorieRepository $categorieRepository): Response
+    public function edit(Request $request, Ligne $ligne, CategorieRepository $categorieRepository): Response
     {
         $categories = $categorieRepository->findBy(['User' => $this->getUser()]);
-        $form = $this->createForm(LigneType::class, $ligne,array('date' => $ligne->getDate(),'categories'=>$categories,'type'=>$ligne->getType()));
+        $form = $this->createForm(
+            LigneType::class,
+            $ligne,
+            array(
+                'date' => $ligne->getDate(),
+                'categories' => $categories,
+                'type' => $ligne->getType(),
+                'statut' => $ligne->getStatut(),
+                'user_id' => $this->getUser()->getId(),
+                'shared_with' => $ligne->getOwner(),
+
+            )
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -97,7 +109,6 @@ class LigneController extends AbstractController
             $referer = $request->headers->get('referer');
 
             return $this->redirect($referer);
-
         }
 
         return $this->renderForm('ligne/edit.html.twig', [

@@ -20,9 +20,10 @@ final class Version20230714183000 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE filter ADD amount DOUBLE PRECISION DEFAULT NULL');
-        $this->addSql('ALTER TABLE folder CHANGE id id INT AUTO_INCREMENT NOT NULL');
-        $this->addSql('ALTER TABLE folder ADD CONSTRAINT FK_ECA209CD79066886 FOREIGN KEY (root_id) REFERENCES folder (id)');
+
+        // drop this fk FK_E3443E17F6203804
+        $this->addSql('ALTER TABLE etapes DROP FOREIGN KEY FK_E3443E17F6203804');
+
         $this->addSql('ALTER TABLE statut CHANGE id id INT AUTO_INCREMENT NOT NULL');
     }
 

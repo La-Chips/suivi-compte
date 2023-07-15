@@ -57,9 +57,9 @@ class HomeController extends AbstractController
         }
         $user = $this->getUser();
         $lignes = $user->getLignesCreated($sort, $order);
-        $to_filter = $ligneRepository->findBy(['categorie' => null]);
-        $du = $ligneRepository->findBy(['statut' => 1]);
-        $to_pay = $ligneRepository->findBy(['statut' => 2]);
+        $to_filter = $ligneRepository->findBy(['categorie' => null, 'user' => $this->getUser()]);
+        $du = $ligneRepository->findBy(['statut' => 1, 'user' => $this->getUser()]);
+        $to_pay = $ligneRepository->findBy(['statut' => 2, 'user' => $this->getUser()]);
         $categories = $categorieRepository->findBy(['User' => $this->getUser()], array('libelle' => 'ASC'));
 
         // $du_total = $ligneRepository->sumDu($user)[0]['total'];

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Ligne;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Persistence\ManagerRegistry;
 use http\Client\Curl\User;
 
@@ -153,16 +154,21 @@ class LigneRepository extends ServiceEntityRepository
     public function findSharesByMonth($month, int $year, $user)
     {
         $qb = $this->createQueryBuilder('line')
-            ->innerJoin('line.owner', 'own')
+        ->select('line.id as id,line.date,line.libelle,line.montant as amount, line.type ,user.id as user_id, user.username as username ')
+        ->leftJoin('line.owner', 'own')
+        ->innerJoin('line.user', 'user')
             ->where('MONTHNAME(line.date) = :month and YEAR(line.date) = :year')
-            ->andWhere(':own in (own.id)')
+        ->andWhere(':user in (own.id) OR line.user = :user ')
+            ->groupBy('id,line.date,user_id,line.libelle,line.montant')
+            ->having('COUNT(own.id) > 0')
             ->setParameters(array(
                 'month' => $month,
                 'year' => $year,
-                'own' => $user->getId(),
+                'user' => $user->getId(),
             ));
 
         $result = $qb->getQuery()->getResult();
+
         return $result;
     }
 

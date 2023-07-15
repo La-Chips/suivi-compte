@@ -68,25 +68,40 @@
 
                 <div>
                 <h3>Dépenses partagés</h3>
-                    <table class="table text-white">
+                    <table class="table text-white align-middle">
                     <thead>
                         <tr>
                             <th>Utilisateurs</th>
-                            <th>Montant Total</th>
+                            <th>Montant Payée</th>
+                            <th>Montant Partagé</th>
+                            <th>Différenciel</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for item in shares %}
+                        {% for item in sharesByUser %}
                             <tr>
                                 <td>{{ item.user }}</td>
-                                <td>{{ item.montant }} €</td>
+                                <td>{{ item.amount }} €</td>
+                                <td>{{ item.shares }} €</td>
+                                <td>
+                                    {% set difference = item.amount - item.shares %}
+                                    {% set class = "bg-danger" %}
+                                    {% if difference > 0 %}
+                                        {% set class = "bg-success" %}
+                                    {% endif %}
+
+                                    <div class="{{class}} rounded w-25 text-center">{{ difference }} €</div>
+                                 </td>
                             </tr>
                         {% endfor %}
                 
                 </table>
                     <hr>
+
+                        <h3>Details</h3>
                     <table class="table  text-white">
                     <thead><tr>
+                        <th></th>
                         <th>Date</th>
                         <th>Utilisateur</th>
                         <th>Montant</th>
@@ -95,17 +110,21 @@
                     
                     </tr></thead>
                     <tbody>
-                        {% for item in shares | merge(own_shares) %}
+                        {% for item in shares  %}
                             <tr>
+                                <td>
+                                    <a href="{{ path('ligne_show',{id: item.id}) }}" class="btn btn-dark">Voir</a>
+                                </td>
                             <td>{{ item.date | date("d/m/Y") }}</td>
-                            <td>{{ item.user}}</td>
-                                <td>{{ item.montant }} €</td>
+                            <td>{{ item.username}}</td>
+                                <td>{{ item.amount }} €</td>
                                 <td>{{ item.libelle }}</td>
                                 <td>{{item.type}}</td>
-                            
+                      
                             </tr>
                         {% endfor %}
                     
+
                     </tbody>
                 
                 </table>

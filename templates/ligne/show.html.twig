@@ -38,7 +38,12 @@
 
     <a class="btn btn-success m-2 rounded" href="{{ path('ligne_edit', {'id': ligne.id}) }}">Modifier</a>
 
+
+    {% if app.user.is('ROLE_ADMIN') %}
     {{ include('ligne/_delete_form.html.twig') }}
+
+{% endif %}
+    
    </div>
 
 {% endblock %}
