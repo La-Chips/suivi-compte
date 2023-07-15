@@ -115,11 +115,10 @@ class LigneRepository extends ServiceEntityRepository
     {
         
         $qb = $this->createQueryBuilder('line')
-        ->innerJoin('line.owner', 'own')
             ->select('ROUND(sum(line.montant),2) as total')
             ->where('MONTHNAME(line.date) = :month and YEAR(line.date) = :year')
             ->andWhere('line.montant > 0')
-            ->andWhere(':own in (own.id)')
+            ->andWhere('line.user = :own')
             ->setParameters(array(
                 'month' => $month,
                 'year' => $year,
@@ -134,11 +133,10 @@ class LigneRepository extends ServiceEntityRepository
     public function getExpenseByMonth($month, int $year, $user)
     {
         $qb = $this->createQueryBuilder('line')
-            ->innerJoin('line.owner', 'own')
             ->select('ROUND(sum(line.montant),2) as total')
             ->where('MONTHNAME(line.date) = :month and YEAR(line.date) = :year')
             ->andWhere('line.montant < 0')
-            ->andWhere(':own in (own.id)')
+            ->andWhere('line.user = :own')
             ->setParameters(array(
                 'month' => $month,
                 'year' => $year,
