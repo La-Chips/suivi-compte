@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New BankAccount{% endblock %}
+
+{% block body %}
+     {% include "components/main/header_crud.html.twig" with {title : 'Créer un compte', link : path('app_bank_account_new')} %}
+
+    {{ include('crud/bank_account/_form.html.twig') }}
+
+{% endblock %}

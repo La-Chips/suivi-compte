@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit ScheduleExpense{% endblock %}
+
+{% block body %}
+
+         {% include "components/main/header_crud.html.twig" with {title : 'Créer une dépense prévisionnel', link : path('app_schedule_expense_new')} %}
+
+
+    {{ include('crud/schedule_expense/_form.html.twig', {'button_label': 'Modifier'}) }}
+
+
+    {{ include('crud/schedule_expense/_delete_form.html.twig') }}
+{% endblock %}

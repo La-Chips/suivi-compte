@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ScheduleRepeat index{% endblock %}
+
+{% block body %}
+    <h1>ScheduleRepeat index</h1>
+
+    <table class="table table-striped text-center text-white">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Label</th>
+                <th>Day_duration</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for schedule_repeat in schedule_repeats %}
+            <tr class="text-white">
+                <td>{{ schedule_repeat.id }}</td>
+                <td>{{ schedule_repeat.label }}</td>
+                <td>{{ schedule_repeat.dayDuration }}</td>
+                <td>
+                    <a href="{{ path('app_schedule_repeat_show', {'id': schedule_repeat.id}) }}">show</a>
+                    <a href="{{ path('app_schedule_repeat_edit', {'id': schedule_repeat.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_schedule_repeat_new') }}">Create new</a>
+{% endblock %}

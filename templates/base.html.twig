@@ -20,17 +20,13 @@
 
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 		<link rel="stylesheet" href="{{ asset('css/style.css') }}">
-		{# <script src="/js/index.js"></script> #}
-		{# Run `composer require symfony/webpack-encore-bundle`
-																																																																																																																						           and uncomment the following Encore helpers to start using Symfony UX #}{% block stylesheets %}
-			{#{{ encore_entry_link_tags('app') }}#}
-		{% endblock %}
 
-		{% block javascripts %}
-			{#{{ encore_entry_script_tags('app') }}#}
-		{% endblock %}
+		
+
+
 
 		<script src="{{ asset('js/index.js') }}"></script>
+
 	</head>
 	<body class="dark-mode">
 
@@ -50,6 +46,11 @@
 			'route' : path('home'),
 			'name' : 'home',
 			'icon' : 'fas fa-home'
+		},
+		'budget' : {
+			'route' : path('app_budget'),
+			'name' : 'Budget',
+			'icon' : 'fas fa-money-bill-wave'
 		},
 		'resume' : {
 			'route' : path('resume', {year:year}),

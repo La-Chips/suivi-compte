@@ -51,10 +51,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $lignes_created;
 
+    /**
+     * @ORM\OneToMany(targetEntity=BankAccount::class, mappedBy="user")
+     */
+    private $bankAccounts;
+
     public function __construct()
     {
         $this->lignes = new ArrayCollection();
         $this->lignes_created = new ArrayCollection();
+        $this->bankAccounts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -213,6 +219,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($lignesCreated->getUser() === $this) {
                 $lignesCreated->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BankAccount>
+     */
+    public function getBankAccounts(): Collection
+    {
+        return $this->bankAccounts;
+    }
+
+    public function addBankAccount(BankAccount $bankAccount): self
+    {
+        if (!$this->bankAccounts->contains($bankAccount)) {
+            $this->bankAccounts[] = $bankAccount;
+            $bankAccount->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBankAccount(BankAccount $bankAccount): self
+    {
+        if ($this->bankAccounts->removeElement($bankAccount)) {
+            // set the owning side to null (unless already changed)
+            if ($bankAccount->getUser() === $this) {
+                $bankAccount->setUser(null);
             }
         }
 

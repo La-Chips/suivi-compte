@@ -1,0 +1,99 @@
+<?php
+
+namespace App\Controller\CRUD;
+
+use App\Entity\ScheduleExpense;
+use App\Form\ScheduleExpenseType;
+use App\Repository\LigneRepository;
+use App\Repository\ScheduleExpenseRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+#[Route('/schedule/expense')]
+class ScheduleExpenseController extends AbstractController
+{
+    #[Route('/', name: 'app_schedule_expense_index', methods: ['GET'])]
+    public function index(ScheduleExpenseRepository $scheduleExpenseRepository): Response
+    {
+        return $this->render('crud/schedule_expense/index.html.twig', [
+            'schedule_expenses' => $scheduleExpenseRepository->findByUser($this->getUser()->getId()),
+        ]);
+    }
+
+    #[Route('/new', name: 'app_schedule_expense_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, ScheduleExpenseRepository $scheduleExpenseRepository,LigneRepository $ligneRepository): Response
+    {
+        $scheduleExpense = new ScheduleExpense();
+
+        if($request->query->get('expense_id'))
+        {
+            $expense = $ligneRepository->find($request->query->get('expense_id'));
+            
+            if($expense->getUser() != $this->getUser())
+            {
+                // return to referer
+                return $this->redirect($request->headers->get('referer'));
+            }
+
+            $scheduleExpense->setLabel($expense->getLabel());
+            $scheduleExpense->setAmount($expense->getAmount());
+            $scheduleExpense->setCategory($expense->getCategorie());
+            $scheduleExpense->setStartDate($expense->getDate());
+        
+        }
+
+        $form = $this->createForm(ScheduleExpenseType::class, $scheduleExpense,[
+            'user_id' => $this->getUser()->getId(),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $scheduleExpenseRepository->add($scheduleExpense);
+            return $this->redirectToRoute('app_schedule_expense_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('crud/schedule_expense/new.html.twig', [
+            'schedule_expense' => $scheduleExpense,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_schedule_expense_show', methods: ['GET'])]
+    public function show(ScheduleExpense $scheduleExpense): Response
+    {
+        return $this->render('crud/schedule_expense/show.html.twig', [
+            'schedule_expense' => $scheduleExpense,
+        ]);
+    }
+
+    #[Route('/{id}/edit', name: 'app_schedule_expense_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, ScheduleExpense $scheduleExpense, ScheduleExpenseRepository $scheduleExpenseRepository): Response
+    {
+        $form = $this->createForm(ScheduleExpenseType::class, $scheduleExpense,[
+            'user_id' => $this->getUser()->getId(),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $scheduleExpenseRepository->add($scheduleExpense);
+            return $this->redirectToRoute('app_schedule_expense_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('crud/schedule_expense/edit.html.twig', [
+            'schedule_expense' => $scheduleExpense,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_schedule_expense_delete', methods: ['POST'])]
+    public function delete(Request $request, ScheduleExpense $scheduleExpense, ScheduleExpenseRepository $scheduleExpenseRepository): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$scheduleExpense->getId(), $request->request->get('_token'))) {
+            $scheduleExpenseRepository->remove($scheduleExpense);
+        }
+
+        return $this->redirectToRoute('app_schedule_expense_index', [], Response::HTTP_SEE_OTHER);
+    }
+}

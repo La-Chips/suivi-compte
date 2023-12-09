@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit ScheduleRepeat{% endblock %}
+
+{% block body %}
+    <h1>Edit ScheduleRepeat</h1>
+
+    {{ include('crud/schedule_repeat/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_schedule_repeat_index') }}">back to list</a>
+
+    {{ include('crud/schedule_repeat/_delete_form.html.twig') }}
+{% endblock %}

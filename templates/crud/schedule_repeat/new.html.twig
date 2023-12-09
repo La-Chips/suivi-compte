@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New ScheduleRepeat{% endblock %}
+
+{% block body %}
+    <h1>Create new ScheduleRepeat</h1>
+
+    {{ include('crud/schedule_repeat/_form.html.twig') }}
+
+    <a href="{{ path('app_schedule_repeat_index') }}">back to list</a>
+{% endblock %}

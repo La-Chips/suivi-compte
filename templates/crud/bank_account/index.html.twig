@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BankAccount index{% endblock %}
+
+{% block body %}
+    {% include "components/main/header_crud_index.html.twig" with {link : path('app_bank_account_new'), title : 'Listes des comptes'} %}
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Label</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for bank_account in bank_accounts %}
+            <tr>
+                <td>{{ bank_account.id }}</td>
+                <td>{{ bank_account.label }}</td>
+                <td>
+                    	{% include "components/main/show_button.html.twig" with {link : path('app_bank_account_show', {'id': bank_account.id})} %}
+						{% include "components/main/edit_button.html.twig" with {link : path('app_bank_account_edit', {'id': bank_account.id})} %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">Aucun compte existant</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

@@ -59,4 +59,13 @@ class BoardController extends AbstractController
             'year' => $year,
         ]);
     }
+
+    // Profile route
+    #[Route('/profile', name: 'app_profile')]
+    public function profile(): Response
+    {
+        return $this->render('board/profile.html.twig', [
+            'controller_name' => 'BoardController',
+        ]);
+    }
 }

@@ -48,10 +48,16 @@ class Categorie
      */
     private ?User $User;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ScheduleExpense::class, mappedBy="category")
+     */
+    private $scheduleExpenses;
+
     #[Pure] public function __construct()
     {
         $this->filters = new ArrayCollection();
         $this->lignes = new ArrayCollection();
+        $this->scheduleExpenses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -69,6 +75,11 @@ class Categorie
         $this->libelle = $libelle;
 
         return $this;
+    }
+
+    public function getLabel(): ?string
+    {
+        return $this->getLibelle();
     }
 
     public function __toString()
@@ -161,6 +172,36 @@ class Categorie
     public function setUser(?User $User): self
     {
         $this->User = $User;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ScheduleExpense>
+     */
+    public function getScheduleExpenses(): Collection
+    {
+        return $this->scheduleExpenses;
+    }
+
+    public function addScheduleExpense(ScheduleExpense $scheduleExpense): self
+    {
+        if (!$this->scheduleExpenses->contains($scheduleExpense)) {
+            $this->scheduleExpenses[] = $scheduleExpense;
+            $scheduleExpense->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScheduleExpense(ScheduleExpense $scheduleExpense): self
+    {
+        if ($this->scheduleExpenses->removeElement($scheduleExpense)) {
+            // set the owning side to null (unless already changed)
+            if ($scheduleExpense->getCategory() === $this) {
+                $scheduleExpense->setCategory(null);
+            }
+        }
 
         return $this;
     }

@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ScheduleExpense{% endblock %}
+
+{% block body %}
+            {% include "components/main/header_crud.html.twig" with {title : 'Dépense prévisionnel', link : path('app_schedule_expense_index')} %}
+
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ schedule_expense.id }}</td>
+            </tr>
+            <tr>
+                <th>Label</th>
+                <td>{{ schedule_expense.label }}</td>
+            </tr>
+            <tr>
+                <th>Amount</th>
+                <td>{{ schedule_expense.amount }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    {{ include('crud/schedule_expense/_delete_form.html.twig') }}
+{% endblock %}

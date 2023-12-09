@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ScheduleExpense index
+{% endblock %}
+
+{% block body %}
+	{% include "components/main/header_crud_index.html.twig" with {link : path('app_schedule_expense_new'), title : 'Listes des Dépenses prévisionnels'} %}
+
+
+	<div class="container">
+	<table class="table table-striped text-center align-middle ">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Compte</th>
+				<th>Label</th>
+				<th>Catégorie</th>
+				<th>Montant</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for schedule_expense in schedule_expenses %}
+				<tr>
+					<td>{{ schedule_expense.id }}</td>
+					<td>{{ schedule_expense.bankAccount }}</td>
+					<td>{{ schedule_expense.label }}</td>
+					<td>
+						{% include "components/category_item.html.twig" with { category : schedule_expense.category} %}
+					</td>
+					<td>{{ schedule_expense.amount }} €</td>
+					<td>
+						{% include "components/main/show_button.html.twig" with {link : path('app_schedule_expense_show', {'id': schedule_expense.id})} %}
+						{% include "components/main/edit_button.html.twig" with {link : path('app_schedule_expense_edit', {'id': schedule_expense.id})} %}
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="6">Aucun enregistrements</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	</div>
+
+{% endblock %}

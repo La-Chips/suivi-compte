@@ -116,6 +116,11 @@ class Ligne
         return $this;
     }
 
+    public function getLabel():?string
+    {
+        return $this->getLibelle();
+    }
+
     public function getLibelle2(): ?string
     {
         return $this->libelle_2;
@@ -138,6 +143,11 @@ class Ligne
         $this->montant = $montant;
 
         return $this;
+    }
+
+    public function getAmount() :?float
+    {
+        return $this->getMontant();
     }
 
     public function getType(): ?string
@@ -175,6 +185,7 @@ class Ligne
 
         return $this;
     }
+
 
     public function getDateInsert(): ?\DateTimeInterface
     {

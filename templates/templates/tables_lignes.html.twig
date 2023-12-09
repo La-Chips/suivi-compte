@@ -1,6 +1,5 @@
-
 <div class="d-flex align-items-center">
-<a href="{{path('ligne_new')}}" class="btn btn-success">Ajouter</a>
+	<a href="{{path('ligne_new')}}" class="btn btn-success">Ajouter</a>
 
 </div>
 
@@ -74,12 +73,12 @@
 				{% else %}
 					{% set bg = 'none' %}
 				{% endif %}
-				<td >
+				<td>
 					<div {% if bg is defined %} class="{{bg}} rounded py-3" {% endif %}>
-					{{item.categorie}}
-				</div>
-			
-			</td>
+						{{item.categorie}}
+					</div>
+
+				</td>
 
 				<td>{{ item.date ? item.date|date('Y-F-d H:i:s') : '' }}</td>
 
@@ -90,21 +89,31 @@
 					€</td>
 				<td>{{total}}
 					€</td>
-				<td >
+				<td>
 					{# <a href="{{path('line.set.statut',{id : item.id,statut : 1})}}" class="btn btn-success m-1">Dû</a>
-					<a href="{{path('line.set.statut',{id : item.id,statut : 2})}}" class="btn btn-danger m-1">A Payer</a> #}
+										<a href="{{path('line.set.statut',{id : item.id,statut : 2})}}" class="btn btn-danger m-1">A Payer</a> #}
 
 				</td>
 				<td>
-					<a href="{{path('ligne_edit',{id : item.id})}}" class="btn btn-info m-1">Modifier</a>
-
+					<div class="btn-group">
+						<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="fas fa-cog"></i>
+						</button>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+							<a class="dropdown-item" href="{{path('ligne_edit',{id : item.id})}}">
+								<i class="fas fa-edit"></i>
+								Modifier
+							</a>
+							<a class="dropdown-item" href="{{ path('app_schedule_expense_new',{expense_id : item.id})}}">Créer une dépense prévisionnel</a>
+						</div>
+					</div>
 				</td>
 			</tr>
 
-			{% else %}
-				<tr>
-					<td colspan="8">Pas de ligne</td>
-				</tr>
+		{% else %}
+			<tr>
+				<td colspan="8">Pas de ligne</td>
+			</tr>
 		{% endfor %}
 	</tbody>
 </table>
