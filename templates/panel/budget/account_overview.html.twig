@@ -1,0 +1,64 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+	{{ parent() }}
+	-
+	{{ 'title.edit'|trans }}
+{% endblock %}
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+		$(document).ready(function () {
+$('#account_select').change(function () {
+var id = $(this).val();
+window.location.href = "{{ path('app_budget_by_bank_account', {'account_id': '0'}) }}".replace('0', id);
+});
+});
+	</script>
+
+{% endblock %}
+
+{% block body %}
+	<div >
+		<select name="account_select" id="account_select" class="form-select w-25">
+
+			{% for bank_account in app.user.bankAccounts %}
+				<option value="{{bank_account.id}}" {% if bank_account.id == current_bank_account.id %} selected="selected" {% endif %}>{{bank_account}}</option>
+			{% endfor %}
+		</select>
+	</div>
+
+<div class="container">
+		<table class="table table-striped text-center align-middle">
+			<thead>
+				<tr>
+					<th scope="col">Mois</th>
+				{% for category in current_bank_account.scheduleExpensesCategories %}
+                    <th>{{category}}</th>
+                {% endfor %}
+				<th>Total</th>
+				</tr>
+
+			</thead>
+			<tbody>
+				{% for month_id in 0..6 %}
+					{% set month_value_conf = "+"~month_id~" month" %}
+					<tr>
+						<td>{{ month_value_conf|date('F') }}</td>
+
+						{% set total = 0 %}
+						{% for category in current_bank_account.scheduleExpensesCategories %}
+                            {% set total = total + current_bank_account.getScheduleExpensesByCategoryAndMonth(category, month_id) %}
+                            <td>{{ current_bank_account.getScheduleExpensesByCategoryAndMonth(category, month_value_conf)|number_format(2, ',', ' ') }} €</td>
+                        {% endfor %}
+						
+                        <td>{{ total|number_format(2, ',', ' ') }} €</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+
+		</table>
+	</div>
+
+{% endblock %}

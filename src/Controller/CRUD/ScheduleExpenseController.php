@@ -2,6 +2,7 @@
 
 namespace App\Controller\CRUD;
 
+use App\Entity\Categorie;
 use App\Entity\ScheduleExpense;
 use App\Form\ScheduleExpenseType;
 use App\Repository\LigneRepository;
@@ -23,16 +24,14 @@ class ScheduleExpenseController extends AbstractController
     }
 
     #[Route('/new', name: 'app_schedule_expense_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, ScheduleExpenseRepository $scheduleExpenseRepository,LigneRepository $ligneRepository): Response
+    public function new(Request $request, ScheduleExpenseRepository $scheduleExpenseRepository, LigneRepository $ligneRepository): Response
     {
         $scheduleExpense = new ScheduleExpense();
 
-        if($request->query->get('expense_id'))
-        {
+        if ($request->query->get('expense_id')) {
             $expense = $ligneRepository->find($request->query->get('expense_id'));
-            
-            if($expense->getUser() != $this->getUser())
-            {
+
+            if ($expense->getUser() != $this->getUser()) {
                 // return to referer
                 return $this->redirect($request->headers->get('referer'));
             }
@@ -41,10 +40,9 @@ class ScheduleExpenseController extends AbstractController
             $scheduleExpense->setAmount($expense->getAmount());
             $scheduleExpense->setCategory($expense->getCategorie());
             $scheduleExpense->setStartDate($expense->getDate());
-        
         }
 
-        $form = $this->createForm(ScheduleExpenseType::class, $scheduleExpense,[
+        $form = $this->createForm(ScheduleExpenseType::class, $scheduleExpense, [
             'user_id' => $this->getUser()->getId(),
         ]);
         $form->handleRequest($request);
@@ -71,7 +69,7 @@ class ScheduleExpenseController extends AbstractController
     #[Route('/{id}/edit', name: 'app_schedule_expense_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, ScheduleExpense $scheduleExpense, ScheduleExpenseRepository $scheduleExpenseRepository): Response
     {
-        $form = $this->createForm(ScheduleExpenseType::class, $scheduleExpense,[
+        $form = $this->createForm(ScheduleExpenseType::class, $scheduleExpense, [
             'user_id' => $this->getUser()->getId(),
         ]);
         $form->handleRequest($request);
@@ -90,10 +88,39 @@ class ScheduleExpenseController extends AbstractController
     #[Route('/{id}', name: 'app_schedule_expense_delete', methods: ['POST'])]
     public function delete(Request $request, ScheduleExpense $scheduleExpense, ScheduleExpenseRepository $scheduleExpenseRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$scheduleExpense->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $scheduleExpense->getId(), $request->request->get('_token'))) {
             $scheduleExpenseRepository->remove($scheduleExpense);
         }
 
         return $this->redirectToRoute('app_schedule_expense_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/category/{id}', name: 'app_schedule_expense_by_category', methods: ['GET'])]
+    public function by_category(Request $request, Categorie $category, ScheduleExpenseRepository $scheduleExpenseRepository): Response
+    {
+        $bank_accounts = [];
+        $scheduleExpenses = $scheduleExpenseRepository->findBy([
+            'category' => $category->getId(),
+        ]);
+        foreach ($scheduleExpenses as $scheduleExpense) {
+            if (!isset($bank_accounts[$scheduleExpense->getBankAccount()->getLabel()])) {
+                $bank_accounts[$scheduleExpense->getBankAccount()->getLabel()] = [
+                    'bank_account' => $scheduleExpense->getBankAccount(),
+                    'schedule_expenses' => [$scheduleExpense],
+                    'balance' => $scheduleExpense->getAmount(),
+                ];
+            } else {
+                $bank_accounts[$scheduleExpense->getBankAccount()->getLabel()]['schedule_expenses'][] = $scheduleExpense;
+                $bank_accounts[$scheduleExpense->getBankAccount()->getLabel()]['balance'] += $scheduleExpense->getAmount();
+            }
+        }
+
+
+        return $this->render('crud/schedule_expense/by_category.html.twig', [
+
+            'category' => $category,
+            'bank_accounts' => $bank_accounts,
+
+        ]);
     }
 }

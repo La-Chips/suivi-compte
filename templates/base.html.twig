@@ -21,22 +21,23 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 		<link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
-		
-
-
 
 		<script src="{{ asset('js/index.js') }}"></script>
+
+		{% block stylesheets %}{% endblock %}
+
+		{% block javascripts %}{% endblock %}
 
 	</head>
 	<body class="dark-mode">
 
-	{% if year is not defined %}
-		{% set year = "now" | date("Y") %}
+		{% if year is not defined %}
+			{% set year = "now" | date("Y") %}
 
-{% endif %}
-	
+		{% endif %}
 
-	{% set menus = {
+
+		{% set menus = {
 		'board' : {
 			'route' : path('app_board'),
 			'name' : 'Tableau de bord',
@@ -50,7 +51,19 @@
 		'budget' : {
 			'route' : path('app_budget'),
 			'name' : 'Budget',
-			'icon' : 'fas fa-money-bill-wave'
+			'icon' : 'fas fa-money-bill-wave',
+			'children' : {
+				'overview' : {
+					'route' : path('app_budget'),
+					'name' : 'Récapitulatif',
+					'icon' : 'fas fa-money-bill-wave'
+				},
+				'by_account' : {
+					'route' : path('app_budget_by_bank_account'),
+					'name' : 'Vue par compte',
+					'icon' : 'fas fa-money-bill-wave'
+				},
+			}
 		},
 		'resume' : {
 			'route' : path('resume', {year:year}),
@@ -74,11 +87,30 @@
 
 				<div id="nav_container" class="d-flex justify-content-between">
 					{% for menu in menus %}
-						<a href= {{menu.route}} {% if active is defined and active == menu.route %}class="active"{% endif %}
-						>
-							<i class="{{menu.icon}} me-3"></i>
-						{{menu.name | capitalize}}
-					</a>
+						{% if menu.children is defined %}
+
+							<div class="btn-group">
+								<button type="button" class="btn text-white dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+									<i class="{{menu.icon}} me-3"></i>
+									{{menu.name | capitalize}}
+								</button>
+								<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+									{% for child in menu.children %}
+										<a class="dropdown-item" href={{child.route}}>
+											<i class="{{child.icon}} me-3"></i>
+											{{child.name | capitalize}}</a>
+									{% endfor %}
+								</div>
+							</div>
+
+						{% else %}
+							<a href={{menu.route}} {% if active is defined and active == menu.route %} class="active" {% endif %}>
+								<i class="{{menu.icon}} me-3"></i>
+								{{menu.name | capitalize}}
+							</a>
+
+						{% endif %}
+
 					{% endfor %}
 
 
@@ -91,16 +123,17 @@
 				<div class="d-flex align-items-center">
 					<a href="{{path('app_logout')}}" class="btn btn-secondary">
 						<i class="fas fa-sign-out-alt"></i>
-				Deconnexion</a>
-					<div class="text-white">
+						Deconnexion</a>
+					<div
+						class="text-white">
 						{# Avatar icon #}
-						
-							<i class="fas fa-user-circle"></i>
-					{{app.user | capitalize}}</div>
+
+						<i class="fas fa-user-circle"></i>
+						{{app.user | capitalize}}</div>
 				</div>
 				<button id="drawer_button" class="btn btn-dark" onclick="toggle_drawer()">
 					<i class="fas fa-bars"></i>
-			</button>
+				</button>
 
 			</header>
 
@@ -108,15 +141,16 @@
 
 		{# make drawer with menus for smartphone #}
 		<div id="drawer" class="drawer">
-		{% for menu in menus %}
-				<div><a href= {{menu.route}} {% if active is defined and active == menu.route %}class="active"{% endif %}
-					>
+			{% for menu in menus %}
+				<div>
+					<a href={{menu.route}} {% if active is defined and active == menu.route %} class="active" {% endif %}>
 						<i class="{{menu.icon}} me-3"></i>
-					{{menu.name | capitalize}}
-				</a></div>
+						{{menu.name | capitalize}}
+					</a>
+				</div>
 			{% endfor %}
-	
-	</div>
+
+		</div>
 
 		<main>
 			{% block body %}{% endblock %}

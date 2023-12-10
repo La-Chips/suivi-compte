@@ -31,7 +31,11 @@
 				<tr>
 					<th scope="col">Mois</th>
 				{% for bankAccount in app.user.bankAccounts %}
-					<th>{{ bankAccount}}</th>
+					<th>
+						<a href="{{ path('app_budget_by_bank_account', {'id': bankAccount.id}) }}">
+							{{ bankAccount }}
+						</a>
+					</th>
 				{% endfor %}
 				<th>Total</th>
 				</tr>

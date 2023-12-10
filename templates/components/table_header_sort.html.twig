@@ -1,0 +1,5 @@
+<div class="d-flex align-items-center justify-content-around">
+	<div>{{label}}</div>
+	{% include "templates/sort_row.html.twig" with { sort : sort , order :order , col : col | default(label)} %}
+
+</div>

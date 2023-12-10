@@ -56,6 +56,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $bankAccounts;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Categorie::class, mappedBy="User")
+     */
+    private $categories;
+
     public function __construct()
     {
         $this->lignes = new ArrayCollection();
@@ -253,5 +258,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    // has bank account
+    public function hasBankAccount(): bool
+    {
+        return $this->bankAccounts->count() > 0;
+    }
+
+    /**
+     * @return Collection<int, Categorie>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    // has categories
+    public function hasCategories(): bool
+    {
+        return $this->categories->count() > 0;
     }
 }

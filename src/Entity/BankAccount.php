@@ -6,6 +6,7 @@ use App\Repository\BankAccountRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Categorie;
 
 /**
  * @ORM\Entity(repositoryClass=BankAccountRepository::class)
@@ -111,5 +112,44 @@ class BankAccount
         }
         return $balance;
     }
+
+    // get schedule expenses categories
+    public function getScheduleExpensesCategories(): array
+    {
+        $categories = [];
+        foreach ($this->getScheduleExpenses() as $scheduleExpense) {
+            $category = $scheduleExpense->getCategory();
+            if(!in_array($category,$categories)){
+                $categories[] = $category;
+            }
+        }
+        return $categories;
+    }
+
+    // get schedule expenses by category
+    public function getScheduleExpensesByCategory(Categorie $category): array
+    {
+        $scheduleExpenses = [];
+        foreach ($this->getScheduleExpenses() as $scheduleExpense) {
+            if($scheduleExpense->getCategory() == $category){
+                $scheduleExpenses[] = $scheduleExpense;
+            }
+        }
+        return $scheduleExpenses;
+    }
+
+    // get schedule expenses by category and month
+    public function getScheduleExpensesByCategoryAndMonth(Categorie $category, int $month): array
+    {
+        $scheduleExpenses = [];
+        foreach ($this->getScheduleExpenses() as $scheduleExpense) {
+            if($scheduleExpense->getCategory() == $category && $scheduleExpense->getMonth() == $month){
+                $scheduleExpenses[] = $scheduleExpense;
+            }
+        }
+        return $scheduleExpenses;
+    }
+
+
 
 }
