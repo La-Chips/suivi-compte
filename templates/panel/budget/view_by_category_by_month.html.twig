@@ -1,0 +1,16 @@
+{% extends "panel/budget/header.html.twig" %}
+
+
+{% block ext %}
+
+
+    {% include "components/main/back_button.html.twig" with {link : path('app_budget_by_bank_account',{id : bank_account.id})} %}
+
+    <h3 class="m-3">
+        {{bank_account}} - {{category}} - {{month | date('F')}}
+    </h3>
+
+	{% include "crud/schedule_expense/index_table.html.twig" with {schedule_expenses:expenses} %}
+
+
+{% endblock %}

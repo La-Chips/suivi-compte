@@ -48,6 +48,11 @@ class ScheduleExpenseController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if($this->check_object($scheduleExpense) != null){
+                $this->addFlash('error',$this->check_object($scheduleExpense));
+                return $this->redirectToRoute('app_schedule_expense_new', [], Response::HTTP_SEE_OTHER);
+            }
+
             $scheduleExpenseRepository->add($scheduleExpense);
             return $this->redirectToRoute('app_schedule_expense_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -75,6 +80,11 @@ class ScheduleExpenseController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if($this->check_object($scheduleExpense) != null){
+                $this->addFlash('error',$this->check_object($scheduleExpense));
+                return $this->redirectToRoute('app_schedule_expense_edit', ['id' => $scheduleExpense->getId()], Response::HTTP_SEE_OTHER);
+            }
+
             $scheduleExpenseRepository->add($scheduleExpense);
             return $this->redirectToRoute('app_schedule_expense_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -122,5 +132,15 @@ class ScheduleExpenseController extends AbstractController
             'bank_accounts' => $bank_accounts,
 
         ]);
+    }
+
+    private function check_object(ScheduleExpense $scheduleExpense): ?string
+    {
+
+        if($scheduleExpense->getRepeatable()
+        && $scheduleExpense->getScheduleRepeat() == null)
+            return "Une répétition doit être programmée";
+            
+        return null;
     }
 }

@@ -1,4 +1,46 @@
-{{ form_start(form) }}
+<div class="container">
+    {{ form_start(form) }}
     {{ form_widget(form) }}
     <button class="btn btn-success my-3">{{ button_label|default('Créer') }}</button>
 {{ form_end(form) }}
+
+</div>
+
+<script>
+		$(document).ready(function () {
+			$('#income').click(function () {
+				let value = $("#schedule_expense_amount").val();
+				$("#schedule_expense_amount").val(Math.abs(value));
+			});
+			$('#expense').click(function () {
+				let value = $("#schedule_expense_amount").val();
+				$("#schedule_expense_amount").val(-Math.abs(value));
+			});
+
+			$('#schedule_expense_amount').change(function () {
+				let value = $("#schedule_expense_amount").val();
+				let income = $('#income').is(':checked');
+
+				if (income) {
+					$("#schedule_expense_amount").val(Math.abs(value));
+				} else {
+					$("#schedule_expense_amount").val(-Math.abs(value));
+				}
+			});
+		});
+	
+
+
+    if(!$('#schedule_expense_repeatable').is(':checked')) {
+        $('#schedule_expense_scheduleRepeat').prop('disabled', true);
+    }
+
+    $('#schedule_expense_repeatable').on('change', function () {
+        if ($(this).is(':checked')) {
+            $('#schedule_expense_scheduleRepeat').prop('disabled', false);
+        } else {
+            $('#schedule_expense_scheduleRepeat').val('');
+            $('#schedule_expense_scheduleRepeat').prop('disabled', true);
+        }
+    });
+</script>

@@ -27,6 +27,9 @@ class ScheduleExpenseType extends AbstractType
                 'choice_label' => 'libelle',
                 'label' => 'Catégorie',
             ])
+            ->add('repeatable',null,[
+                'label' => 'Répétable',
+            ])
             ->add('scheduleRepeat', EntityType::class, [
                 'class' => ScheduleRepeat::class,
                 'choice_label' => 'label',

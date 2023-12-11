@@ -59,15 +59,10 @@ header a:hover {
     color: #fff !important;
 }
 
-.dark-mode table,.dark-mode th,.dark-mode td{
+.dark-mode .table,.dark-mode .table-striped th,.dark-mode .table-striped td{
     color: #fff !important;
 }
 
-.dark-mode #ui-datepicker-div{
-    background-color: rgb(255, 255, 255) !important;
-    color: #000000 !important;
-
-}
 
 hr{
     border-top: 2px solid #ccc !important;

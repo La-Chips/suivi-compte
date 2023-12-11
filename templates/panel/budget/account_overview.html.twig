@@ -1,4 +1,4 @@
-{% extends "base.html.twig" %}
+{% extends "panel/budget/header.html.twig" %}
 
 {% block title %}
 	{{ parent() }}
@@ -19,7 +19,9 @@ window.location.href = "{{ path('app_budget_by_bank_account', {'account_id': '0'
 
 {% endblock %}
 
-{% block body %}
+{% set old_total = 0 %}
+
+{% block ext %}
 	<div >
 		<select name="account_select" id="account_select" class="form-select w-25">
 
@@ -49,11 +51,17 @@ window.location.href = "{{ path('app_budget_by_bank_account', {'account_id': '0'
 
 						{% set total = 0 %}
 						{% for category in current_bank_account.scheduleExpensesCategories %}
-                            {% set total = total + current_bank_account.getScheduleExpensesByCategoryAndMonth(category, month_id) %}
-                            <td>{{ current_bank_account.getScheduleExpensesByCategoryAndMonth(category, month_value_conf)|number_format(2, ',', ' ') }} €</td>
+                            {% set total = total + current_bank_account.getScheduleExpensesBalanceByCategoryAndMonth(category, month_id) %}
+							
+                            <td>
+								<a class="text-white text-decoration-none" href="{{path('app_budget_by_bank_account_category_month',{bankAccount : current_bank_account.id,category : category.id, month : month_id})}}">
+									{{ current_bank_account.getScheduleExpensesBalanceByCategoryAndMonth(category, month_id)|number_format(2, ',', ' ') }} €
+								</a>
+							</td>
                         {% endfor %}
+							{% set old_total = total + old_total %}
 						
-                        <td>{{ total|number_format(2, ',', ' ') }} €</td>
+                        <td>{{ old_total|number_format(2, ',', ' ') }} €</td>
 					</tr>
 				{% endfor %}
 			</tbody>

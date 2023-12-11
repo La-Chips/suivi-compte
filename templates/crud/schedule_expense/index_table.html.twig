@@ -1,0 +1,55 @@
+{% set table_header = [
+		{label : "Date", col : "startDate"},
+		{label : "Compte", col : "bankAccount"},
+		{label : "Label", col : "label"},
+		{label : "Catégorie", col : "category"},
+		{label : "Montant", col : "amount"},
+		
+	] %}
+
+{% if sort is not defined or order is not defined %}
+	{% set sort = "" %}
+	{% set order = "" %}
+{% endif %}
+
+<div class="container">
+		<table class="table table-striped text-center align-middle ">
+			<thead>
+				<tr>
+				<th>Repeat Time</th>
+					{% for header in table_header %}
+						<th>
+							{% include "components/table_header_sort.html.twig" with { sort : sort , order :order , col : header.col,label : header.label} %}
+						</th>
+					{% endfor %}
+
+					<th>actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for schedule_expense in schedule_expenses %}
+					<tr>
+						<td>{{ schedule_expense.scheduleRepeat }}</td>
+						<td>{{ schedule_expense.startDate|date('d/m/Y') }}</td>
+						<td>{{ schedule_expense.bankAccount }}</td>
+						<td>{{ schedule_expense.label }}</td>
+						<td>
+							<a href="{{path('app_schedule_expense_by_category',{id : schedule_expense.category.id})}}">
+								{% include "components/category_item.html.twig" with { category : schedule_expense.category} %}
+							</a>
+						</td>
+						<td>{{ schedule_expense.amount }}
+							€</td>
+						<td>
+							{% include "components/main/show_button.html.twig" with {link : path('app_schedule_expense_show', {'id': schedule_expense.id})} %}
+							{% include "components/main/edit_button.html.twig" with {link : path('app_schedule_expense_edit', {'id': schedule_expense.id})} %}
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="6">Aucun enregistrements</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>

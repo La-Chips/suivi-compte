@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\BankAccount;
+use App\Entity\Categorie;
 use App\Repository\BankAccountRepository;
+use App\Repository\ScheduleExpenseRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +16,10 @@ class BudgetController extends AbstractController
     #[Route('/budget', name: 'app_budget')]
     public function index(): Response
     {
+        if(!$this->getUser()->hasBankAccount()){
+            $this->addFlash('error','Veuillez créer un compte');
+        }
+
         return $this->render('panel/budget/index.html.twig', [
             'controller_name' => 'BudgetController',
         ]);
@@ -35,6 +42,24 @@ class BudgetController extends AbstractController
         return $this->render('panel/budget/account_overview.html.twig', [
             'controller_name' => 'BudgetController',
             'current_bank_account' => $bankAccount,
+        ]);
+    }
+
+    #[Route('/budget/account/{bankAccount}/{category}/{month}', name: 'app_budget_by_bank_account_category_month')]
+    public function by_bank_account_category_month(Request $request,BankAccount $bankAccount,Categorie $category,int $month,ScheduleExpenseRepository $scheduleExpenseRepository): Response
+    {
+        $expenses =  $scheduleExpenseRepository->findByWithMonth([
+            'bankAccount' => $bankAccount,
+            'category' => $category,
+            'month' => $month,
+
+        ]);   
+
+        return $this->render('panel/budget/view_by_category_by_month.html.twig', [
+            'bank_account' => $bankAccount,
+            'expenses' => $expenses,
+            'category' => $category,
+            'month' => $month,
         ]);
     }
 }

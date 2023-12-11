@@ -20,6 +20,10 @@
                 <th>Amount</th>
                 <td>{{ schedule_expense.amount }}</td>
             </tr>
+            <tr>
+                <th>Date</th>
+                <td>{{ schedule_expense.startdate ? schedule_expense.startdate|date('Y-m-d') : '' }}</td>
+            </tr>
         </tbody>
     </table>
 

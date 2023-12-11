@@ -4,8 +4,12 @@
 
 {% block body %}
 
-         {% include "components/main/header_crud.html.twig" with {title : 'Créer une dépense prévisionnel', link : path('app_schedule_expense_new')} %}
+         {% include "components/main/header_crud.html.twig" with {title : 'Créer une dépense prévisionnel', link : path('app_schedule_expense_index')} %}
 
+    <div class="d-flex justify-content-end mx-3">
+    {% include "components/toggle_income_expense.html.twig" %}
+
+    </div>
 
     {{ include('crud/schedule_expense/_form.html.twig', {'button_label': 'Modifier'}) }}
 

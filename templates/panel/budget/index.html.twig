@@ -1,43 +1,27 @@
-{% extends 'base.html.twig' %}
+{% extends 'panel/budget/header.html.twig' %}
 
 {% block title %}Hello BudgetController!
 {% endblock %}
 
-{% block body %}
 
-	<div class="d-flex justify-content-between">
-		<div></div>
-		<div
-			class="button-wrapper">
-			{# dropdown #}
-			<div class="btn-group">
-				<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-					<i class="fas fa-cog"></i>
-				</button>
-				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-					<a class="dropdown-item" href="{{path('app_bank_account_index')}}">Compte</a>
-					<a class="dropdown-item" href="{{ path('app_schedule_expense_index')}}">Dépense prévisionnel</a>
-				</div>
-			</div>
+{% set old_total = 0 %}
+{% block ext %}
 
-
-		</div>
-
-	</div>
+	
 
 	<div class="container">
 		<table class="table table-striped text-center align-middle">
 			<thead>
 				<tr>
 					<th scope="col">Mois</th>
-				{% for bankAccount in app.user.bankAccounts %}
-					<th>
-						<a href="{{ path('app_budget_by_bank_account', {'id': bankAccount.id}) }}">
-							{{ bankAccount }}
-						</a>
-					</th>
-				{% endfor %}
-				<th>Total</th>
+					{% for bankAccount in app.user.bankAccounts %}
+						<th>
+							<a href="{{ path('app_budget_by_bank_account', {'id': bankAccount.id}) }}">
+								{{ bankAccount }}
+							</a>
+						</th>
+					{% endfor %}
+					<th>Total</th>
 				</tr>
 
 			</thead>
@@ -49,10 +33,13 @@
 
 						{% set total = 0 %}
 						{% for bankAccount in app.user.bankAccounts %}
-							{% set total = total + bankAccount.getScheduleBalance(month_id) %}
-							<td>{{ bankAccount.getScheduleBalance(month_id)|number_format(2, ',', ' ') }} €</td>
+							{% set total = total + bankAccount.getScheduleBalance(month_id) + old_total %}
+							{% set old_total = total %}
+							<td>{{ bankAccount.getScheduleBalance(month_id)|number_format(2, ',', ' ') }}
+								€</td>
 						{% endfor %}
-						<td>{{ total|number_format(2, ',', ' ') }} €</td>
+						<td>{{ total|number_format(2, ',', ' ') }}
+							€</td>
 					</tr>
 				{% endfor %}
 			</tbody>

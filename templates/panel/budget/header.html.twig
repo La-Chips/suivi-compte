@@ -1,0 +1,27 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+
+<div class="d-flex justify-content-between">
+		<div></div>
+		<div
+			class="button-wrapper">
+			{# dropdown #}
+			<div class="btn-group">
+				<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+					<i class="fas fa-cog"></i>
+				</button>
+				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					<a class="dropdown-item" href="{{path('app_bank_account_index')}}">Compte</a>
+					<a class="dropdown-item" href="{{ path('app_schedule_expense_index')}}">Dépense prévisionnel</a>
+				</div>
+			</div>
+
+
+		</div>
+
+	</div>
+
+{% block ext %}{% endblock %}
+
+{% endblock %}

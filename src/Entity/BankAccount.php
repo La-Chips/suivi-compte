@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\BankAccountRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
+use DateInterval;
 use App\Entity\Categorie;
+use Doctrine\ORM\Mapping as ORM;
+use DoctrineExtensions\Query\Mysql\Date;
+use App\Repository\BankAccountRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass=BankAccountRepository::class)
@@ -104,11 +106,20 @@ class BankAccount
         return $this->label;
     }
 
-    public function getScheduleBalance(int $target_month = 0 ): ?float
+    public function getScheduleBalance(int $target_month = 0,array $expenses = [] ): ?float
     {
         $balance = 0;
-        foreach ($this->getScheduleExpenses() as $scheduleExpense) {
-            $balance += $scheduleExpense->getAmount();
+        $date = new \DateTime('now');
+        $interval = DateInterval::createFromDateString(strval($target_month).' month');
+        $date->add($interval);
+
+
+        if(empty($expenses)){
+            $expenses = $this->getScheduleExpenses();
+        }
+
+        foreach ($expenses as $scheduleExpense) {
+            $balance += $scheduleExpense->getSumByMonth($date);
         }
         return $balance;
     }
@@ -131,7 +142,7 @@ class BankAccount
     {
         $scheduleExpenses = [];
         foreach ($this->getScheduleExpenses() as $scheduleExpense) {
-            if($scheduleExpense->getCategory() == $category){
+            if($scheduleExpense->getCategory()->getId() == $category->getId()){
                 $scheduleExpenses[] = $scheduleExpense;
             }
         }
@@ -143,13 +154,24 @@ class BankAccount
     {
         $scheduleExpenses = [];
         foreach ($this->getScheduleExpenses() as $scheduleExpense) {
-            if($scheduleExpense->getCategory() == $category && $scheduleExpense->getMonth() == $month){
+            if($scheduleExpense->getCategory()->getId() == $category->getId() && $scheduleExpense->haveToPay($month) ){
                 $scheduleExpenses[] = $scheduleExpense;
             }
         }
         return $scheduleExpenses;
     }
 
+    // get schedule expenses balance by category and month
 
+    public function getScheduleExpensesBalanceByCategoryAndMonth(Categorie $category, int $month): float
+    {
+
+        $expenses = $this->getScheduleExpensesByCategoryAndMonth($category,$month);
+        if(empty($expenses))
+            return 0;
+        
+        return $this->getScheduleBalance($month,$expenses);
+    }
+   
 
 }

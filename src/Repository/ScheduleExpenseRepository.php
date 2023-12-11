@@ -61,6 +61,31 @@ class ScheduleExpenseRepository extends ServiceEntityRepository
         ;
     }
 
+    // findByWithMonth
+    public function findByWithMonth(array $params): array
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->join('s.bankAccount', 'b')
+            ->join('s.category', 'c')
+            ->andWhere('b.id = :bankAccount')
+            ->setParameter('bankAccount', $params['bankAccount']->getId())
+            ->andWhere('c.id = :category')
+            ->setParameter('category', $params['category']->getId())
+
+            ->orderBy('s.id', 'ASC')
+        ;
+
+        if (isset($params['year'])) {
+            $qb->andWhere('YEAR(s.start_date) = :year')
+                ->setParameter('year', $params['year'])
+            ;
+        }
+
+        return $qb->getQuery()
+            ->getResult()
+        ;
+    }
+
     // /**
     //  * @return ScheduleExpense[] Returns an array of ScheduleExpense objects
     //  */
