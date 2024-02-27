@@ -6,6 +6,7 @@
 
          {% include "components/main/header_crud.html.twig" with {title : 'Créer un compte', link : path('app_bank_account_new')} %}
 
+    {{ include('crud/bank_account/_form.html.twig', {'button_label': 'Modifier'}) }}
 
     {{ include('crud/bank_account/_delete_form.html.twig') }}
 {% endblock %}

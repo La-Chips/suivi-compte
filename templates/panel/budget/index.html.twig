@@ -4,7 +4,6 @@
 {% endblock %}
 
 
-{% set old_total = 0 %}
 {% block ext %}
 
 	
@@ -26,19 +25,45 @@
 
 			</thead>
 			<tbody>
+				{% set accounts_value = [] %}
 				{% for month_id in 0..6 %}
 					{% set month_value_conf = "+"~month_id~" month" %}
+					{% set accounts_total = 0 %}
+
 					<tr>
 						<td>{{ month_value_conf|date('F') }}</td>
 
-						{% set total = 0 %}
 						{% for bankAccount in app.user.bankAccounts %}
-							{% set total = total + bankAccount.getScheduleBalance(month_id) + old_total %}
-							{% set old_total = total %}
-							<td>{{ bankAccount.getScheduleBalance(month_id)|number_format(2, ',', ' ') }}
-								€</td>
+						{% set current_value  = bankAccount.getScheduleBalance(month_id) %}
+
+						{% if current_value < 0 %}
+								{% set color = "bg-danger" %}
+							{% else %}
+								{% set color = "bg-success" %}
+							{% endif %}
+
+						{% if month_id == 0 %}
+							{% set current_value = current_value + bankAccount.initialValue %}
+						{% endif %}
+						
+							
+							
+
+
+							{% set accounts_total = accounts_total + current_value  %}
+							
+							{% if bankAccount.label not in accounts_value|keys %}
+								{% set accounts_value = accounts_value|merge({ (bankAccount.label) : current_value}) %}
+							{% else %}
+								
+								{% set accounts_value = accounts_value|merge({ (bankAccount.label) : accounts_value[bankAccount.label] + current_value}) %}
+							{% endif %}
+
+							
+							<td class="{{color|default('')}}">{{ accounts_value[bankAccount.label] |number_format(2, ',', ' ')  }} 
+								 €</td>
 						{% endfor %}
-						<td>{{ total|number_format(2, ',', ' ') }}
+						<td>{{ accounts_total|number_format(2, ',', ' ') }}
 							€</td>
 					</tr>
 				{% endfor %}

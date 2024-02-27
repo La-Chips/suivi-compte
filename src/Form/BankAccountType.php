@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\BankAccount;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -13,6 +14,9 @@ class BankAccountType extends AbstractType
     {
         $builder
             ->add('label')
+            ->add('initial_value',MoneyType::class,[
+                'currency' => 'EUR',
+            ])
             
         ;
     }

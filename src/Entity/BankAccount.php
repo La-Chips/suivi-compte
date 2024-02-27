@@ -37,6 +37,11 @@ class BankAccount
      */
     private $scheduleExpenses;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $initial_value;
+
     public function __construct()
     {
         $this->scheduleExpenses = new ArrayCollection();
@@ -171,6 +176,18 @@ class BankAccount
             return 0;
         
         return $this->getScheduleBalance($month,$expenses);
+    }
+
+    public function getInitialValue(): ?float
+    {
+        return $this->initial_value;
+    }
+
+    public function setInitialValue(?float $initial_value): self
+    {
+        $this->initial_value = $initial_value;
+
+        return $this;
     }
    
 
