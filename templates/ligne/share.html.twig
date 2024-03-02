@@ -1,0 +1,53 @@
+
+{% extends "base.html.twig" %}
+
+{% block title %}Partager des dépenses
+{% endblock %}
+
+{% if sort is not defined %}
+	{% set sort = '' %}
+{% endif %}
+{% if order is not defined %}
+{% set order = 'ASC' %}
+{% endif %}
+
+{% block body %}
+
+	<div class="container">
+		<div class="d-flex justify-content-end">
+			<button class="btn btn-success">Partager</button>
+		</div>
+
+		<div class="container">
+			<div class="d-flex align-items-center">
+				<i class="fal fa-user"></i>
+				<h3 class="ms-3">Utilisateurs</h3>
+			</div>
+			<hr>
+			{% for user in users %}
+				{% if user.id != app.user.id %}
+					<div class="d-flex">
+						<input type="checkbox" name="user" id="user_{{user.id}}">
+						<div class="ms-3">{{user}}</div>
+					</div>
+				{% endif %}
+
+			{% endfor %}
+		</div>
+
+		<div class="container my-5">
+			<div class="d-flex align-items-center">
+				<i class="fas fa-search"></i>
+				<h3 class="ms-3">Details</h3>
+			</div>
+			<hr>
+			<div class="table-responsive">
+					{% include "/templates/tables_lignes.html.twig" with {lignes : lines} %}
+
+				</div>
+		</div>
+
+	</div>
+
+
+{% endblock %}

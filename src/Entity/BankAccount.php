@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use DateInterval;
+use App\Entity\Ligne;
 use App\Entity\Categorie;
+use App\Entity\ScheduleExpense;
 use Doctrine\ORM\Mapping as ORM;
 use DoctrineExtensions\Query\Mysql\Date;
 use App\Repository\BankAccountRepository;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -42,9 +45,15 @@ class BankAccount
      */
     private $initial_value;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Ligne::class, mappedBy="bankAccount")
+     */
+    private $accountantEntry;
+
     public function __construct()
     {
         $this->scheduleExpenses = new ArrayCollection();
+        $this->accountantEntry = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -188,6 +197,54 @@ class BankAccount
         $this->initial_value = $initial_value;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Ligne>
+     */
+    public function getAccountantEntry(?string $sort = null , string $order = 'ASC'): Collection
+    {
+        if($sort != null) {
+            return $this->accountantEntry->matching(
+                Criteria::create()->orderBy([$sort => $order])
+            );
+        }
+
+        return $this->accountantEntry;
+    }
+
+
+
+    public function addAccountantEntry(Ligne $accountantEntry): self
+    {
+        if (!$this->accountantEntry->contains($accountantEntry)) {
+            $this->accountantEntry[] = $accountantEntry;
+            $accountantEntry->setBankAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAccountantEntry(Ligne $accountantEntry): self
+    {
+        if ($this->accountantEntry->removeElement($accountantEntry)) {
+            // set the owning side to null (unless already changed)
+            if ($accountantEntry->getBankAccount() === $this) {
+                $accountantEntry->setBankAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getCurrentValue() : float
+    {
+        $value = $this->initial_value;
+
+        foreach($this->accountantEntry as $entry){
+            $value += $entry->getAmount();
+        }
+        return round($value,2);
     }
    
 

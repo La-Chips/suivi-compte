@@ -290,4 +290,14 @@ class LigneRepository extends ServiceEntityRepository
         $em->remove($lastligne);
         $em->flush();
     }
+
+    public function findUnclosedEntries()
+    {
+        $qb = $this->createQueryBuilder('l')
+        ->innerJoin('l.owner','o')
+        ->where('l.closed = false');
+
+
+        return $qb->getQuery()->getResult();
+    }
 }

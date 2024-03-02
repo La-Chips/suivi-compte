@@ -1,16 +1,18 @@
+
+
 <div class="d-flex align-items-center">
 	<a href="{{path('ligne_new')}}" class="btn btn-success">Ajouter</a>
 
 </div>
 
-<table class="table table-striped text-center">
+<table class="table table-striped text-center align-middle">
 
 
 	<thead>
 
 		<tr>
+		<th></th>
 			<th>
-
 				<div class="d-flex align-items-center">
 					<div>Catégorie</div>
 					{% include "templates/sort_row.html.twig" with { sort : sort , order :order, col :'categorie'} %}
@@ -74,6 +76,10 @@
 					{% set bg = 'none' %}
 				{% endif %}
 				<td>
+					<input type="checkbox" class="form-check" name="entry_{{item.id}}" id="entry_{{item.id}}">
+				</td>
+
+				<td>
 					<div {% if bg is defined %} class="{{bg}} rounded py-3" {% endif %}>
 						{{item.categorie}}
 					</div>
@@ -91,7 +97,7 @@
 					€</td>
 				<td>
 					{# <a href="{{path('line.set.statut',{id : item.id,statut : 1})}}" class="btn btn-success m-1">Dû</a>
-										<a href="{{path('line.set.statut',{id : item.id,statut : 2})}}" class="btn btn-danger m-1">A Payer</a> #}
+																				<a href="{{path('line.set.statut',{id : item.id,statut : 2})}}" class="btn btn-danger m-1">A Payer</a> #}
 
 				</td>
 				<td>

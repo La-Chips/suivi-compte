@@ -13,6 +13,25 @@ class BoardController extends AbstractController
     #[Route('/board', name: 'app_board')]
     public function index(Request $request,LigneRepository $ligneRepository): Response
     {
+
+        $unclosed_entry = $ligneRepository->findUnclosedEntries();
+        $months = [];
+
+        foreach($unclosed_entry as $entry){
+            $months_id = $entry->getDate()->format('m');
+            $months[$months_id]["entry"][] = $entry;
+            $months[$months_id]["name"] = $entry->getDate()->format('F');
+            if(isset($months[$months_id]["amount"]))
+                $months[$months_id]["amount"] += $entry->getAmount();
+            else
+                $months[$months_id]["amount"] = $entry->getAmount();
+
+            if(!$entry->getClosed())
+                $months[$months_id]["closed"] = false;
+
+
+        }
+
         $request->query->get('month') != null ? $month = $request->query->get('month') : $month = date('F');
         $request->query->get('year') != null ? $year = $request->query->get('year') : $year = date('Y');
      
@@ -48,6 +67,7 @@ class BoardController extends AbstractController
         
 
         return $this->render('board/index.html.twig', [
+            'months' => $months,
             'balance'=> [
                 'incomes' => $income,
                 'expenses' => $expense,

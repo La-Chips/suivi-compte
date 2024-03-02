@@ -8,6 +8,18 @@
 {% endblock %}
 
 {% block body %}
+	<div class="d-flex justify-content-end">
+		<div class="btn-group">
+			<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+				<i class="fas fa-cog"></i>
+			</button>
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				<a class="dropdown-item" href="{{path('app_bank_account_index')}}">Gerer les Comptes</a>
+				<a class="dropdown-item" href="{{ path('app_schedule_expense_index')}}">Gerer les Dépenses prévisionnelles</a>
+			</div>
+		</div>
+	</div>
+
 	<div class="container d-flex justify-content-around">
 
 		<div>
@@ -58,10 +70,10 @@
 											{% for tags in item.filters %}
 												<div class="bg-light-grey rounded-pill ps-2 m-1 fw-bold">{{tags.keyword | capitalize}}
 
-												{% if tags.amount %}
-													<span class="badge bg-success rounded-pill">{{tags.amount}}</span>
-											{% endif %}
-												
+													{% if tags.amount %}
+														<span class="badge bg-success rounded-pill">{{tags.amount}}</span>
+													{% endif %}
+
 
 													<a href="{{path('delete',{option: 'filter' , id: tags.id})}}" class="btn btn-danger  rounded-circle">
 														<img src="{{ asset('img/cross-circle.svg') }}" alt="del" width="20">

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\BankAccount;
 use App\Entity\LastImport;
 use App\Repository\CategorieRepository;
 use App\Repository\FilterRepository;
@@ -44,8 +45,22 @@ class HomeController extends AbstractController
         $this->security = $security;
     }
 
-    #[Route('/', name: 'home')]
-    public function index(Request $request,LigneRepository $ligneRepository,SessionInterface $session,UserRepository $userRepository,CategorieRepository $categorieRepository): Response
+    #[Route('/',name:'home_redirect')]
+    public function home_redirect()
+    {
+        $user = $this->getUser();
+        if(!$this->getUser()->hasBankAccount())
+            return $this->redirectToRoute('app_bank_account_index');
+        else
+            return $this->redirectToRoute('home',[
+                'bank_account'=> $user->getBankAccounts()->first()->getId(),
+        ]);
+    }
+
+    #[Route('/{bank_account}', name: 'home')]
+    public function index(Request $request,BankAccount $bank_account,LigneRepository $ligneRepository,
+    SessionInterface $session,UserRepository $userRepository,CategorieRepository $categorieRepository,
+    ): Response
     {
         $session->set('userID',$this->security->getUser()->getId());
         $session->set('user',$this->security->getUser());
@@ -56,7 +71,6 @@ class HomeController extends AbstractController
             $order = 'DESC';
         }
         $user = $this->getUser();
-        $lignes = $user->getLignesCreated($sort, $order);
         $to_filter = $ligneRepository->findBy(['categorie' => null, 'user' => $this->getUser()]);
         $du = $ligneRepository->findBy(['statut' => 1, 'user' => $this->getUser()]);
         $to_pay = $ligneRepository->findBy(['statut' => 2, 'user' => $this->getUser()]);
@@ -77,7 +91,6 @@ class HomeController extends AbstractController
             'active' => 'home',
             'categories' => $categories,
             'to_filter' => $to_filter,
-            'lignes' => $lignes,
             'to_pay' => $to_pay,
             'du' => $du,
             'sum' => $sum,
@@ -85,6 +98,7 @@ class HomeController extends AbstractController
             'total_du' => $du_total,
             'sort' => $sort,
             'order' => $order,
+            'current_bank_account' => $bank_account,
         ]);
     }
 

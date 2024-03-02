@@ -8,62 +8,79 @@
 {% endblock %}
 
 {% block body %}
-	<div>
-		<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importModal">Importer</button>
-		<a href="{{path('export')}}" class="btn btn btn-primary">Exporter</a>
+
+	<div class="d-flex justify-content-end">
+		<div class="btn-group">
+			<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+				Actions
+			</button>
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+				<div class="dropdown-item">
+					<a data-bs-toggle="modal" data-bs-target="#importModal">Importer</a>
+				</div>
+				<div class="dropdown-item">
+					<a href="{{path('export')}}">Exporter</a>
+				</div>
+
+			</div>
+		</div>
 	</div>
+
 
 	<div>
 		<div class="d-flex justify-content-around mx-3">
 			<fieldset>
-				<a href="{{path('ligne_new',{option : 2})}}" class=" btn btn-success">Ajouter</a>
-
-
-				<legend>Montant à payer</legend>
+				<div class="d-flex justify-content-between">
+					<legend>Montant à payer</legend>
+					<div class="ms-3">
+						<a href="{{path('ligne_new',{option : 2})}}" class=" btn btn-success">Ajouter</a>
+					</div>
+				</div>
 				<div>
 					{% if to_pay | length > 0 %}
-					<div class="table-responsive">
+						<div class="table-responsive">
 
-						<table class="table table-striped text-center">
+							<table class="table table-striped text-center">
 
 
-							<thead>
+								<thead>
 
-								<tr>
-
-									<th>Date</th>
-									<th>Type</th>
-									<th>Libelle</th>
-									<th>Montant</th>
-									<th></th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for item in to_pay %}
 									<tr>
-										<td>{{ item.date ? item.date|date('Y-m-d H:i:s') : '' }}</td>
 
-										<td>{{item.type}}</td>
-										<td>{{item.libelle}}</td>
-										<td>{{item.montant}}
-											€</td>
-										<td>
-											<a href="{{path('line.set.statut',{id:item.id,statut : 3})}}" class="btn btn-info">Payée</a>
-										</td>
-
+										<th>Date</th>
+										<th>Type</th>
+										<th>Libelle</th>
+										<th>Montant</th>
+										<th></th>
 									</tr>
+								</thead>
+								<tbody>
+									{% for item in to_pay %}
+										<tr>
+											<td>{{ item.date ? item.date|date('Y-m-d H:i:s') : '' }}</td>
 
-								{% endfor %}
-								<tr>
-									<td></td>
-									<td></td>
-									<td>TOTAL :</td>
-									<td>{{total_to_pay}}€</td>
+											<td>{{item.type}}</td>
+											<td>{{item.libelle}}</td>
+											<td>{{item.montant}}
+												€</td>
+											<td>
+												<a href="{{path('line.set.statut',{id:item.id,statut : 3})}}" class="btn btn-info">Payée</a>
+											</td>
 
-									<td></td>
-								</tr>
-							</tbody>
-						</table>
+										</tr>
+
+									{% endfor %}
+									<tr>
+										<td></td>
+										<td></td>
+										<td>TOTAL :</td>
+										<td>{{total_to_pay}}€</td>
+
+										<td></td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 					{% else %}
 						<div>
@@ -74,54 +91,59 @@
 
 			</fieldset>
 			<fieldset>
-				<a href="{{path('ligne_new',{option : 1})}}" class=" btn btn-success">Ajouter</a>
 
-				<legend>Montant dû</legend>
+
+				<div class="d-flex justify-content-between">
+					<legend>Montant dû</legend>
+					<div class="ms-3">
+						<a href="{{path('ligne_new',{option : 1})}}" class=" btn btn-success">Ajouter</a>
+					</div>
+				</div>
 				<div>
 					{% if du | length > 0 %}
-				<div class="table-responsive">
+						<div class="table-responsive">
 
-						<table class="table table-striped text-center">
+							<table class="table table-striped text-center">
 
 
-							<thead>
+								<thead>
 
-								<tr>
-
-									<th>Date</th>
-									<th>Type</th>
-									<th>Libelle</th>
-									<th>Montant</th>
-									<th></th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for item in du %}
 									<tr>
-										<td>{{ item.date ? item.date|date('Y-m-d H:i:s') : '' }}</td>
+
+										<th>Date</th>
+										<th>Type</th>
+										<th>Libelle</th>
+										<th>Montant</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for item in du %}
+										<tr>
+											<td>{{ item.date ? item.date|date('Y-m-d H:i:s') : '' }}</td>
 
 
-										<td>{{item.type}}</td>
-										<td>{{item.libelle}}</td>
-										<td>{{item.montant}}
-											€</td>
-										<td>
-											<a href="{{path('line.set.statut',{id:item.id,statut : 4})}}" class="btn btn-info">Soldée</a>
-										</td>
+											<td>{{item.type}}</td>
+											<td>{{item.libelle}}</td>
+											<td>{{item.montant}}
+												€</td>
+											<td>
+												<a href="{{path('line.set.statut',{id:item.id,statut : 4})}}" class="btn btn-info">Soldée</a>
+											</td>
 
+										</tr>
+
+									{% endfor %}
+									<tr>
+										<td></td>
+										<td></td>
+										<td>TOTAL :</td>
+										<td>{{total_du}}€</td>
+										<td></td>
 									</tr>
 
-								{% endfor %}
-								<tr>
-									<td></td>
-									<td></td>
-									<td>TOTAL :</td>
-									<td>{{total_du}}€</td>
-									<td></td>
-								</tr>
-
-							</tbody>
-						</table>
+								</tbody>
+							</table>
 						</div>
 					{% else %}
 						<div>Vous n'avez rien à recevoir</div>
@@ -131,73 +153,88 @@
 			</fieldset>
 		</div>
 		<div class="d-flex flex-column mx-3">
-			<fieldset class="me-3">
-				<legend>Opération à catégoriser ({{to_filter | length}})</legend>
-				<form action="{{path('categoriser')}}" method="post">
-
-					<div class="table-responsive">
-					<table class="table table-striped me-3">
-					<thead>
-
-						<tr>
-							<th>Catégorie</th>
-							<th>Date</th>
-							<th>Type</th>
-							<th>Libelle</th>
-							<th>Montant</th>
-							<th>
-								<button type="submit" class="btn btn-success">Valider</button>
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for item in to_filter %}
-							<tr>
-								{% if item.categorie != null %}
-									{% set bg = "bg-"~item.categorie.color %}
-								{% else %}
-									{% set bg = 'none' %}
-								{% endif %}
-								<td {% if bg is defined %} class="{{bg}}" {% endif %}>{{item.categorie}}</td>
-								<td>{{ item.date ? item.date|date('Y-F-d H:i:s') : '' }}</td>
 
 
-								<td>{{item.type}}</td>
-								<td>{{item.libelle}}</td>
-								<td>{{item.montant}}
-									€</td>
+			{% if to_filter is not empty %}
+				<fieldset class="me-3">
+					<legend>Opération à catégoriser ({{to_filter | length}})</legend>
+					<form action="{{path('categoriser')}}" method="post">
 
-								<td class="d-flex justify-content-between p-1">
-									<select name="categorie_{{item.id}}" id="ligne_{{item.id}}" class="form-select">
-										<option value="null"></option>
-										{% for cat in categories %}
-											<option value="{{cat.id}}">{{cat}}</option>
-										{% endfor %}
+						<div class="table-responsive">
+							<table class="table table-striped me-3">
+								<thead>
 
-									</select>
-								</td>
-							</tr>
-							{% else %}
-								<tr>
-									<td colspan="6" class="text-center">Aucun éléments</td>
-								</tr>
-						{% endfor %}
-					</tbody>
+									<tr>
+										<th>Catégorie</th>
+										<th>Date</th>
+										<th>Type</th>
+										<th>Libelle</th>
+										<th>Montant</th>
+										<th>
+											<button type="submit" class="btn btn-success">Valider</button>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for item in to_filter %}
+										<tr>
+											{% if item.categorie != null %}
+												{% set bg = "bg-"~item.categorie.color %}
+											{% else %}
+												{% set bg = 'none' %}
+											{% endif %}
+											<td {% if bg is defined %} class="{{bg}}" {% endif %}>{{item.categorie}}</td>
+											<td>{{ item.date ? item.date|date('Y-F-d H:i:s') : '' }}</td>
 
-				</table>
-				
-				</div>
-					
-				</form>
 
-			</fieldset>
+											<td>{{item.type}}</td>
+											<td>{{item.libelle}}</td>
+											<td>{{item.montant}}
+												€</td>
+
+											<td class="d-flex justify-content-between p-1">
+												<select name="categorie_{{item.id}}" id="ligne_{{item.id}}" class="form-select">
+													<option value="null"></option>
+													{% for cat in categories %}
+														<option value="{{cat.id}}">{{cat}}</option>
+													{% endfor %}
+
+												</select>
+											</td>
+										</tr>
+									{% else %}
+										<tr>
+											<td colspan="6" class="text-center">Aucun éléments</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+
+							</table>
+
+						</div>
+
+					</form>
+
+				</fieldset>
+
+			{% endif %}
+
 
 			<fieldset>
-				<legend></legend>
+				<div class="my-3">
+					<select name="bank_account_select" id="bank_account_select">
+						{% for bank_account in app.user.bankAccounts %}
+							<option value="{{bank_account.id}}" {% if bank_account.id == current_bank_account.id %} selected {% endif %}>{{bank_account}}</option>
+						{% endfor %}
+
+					</select>
+				</div>
+
+
 				<div class="table-responsive">
-				{% include "/templates/tables_lignes.html.twig" with {lignes : lignes} %}
-			
-			</div>
+					{% include "/templates/tables_lignes.html.twig" with {lignes : current_bank_account.getAccountantEntry(sort,order)} %}
+
+				</div>
 
 			</fieldset>
 		</div>

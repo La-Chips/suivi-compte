@@ -6,10 +6,53 @@
 {% endblock %}
 
 {% block title %}
-	Résumé {{ app.request.get('month')}} {{app.request.get('year') }} - Tech&Dev
+	Résumé
+	{{ app.request.get('month')}}
+	{{app.request.get('year') }}
+	- Tech&Dev
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+
+
 {% endblock %}
 
 {% block body %}
+	<div class="d-flex justify-content-end">
+		<div class="btn-group">
+			<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+				Actions
+			</button>
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+				<a class="dropdown-item" >Partager</a>
+				
+			</div>
+		</div>
+	</div>
+
 	<div class="container py-3 table-responsive">{% include "/templates/tables_lignes.html.twig" with {lignes : lignes} %}</div>
 
+
+	<script defer>
+
+		let selected_items = [];
+
+let checkboxs = document.getElementsByTagName('input');
+
+for (let i = 0; i < checkboxs.length; i++) {
+checkboxs[i].addEventListener('click', (event) => {
+if (event.target.checked) 
+selected_items.push(event.target);
+ else {
+let index = selected_items.indexOf(event.target);
+selected_items.splice(index, 1);
+}
+
+
+console.log(selected_items);
+})
+}
+	</script>
 {% endblock %}

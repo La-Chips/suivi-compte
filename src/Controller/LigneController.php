@@ -128,4 +128,14 @@ class LigneController extends AbstractController
 
         return $this->redirectToRoute('home', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/share/user',name:'line_share')]
+    public function share(Request $request,LigneRepository $ligneRepository,UserRepository $userRepository){
+        
+
+        return $this->render('ligne/share.html.twig',[
+            'users' => $userRepository->findAll(),
+            'lines'=> $ligneRepository->findAll(),
+        ]);
+    }
 }

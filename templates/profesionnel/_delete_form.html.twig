@@ -1,4 +1,0 @@
-<form method="post" action="{{ path('profesionnel_delete', {'id': profesionnel.id}) }}" onsubmit="return confirm('Êtes-vous sûre de vouloir supprimer ce contact ?');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ profesionnel.id) }}">
-    <button class="btn btn-danger m-2 rounded">Supprimer</button>
-</form>

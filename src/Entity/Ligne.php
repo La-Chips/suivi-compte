@@ -78,6 +78,16 @@ class Ligne
      */
     private $user;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=BankAccount::class, inversedBy="accountantEntry")
+     */
+    private $bankAccount;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $closed;
+
     public function __construct()
     {
         $this->date_insert = new \DateTime('now', new \DateTimeZone('Europe/paris'));
@@ -248,6 +258,30 @@ class Ligne
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getBankAccount(): ?BankAccount
+    {
+        return $this->bankAccount;
+    }
+
+    public function setBankAccount(?BankAccount $bankAccount): self
+    {
+        $this->bankAccount = $bankAccount;
+
+        return $this;
+    }
+
+    public function getClosed(): ?bool
+    {
+        return $this->closed;
+    }
+
+    public function setClosed(bool $closed): self
+    {
+        $this->closed = $closed;
 
         return $this;
     }
