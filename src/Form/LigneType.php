@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\BankAccount;
 use App\Entity\Categorie;
 use App\Entity\Ligne;
 use App\Entity\Statut;
@@ -51,13 +52,18 @@ class LigneType extends AbstractType
                     'placeholder' => 'CB, Virement, Espèces, ...'
                 )
             ])
-            ->add('statut', EntityType::class, array(
-                'class' => Statut::class,
-                'choice_label' => 'libelle',
-                'data' => $options['statut'],
+            ->add('bankAccount', EntityType::class, array(
+                'class' => BankAccount::class,
+                'choice_label' => 'label',
                 'attr' => array(
                     'class' => 'form-select'
-                )
+                ),
+                'query_builder' => function (\Doctrine\ORM\EntityRepository $er) use ($options) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.user = :user')
+                        ->setParameter('user', $options['user_id']);
+                },
+
             ))
             ->add('categorie',EntityType::class, array(
                 'class' => Categorie::class,

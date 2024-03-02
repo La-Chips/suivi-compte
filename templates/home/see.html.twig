@@ -19,6 +19,7 @@
 {% endblock %}
 
 {% block body %}
+	<form action="{{path('line_share')}}" method="POST" id="share_form">
 	<div class="d-flex justify-content-end">
 		<div class="btn-group">
 			<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -26,22 +27,24 @@
 			</button>
 			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 
-				<a class="dropdown-item" >Partager</a>
-				
+				<a class="dropdown-item" id="share_btn">Partager</a>
+
 			</div>
 		</div>
 	</div>
 
 	<div class="container py-3 table-responsive">{% include "/templates/tables_lignes.html.twig" with {lignes : lignes} %}</div>
 
+</form>
+<script defer>
 
-	<script defer>
-
-		let selected_items = [];
+	let selected_items = [];
 
 let checkboxs = document.getElementsByTagName('input');
 
 for (let i = 0; i < checkboxs.length; i++) {
+checkboxs[i].checked = false;
+
 checkboxs[i].addEventListener('click', (event) => {
 if (event.target.checked) 
 selected_items.push(event.target);
@@ -51,8 +54,12 @@ selected_items.splice(index, 1);
 }
 
 
-console.log(selected_items);
 })
 }
-	</script>
-{% endblock %}
+
+document.getElementById('share_btn').addEventListener('click', () => {
+let form = document.getElementById('share_form');
+form.submit();
+
+});
+</script>{% endblock %}

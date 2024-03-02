@@ -57,7 +57,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    #[Route('/{bank_account}', name: 'home')]
+    #[Route('/home/{bank_account}', name: 'home')]
     public function index(Request $request,BankAccount $bank_account,LigneRepository $ligneRepository,
     SessionInterface $session,UserRepository $userRepository,CategorieRepository $categorieRepository,
     ): Response
@@ -224,7 +224,7 @@ class HomeController extends AbstractController
         $etape = new Etapes($line, $statut);
         $em->persist($etape);
         $em->flush();
-        return $this->redirectToRoute('home');
+        return $this->redirectToRoute('home_redirect');
     }
 
 
@@ -249,7 +249,7 @@ class HomeController extends AbstractController
 
       
         $this->sync($entityManager,$categorieRepository,$ligneRepository,$filterRepository);
-        return $this->redirectToRoute('home');
+        return $this->redirectToRoute('home_redirect');
     }
 
 
@@ -301,7 +301,7 @@ class HomeController extends AbstractController
             $ligne->setCategorie($categorie);
             $this->getDoctrine()->getManager()->flush();
         }
-        return $this->redirectToRoute('home');
+        return $this->redirectToRoute('home_redirect');
     }
 
 

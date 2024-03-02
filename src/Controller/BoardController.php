@@ -13,7 +13,7 @@ class BoardController extends AbstractController
     #[Route('/board', name: 'app_board')]
     public function index(Request $request,LigneRepository $ligneRepository): Response
     {
-
+        $year = $request->query->get('year') != null ? $request->query->get('year') : date('Y');
         $unclosed_entry = $ligneRepository->findUnclosedEntries();
         $months = [];
 
@@ -21,6 +21,7 @@ class BoardController extends AbstractController
             $months_id = $entry->getDate()->format('m');
             $months[$months_id]["entry"][] = $entry;
             $months[$months_id]["name"] = $entry->getDate()->format('F');
+            $months[$months_id]["id"] = $entry->getDate()->format('m');
             if(isset($months[$months_id]["amount"]))
                 $months[$months_id]["amount"] += $entry->getAmount();
             else
@@ -32,8 +33,22 @@ class BoardController extends AbstractController
 
         }
 
-        $request->query->get('month') != null ? $month = $request->query->get('month') : $month = date('F');
-        $request->query->get('year') != null ? $year = $request->query->get('year') : $year = date('Y');
+        
+
+
+        
+        
+
+        return $this->render('board/index.html.twig', [
+            'months' => $months,
+            'year' => $year,
+            
+        ]);
+    }
+
+    #[Route('/board/{year}/{month}', name: 'app_month_board')]
+    public function month_board(Request $request,int $year,string $month,LigneRepository $ligneRepository)
+    {
      
 
         $income = $ligneRepository->getIncomeByMonth($month, $year, $this->getUser());
@@ -48,6 +63,17 @@ class BoardController extends AbstractController
         foreach ($shares as $share) {
             $userId = $share['user_id'];
             $sum += $share['amount'];
+            
+            $owners = $ligneRepository->find($share['id'])->getOwner();
+            foreach($owners as $owner){
+                $ownerId = $owner->getId();
+                if(!isset($shares_by_user[$ownerId]))
+                    $shares_by_user[$ownerId] = [
+                        'user' => $owner->__toString(),
+                        'amount' => 0
+                    ];
+            }
+
             if(isset($shares_by_user[$userId])) {
                 $shares_by_user[$userId]['amount'] += $share['amount'];
             } else {
@@ -58,16 +84,12 @@ class BoardController extends AbstractController
             }
         }
 
+
         foreach ($shares_by_user as $key => $value) {
             $shares_by_user[$key]['shares'] = $sum / count($shares_by_user);
         }
 
-
-        
-        
-
-        return $this->render('board/index.html.twig', [
-            'months' => $months,
+        return $this->render('board/month_view.html.twig',[
             'balance'=> [
                 'incomes' => $income,
                 'expenses' => $expense,

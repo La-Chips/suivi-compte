@@ -157,6 +157,7 @@ class LigneRepository extends ServiceEntityRepository
         ->innerJoin('line.user', 'user')
             ->where('MONTHNAME(line.date) = :month and YEAR(line.date) = :year')
         ->andWhere(':user in (own.id) OR line.user = :user ')
+        ->andWhere('line.montant < 0')
             ->groupBy('id,line.date,user_id,line.libelle,line.montant')
             ->having('COUNT(own.id) > 0')
             ->setParameters(array(

@@ -61,12 +61,21 @@ class LigneController extends AbstractController
         $form = $this->createForm(LigneType::class, $ligne, ['statut' => $statut, 'categories' => $categories, 'user_id' => $this->getUser()->getId()]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $shared_people = $request->request->get('ligne')['owner'] ?? [];
+
+            if($ligne->getOwner()->count() == 0){
+                foreach ($shared_people as $user_id) {
+                    $user = $userRepository->findOneBy(['id' => $user_id]);
+                    $ligne->addOwner($user);
+                }
+            }
+
             $ligne->setUser($this->getUser());
             $ligne->setOrigine(0); //zero means it's a ligne add manually by the user
             $entityManager->persist($ligne);
             $entityManager->flush();
 
-            return $this->redirectToRoute('home', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('home_redirect', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('ligne/new.html.twig', [
@@ -126,16 +135,35 @@ class LigneController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('home', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('home_redirect', [], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/share/user',name:'line_share')]
     public function share(Request $request,LigneRepository $ligneRepository,UserRepository $userRepository){
         
+        $lines = $request->request->get('entry');     
+        $lines = $ligneRepository->findBy(['id'=>$lines]);   
+
+        $users = $request->request->get('users');
+        if($users != null){
+            $users = $userRepository->findBy(['id'=>$users]);
+
+            foreach($lines as $line){
+                foreach($users as $user){
+                    $line->addOwner($user);
+                }
+            }
+
+            $entityManager = $this->getDoctrine()->getManager();    
+            $entityManager->flush();
+
+            return $this->redirectToRoute('resume');
+
+        }
 
         return $this->render('ligne/share.html.twig',[
             'users' => $userRepository->findAll(),
-            'lines'=> $ligneRepository->findAll(),
+            'lines'=> $lines,
         ]);
     }
 }

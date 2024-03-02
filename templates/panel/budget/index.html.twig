@@ -36,11 +36,7 @@
 						{% for bankAccount in app.user.bankAccounts %}
 						{% set current_value  = bankAccount.getScheduleBalance(month_id) %}
 
-						{% if current_value < 0 %}
-								{% set color = "bg-danger" %}
-							{% else %}
-								{% set color = "bg-success" %}
-							{% endif %}
+						
 
 						{% if month_id == 0 %}
 							{% set current_value = current_value + bankAccount.initialValue %}
@@ -51,12 +47,19 @@
 
 
 							{% set accounts_total = accounts_total + current_value  %}
+
+							
 							
 							{% if bankAccount.label not in accounts_value|keys %}
 								{% set accounts_value = accounts_value|merge({ (bankAccount.label) : current_value}) %}
 							{% else %}
 								
 								{% set accounts_value = accounts_value|merge({ (bankAccount.label) : accounts_value[bankAccount.label] + current_value}) %}
+							{% endif %}
+							{% if accounts_value[bankAccount.label] < 0 %}
+								{% set color = "bg-danger" %}
+							{% else %}
+								{% set color = "bg-success" %}
 							{% endif %}
 
 							

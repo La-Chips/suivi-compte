@@ -86,7 +86,7 @@ class Ligne
     /**
      * @ORM\Column(type="boolean")
      */
-    private $closed;
+    private $closed = false;
 
     public function __construct()
     {
