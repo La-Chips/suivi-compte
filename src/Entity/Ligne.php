@@ -233,6 +233,11 @@ class Ligne
         return $this;
     }
 
+    public function hasOwner() : bool
+     {
+        return $this->owner->count() > 0;
+    }
+
     public function __toString()
     {
         return $this->id;

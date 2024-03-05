@@ -19,6 +19,10 @@ main {
     color: white;
 }
 
+.bg-pink{
+    background-color: rgb(210, 160, 168);
+}
+
 .bg-light-grey {
     background-color: #DDD;
 }

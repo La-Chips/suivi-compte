@@ -27,7 +27,7 @@
 				<legend>Catégorie</legend>
 				<div>
 					<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createCategorie">Créer</button>
-					<table class="table table-striped">
+					<table class="table table-striped align-middle">
 						<thead>
 							<th>Libelle</th>
 							<th></th>
@@ -35,7 +35,16 @@
 						<tbody>
 							{% for item in categories %}
 								<tr>
-									<td>{{item}}</td>
+									<td>
+										{% if item.color is not empty %}
+											<div class="rounded p-3 bg-{{item.color}}">
+												{{item}}
+											</div>
+										{% else %}
+											{{item}}
+										{% endif %}
+										
+									</td>
 									<td class="d-flex">
 										<a href="{{path('delete',{option: 'categorie' , id: item.id})}}" class="btn btn-danger">
 											<img src="{{ asset('img/cross-circle.svg') }}" alt="del" width="30">

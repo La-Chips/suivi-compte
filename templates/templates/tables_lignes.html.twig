@@ -80,6 +80,11 @@
 				</td>
 
 				<td>
+					{% if item.hasOwner() %}
+				<i class="fas fa-users"></i>
+
+					{% endif %}
+					
 					<div {% if bg is defined %} class="{{bg}} rounded py-3" {% endif %}>
 						{{item.categorie}}
 					</div>
