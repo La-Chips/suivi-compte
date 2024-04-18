@@ -15,6 +15,20 @@ fieldset {
     border-radius: 5px;
 }
 
+/* Filter */
+.wrapper-filter{
+    background-color: #555;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.wrapper-filter > div{
+    margin: 1rem 0;
+}
+
+.wrapper-filter label{
+    color: white !important;
+}
 
 /* dark mode  */
 

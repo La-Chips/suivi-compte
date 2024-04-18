@@ -7,6 +7,121 @@
 	<link rel="stylesheet" href="{{ asset('css/home.css') }}">
 {% endblock %}
 
+{% block javascripts %}
+	{{ parent() }}
+
+	<script defer>
+		var params = {
+			sort: 'date',
+			order: 'DESC',
+			bank_account: {{current_bank_account.id}},
+			categories: [],
+			unlimited: 0,
+			label: '',
+			startDate: '',
+			endDate: ''
+		}
+		function updateCheckbox(id) {
+			if (params.categories.includes(id)) {
+				params.categories = params.categories.remove(id);
+			} else {
+				params.categories.push(id);
+			}
+			updateTable()
+			
+		}
+
+		function updateTable() {
+			fetch("{{path('render_table_lines')}}", {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(params),
+			})
+				.then(response => response.text())
+				.then(data => {
+					document.querySelector('#complete_table').innerHTML = data;
+				})
+				.catch((error) => {
+					console.error('Error:', error);
+				});
+		}
+
+		function forceUnchecked() {
+			document.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+				checkbox.checked = false;
+			})
+		}
+
+		function clearInputs() {
+			document.querySelectorAll('input[type="text"]').forEach((input) => {
+				input.value = '';
+			})
+			document.querySelectorAll('input[type="date"]').forEach((input) => {
+				input.value = '';
+			})
+		}
+
+		function setupRefresh(){
+			forceUnchecked();
+			clearInputs();
+		}
+
+		// jquery document is ready
+		$(document).ready(function () {
+			setupRefresh();
+			
+			$('#bank_account_select').change(function () {
+				params.bank_account = $(this).val();
+				updateTable()
+			})
+
+			$('#sort').change(function () {
+				params.sort = $(this).val();
+				updateTable()
+			})
+
+			$('#order').change(function () {
+				params.order = $(this).val();
+				updateTable()
+			})
+
+			$('#unlimited').change(function () {
+				params.unlimited = $(this).val();
+				updateTable()
+			})
+
+			$('#category_container input').change(function () {
+				updateCheckbox($(this).val())
+			})
+			
+			$('#label').change(function () {
+				params.label = $(this).val();
+				updateTable()
+			})
+
+			$('#startDate').change(function () {
+				params.startDate = $(this).val();
+				updateTable()
+			})
+
+			$('#endDate').change(function () {
+				params.endDate = $(this).val();
+				updateTable()
+			})
+
+			updateTable()
+
+
+
+		})
+
+	
+	</script>
+
+{% endblock %}
+
 {% block body %}
 
 	<div class="d-flex justify-content-end">
@@ -220,23 +335,52 @@
 			{% endif %}
 
 
-			<fieldset>
-				<div class="my-3">
-					<select name="bank_account_select" id="bank_account_select">
-						{% for bank_account in app.user.bankAccounts %}
-							<option value="{{bank_account.id}}" {% if bank_account.id == current_bank_account.id %} selected {% endif %}>{{bank_account}}</option>
+			<div class="d-flex">
+				<div class="wrapper-filter">
+					<div class="form-check ms-3">
+						<input type="checkbox" name="unlimited" id="unlimited" class="form-check-input" value="0">
+						<label class="form-check-label" for="unlimited">Affichage non limité</label>
+					</div>
+					<div class="form-row">
+						<label for="label">Libelle</label>
+						<input type="text" name="label" id="label" class="form-control" value="">
+					</div>
+					<div class="form-row">
+						<label for="startDate">Date de début</label>
+						<input type="date" name="startDate" id="startDate" class="form-control" value="">
+					</div>
+					<div class="form-row">
+						<label for="endDate">Date de fin</label>
+						<input type="date" name="endDate" id="endDate" class="form-control" value="">
+					</div>
+					<div id="category_container">
+						<label for="category">Catégories</label>
+						{% for category in app.user.categories %}
+							<div class="form-check ms-3">
+								<input type="checkbox" name="category" id="category" class="form-check-input" value="{{category.id}}">
+								<label class="form-check-label" for="category">{{category}}</label>
+							</div>
 						{% endfor %}
-
-					</select>
+					</div>
 				</div>
 
+				<fieldset class="flex-fill">
+					<div class="my-3">
+						<select name="bank_account_select" id="bank_account_select">
+							{% for bank_account in app.user.bankAccounts %}
+								<option value="{{bank_account.id}}" {% if bank_account.id == current_bank_account.id %} selected {% endif %}>{{bank_account}}</option>
+							{% endfor %}
 
-				<div class="table-responsive">
-					{% include "/templates/tables_lignes.html.twig" with {lignes : current_bank_account.getAccountantEntry(sort,order)} %}
+						</select>
+					</div>
 
-				</div>
 
-			</fieldset>
+					<div class="table-responsive" id="complete_table">
+
+					</div>
+
+				</fieldset>
+			</div>
 		</div>
 
 	</div>

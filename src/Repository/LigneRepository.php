@@ -20,6 +20,37 @@ class LigneRepository extends ServiceEntityRepository
         parent::__construct($registry, Ligne::class);
     }
 
+    public function findByFilter($criteria,$limit= 100){
+        $qb = $this->createQueryBuilder('l')
+ 
+            ->setMaxResults($limit);
+
+        if($criteria['categories'] != []){
+            $qb->andWhere('l.categorie in (:categorie)')
+                ->setParameter('categorie',$criteria['categories']);
+        }
+
+        if($criteria['label'] != ''){
+            $qb->andWhere('l.libelle like :label')
+                ->setParameter('label','%'.$criteria['label'].'%');
+        }
+
+        if($criteria['startDate'] != ''){
+            $qb->andWhere('l.date >= :startDate')
+                ->setParameter('startDate',$criteria['startDate']);
+        }
+
+        if($criteria['endDate'] != ''){
+            $qb->andWhere('l.date <= :endDate')
+                ->setParameter('endDate',$criteria['endDate']);
+        }
+
+
+
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function exist(Ligne $ligne)
     {
         $qb = $this->createQueryBuilder('l')
