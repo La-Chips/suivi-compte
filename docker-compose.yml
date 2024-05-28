@@ -2,13 +2,13 @@ version: '3.8'
 
 services:
   compta:
-    container_name: compta
+    container_name: compta_app
     restart: always
     build: .
     ports:
         - 8080:80
-    env_file:
-      - .env
+    environment:
+      PRIVATE_KEY: ${PRIVATE_KEY}
     depends_on:
       - db_compta
 
