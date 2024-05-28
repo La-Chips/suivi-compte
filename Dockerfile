@@ -17,7 +17,7 @@ COPY ./entrypoint.sh /entrypoint.sh
 
 COPY . /var/www
 
-RUN eccho $PRIVATE_KEY > /var/www/config/secrets/prod/prod.decrypt.private.php
+RUN echo $PRIVATE_KEY > /var/www/config/secrets/prod/prod.decrypt.private.php
  
 WORKDIR /var/www
 RUN chmod -R 777 /var/www
