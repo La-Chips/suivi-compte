@@ -16,7 +16,7 @@ COPY ./apache.conf /etc/apache2/sites-enabled/000-default.conf
 COPY ./entrypoint.sh /entrypoint.sh
 
 COPY . /var/www
-COPY /tmp/prod.decrypt.private.php /var/www/config/secrets/prod/prod.decrypt.private.php
+COPY /compta/prod.decrypt.private.php /var/www/config/secrets/prod/prod.decrypt.private.php
  
 WORKDIR /var/www
 RUN chmod -R 777 /var/www
