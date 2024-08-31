@@ -45,6 +45,21 @@ class LigneRepository extends ServiceEntityRepository
                 ->setParameter('endDate',$criteria['endDate']);
         }
 
+        switch($criteria['sort']){
+            case 'date':
+                $qb->orderBy('l.date',$criteria['order']);
+                break;
+            case 'amount':
+                $qb->orderBy('l.montant',$criteria['order']);
+                break;
+            case 'label':
+                $qb->orderBy('l.libelle',$criteria['order']);
+                break;
+            case 'categorie':
+                $qb->orderBy('l.categorie',$criteria['order']);
+                break;
+        }
+
 
 
 

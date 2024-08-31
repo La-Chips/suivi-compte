@@ -38,12 +38,7 @@ class LigneType extends AbstractType
                     'placeholder' => 'Boulangerie, Carrefour, ...'
                 ),
             ])
-            ->add('libelle_2', null, [
-                'label' => 'Libellé 2',
-                'attr' => array(
-                    'placeholder' => 'Boulangerie, Carrefour, ...'
-                ),
-            ])
+
             ->add('montant',MoneyType::class)
             ->add('type',null, [
                 'data' => $options['type'],
