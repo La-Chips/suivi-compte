@@ -48,15 +48,21 @@ class ScheduleExpenseRepository extends ServiceEntityRepository
     }
 
     // findByUser
-    public function findByUser(int $user_id): array
+    public function findByUser(int $user_id,array $criteria = []): array
     {
-        return $this->createQueryBuilder('s')
+        $qb =  $this->createQueryBuilder('s')
             ->join('s.bankAccount', 'b')
             ->join('b.user', 'u')
             ->andWhere('u.id = :user')
             ->setParameter('user', $user_id)
-            ->orderBy('s.id', 'ASC')
-            ->getQuery()
+            ->orderBy('s.id', 'ASC');
+
+            if(isset($criteria['sort']) && isset($criteria['order'])){
+                $qb->orderBy('s.'.$criteria['sort'], $criteria['order']);
+            }
+
+
+            return $qb->getQuery()
             ->getResult()
         ;
     }

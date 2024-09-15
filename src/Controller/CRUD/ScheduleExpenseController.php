@@ -16,10 +16,17 @@ use Symfony\Component\Routing\Annotation\Route;
 class ScheduleExpenseController extends AbstractController
 {
     #[Route('/', name: 'app_schedule_expense_index', methods: ['GET'])]
-    public function index(ScheduleExpenseRepository $scheduleExpenseRepository): Response
+    public function index(Request $request,ScheduleExpenseRepository $scheduleExpenseRepository): Response
     {
+        $sort = $request->query->get('sort') ?? "id";
+        $order = $request->query->get('order') ?? "asc";
+
         return $this->render('crud/schedule_expense/index.html.twig', [
-            'schedule_expenses' => $scheduleExpenseRepository->findByUser($this->getUser()->getId()),
+            'schedule_expenses' => $scheduleExpenseRepository->findByUser($this->getUser()->getId(),[
+                'sort' => $sort,
+                'order' => $order,
+            ])
+
         ]);
     }
 
