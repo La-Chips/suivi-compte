@@ -14,7 +14,7 @@ services:
 
   db_compta:
     container_name: db_compta
-    image: mysql:latest
+    image: mysql:8.0.39
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
