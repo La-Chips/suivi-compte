@@ -305,15 +305,18 @@ class HomeController extends AbstractController
     }
 
 
-    #[NoReturn] #[Route('/export', name: 'export')]
+    #[Route('/export', name: 'export')]
     public function export(Request $request): Response
     {
         $lignes = $this->getDoctrine()->getRepository(Ligne::class)->findAll();
 
         $file = fopen('comptes.csv', 'w');
+        $header = ["Date","Catégorie", "Type", "Libelle", "Montant"];
+        fputcsv($file, $header, ';');
         foreach ($lignes as $ligne) {
             $array = array(
                 $ligne->getDate()->format('d/m/Y'),
+                $ligne->getCategorie()->getLibelle(),
                 $ligne->getType(),
                 $ligne->getLibelle(),
                 $ligne->getMontant()
@@ -322,7 +325,12 @@ class HomeController extends AbstractController
             fputcsv($file, $array, ';');
         }
         fclose($file);
-        die();
+        
+        // Download file 
+        header('Content-Type: application/csv');
+        header('Content-Disposition: attachment; filename=comptes.csv');
+        readfile('comptes.csv');
+        exit();        
     }
     private function MonthsToMois($months): array
     {
